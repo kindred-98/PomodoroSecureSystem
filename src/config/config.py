@@ -9,10 +9,10 @@ load_dotenv()
 # ============================
 MONGODB_URI = os.getenv(
     "MONGODB_URI",
-    "mongodb+srv://user:p@cluster0.mongodb.net/?appName=Cluster0"
+    "mongodb+srv://user:pass@cluster0.mongodb.net/?appName=Cluster0"
 )
 
-if not MONGODB_URI or "p" in MONGODB_URI:
+if not MONGODB_URI or "YOUR_PASSWORD" in MONGODB_URI:
     raise ValueError(
         "❌ MONGODB_URI no está configurada en .env\n"
         "Por favor, configura tu variable de entorno MONGODB_URI"

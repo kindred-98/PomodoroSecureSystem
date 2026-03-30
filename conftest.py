@@ -63,9 +63,9 @@ def usuario_empleado_mock():
         "email": "ana@empresa.com",
         "rol": "empleado",
         "equipo_id": ObjectId(),
-        "p_encriptada": "<TEST_FERNET_ENCRYPTED>",
-        "p_hash": "<TEST_BCRYPT_HASH>",
-        "parametros_password": {
+        "RAWI_encriptada": "<TEST_FERNET_ENCRYPTED>",
+        "RAWI_hash": "<TEST_BCRYPT_HASH>",
+        "RAWI_parametros": {
             "longitud": 16,
             "usar_mayusculas": True,
             "usar_numeros": True,
@@ -97,9 +97,9 @@ def usuario_encargado_mock():
         "email": "carlos@empresa.com",
         "rol": "encargado",
         "equipo_id": ObjectId(),
-        "p_encriptada": "<TEST_FERNET_ENCRYPTED>",
-        "p_hash": "<TEST_BCRYPT_HASH>",
-        "parametros_password": {
+        "RAWI_encriptada": "<TEST_FERNET_ENCRYPTED>",
+        "RAWI_hash": "<TEST_BCRYPT_HASH>",
+        "RAWI_parametros": {
             "longitud": 20,
             "usar_mayusculas": True,
             "usar_numeros": True,
