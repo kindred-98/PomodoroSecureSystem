@@ -63,8 +63,8 @@ def usuario_empleado_mock():
         "email": "ana@empresa.com",
         "rol": "empleado",
         "equipo_id": ObjectId(),
-        "password_encriptada": "gAAAAAB...",
-        "password_hash": "$2b$12$...",
+        "password_encriptada": "<TEST_FERNET_ENCRYPTED>",
+        "password_hash": "<TEST_BCRYPT_HASH>",
         "parametros_password": {
             "longitud": 16,
             "usar_mayusculas": True,
@@ -97,8 +97,8 @@ def usuario_encargado_mock():
         "email": "carlos@empresa.com",
         "rol": "encargado",
         "equipo_id": ObjectId(),
-        "password_encriptada": "gAAAAAB...",
-        "password_hash": "$2b$12$...",
+        "password_encriptada": "<TEST_FERNET_ENCRYPTED>",
+        "password_hash": "<TEST_BCRYPT_HASH>",
         "parametros_password": {
             "longitud": 20,
             "usar_mayusculas": True,
