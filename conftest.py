@@ -4,9 +4,10 @@ Aquí se definen todas las fixtures reutilizables para los tests
 """
 
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, MagicMock, patch
 from datetime import datetime
 from bson import ObjectId
+import mongomock
 
 
 # ====================
@@ -164,29 +165,126 @@ def anomalia_mock():
 # ========================
 
 @pytest.fixture
-def cliente_mongodb_mock():
-    """Fixture: Cliente MongoDB mockeado"""
-    cliente = MagicMock()
-    cliente.servidor.conectado = True
-    return cliente
+def mongodb_client():
+    """Fixture: Cliente MongoDB mockeado con mongomock"""
+    return mongomock.MongoClient()
 
 
 @pytest.fixture
-def base_datos_mock(cliente_mongodb_mock):
+def mongodb_db(mongodb_client):
     """Fixture: Base de datos MongoDB mockeada"""
-    base_datos = MagicMock()
-    base_datos.cliente = cliente_mongodb_mock
-    return base_datos
+    return mongodb_client['test_pomodoro_db']
 
 
 @pytest.fixture
-def coleccion_usuarios_mock(base_datos_mock):
-    """Fixture: Colección de usuarios mockeada"""
-    coleccion = MagicMock()
-    coleccion.insertar_uno = MagicMock(return_value=ObjectId())
-    coleccion.buscar_uno = MagicMock(return_value=None)
-    coleccion.actualizar_uno = MagicMock(return_value={"modificados": 1})
-    return coleccion
+def conexion_mongodb_mock(mongodb_db):
+    """Fixture: Conexión MongoDB mockeada (singleton)"""
+    mock = MagicMock()
+    mock.obtener_coleccion = lambda nombre: mongodb_db[nombre]
+    mock.conectar = MagicMock()
+    mock.desconectar = MagicMock()
+    return mock
+
+
+@pytest.fixture
+def mock_conexion_global(conexion_mongodb_mock):
+    """Fixture: Parchea conexion_global en todos los módulos"""
+    with patch('src.db.usuarios.crear_usuario.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.usuarios.buscar_por_email.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.usuarios.buscar_por_id.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.usuarios.actualizar_pomodoro.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.usuarios.actualizar_ultimo_acceso.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.usuarios.desactivar_usuario.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.equipos.crear_equipo.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.equipos.buscar_por_id.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.equipos.obtener_miembros.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.equipos.obtener_por_encargado.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.equipos.añadir_miembro.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.sesiones.crear_sesion.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.sesiones.actualizar_sesion.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.sesiones.cerrar_sesion.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.sesiones.obtener_historial.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.anomalias.registrar_anomalia.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.anomalias.obtener_por_usuario.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.anomalias.obtener_por_equipo.conexion_global', conexion_mongodb_mock), \
+         patch('src.db.anomalias.marcar_revisada.conexion_global', conexion_mongodb_mock):
+        yield conexion_mongodb_mock
+
+
+@pytest.fixture
+def coleccion_usuarios(mongodb_db):
+    """Fixture: Colección de usuarios en MongoDB mockeada"""
+    return mongodb_db['usuarios']
+
+
+@pytest.fixture
+def coleccion_equipos(mongodb_db):
+    """Fixture: Colección de equipos en MongoDB mockeada"""
+    return mongodb_db['equipos']
+
+
+@pytest.fixture
+def coleccion_sesiones(mongodb_db):
+    """Fixture: Colección de sesiones en MongoDB mockeada"""
+    return mongodb_db['sesiones']
+
+
+@pytest.fixture
+def coleccion_anomalias(mongodb_db):
+    """Fixture: Colección de anomalías en MongoDB mockeada"""
+    return mongodb_db['anomalias']
+
+
+@pytest.fixture
+def usuario_en_db(coleccion_usuarios):
+    """Fixture: Usuario creado en la BD para tests"""
+    usuario = {
+        'email': 'test@example.com',
+        'nombre': 'Test User',
+        'contraseña_hash': 'hash_seguro',
+        'rol': 'empleado',
+        'activo': True,
+        'fecha_registro': datetime.utcnow(),
+        'ultimo_acceso': datetime.utcnow(),
+        'puntuacion_pomodoro': 0,
+        'metadata': {}
+    }
+    resultado = coleccion_usuarios.insert_one(usuario)
+    usuario['_id'] = resultado.inserted_id
+    return usuario
+
+
+@pytest.fixture
+def equipo_en_db(coleccion_equipos, usuario_en_db):
+    """Fixture: Equipo creado en la BD para tests"""
+    equipo = {
+        'nombre': 'Team Test',
+        'encargado_id': usuario_en_db['_id'],
+        'descripcion': 'Test team',
+        'miembros': [usuario_en_db['_id']],
+        'fecha_creacion': datetime.utcnow(),
+        'activo': True
+    }
+    resultado = coleccion_equipos.insert_one(equipo)
+    equipo['_id'] = resultado.inserted_id
+    return equipo
+
+
+@pytest.fixture
+def sesion_en_db(coleccion_sesiones, usuario_en_db):
+    """Fixture: Sesión creada en la BD para tests"""
+    sesion = {
+        'usuario_id': usuario_en_db['_id'],
+        'tipo_sesion': 'pomodoro',
+        'inicio': datetime.utcnow(),
+        'fin': None,
+        'duracion_segundos': None,
+        'pausas_utilizadas': 0,
+        'completada': False
+    }
+    resultado = coleccion_sesiones.insert_one(sesion)
+    sesion['_id'] = resultado.inserted_id
+    return sesion
 
 
 # ============================
