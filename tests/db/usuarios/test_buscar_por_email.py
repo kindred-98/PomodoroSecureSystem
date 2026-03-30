@@ -12,12 +12,12 @@ class TestBuscarPorEmailValidacion:
     
     def test_email_no_string(self, mock_conexion_global):
         """Debe fallar si email no es string"""
-        with pytest.raises(TypeError, match="email debe ser string"):
+        with pytest.raises(TypeError, match="Email debe ser string"):
             buscar_por_email(123)
     
     def test_email_vacio(self, mock_conexion_global):
         """Debe fallar si email es vacío"""
-        with pytest.raises(ValueError, match="email no puede estar vacío"):
+        with pytest.raises(ValueError, match="Email no puede estar vacío"):
             buscar_por_email('')
 
 

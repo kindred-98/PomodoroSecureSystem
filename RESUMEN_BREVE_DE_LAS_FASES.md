@@ -20,8 +20,8 @@
 - **Funciones:** 19 funciones CRUD (usuarios 6, equipos 5, sesiones 4, anomalías 4)
 - **Módulos:** 4 (usuarios, equipos, sesiones, anomalías)
 - **Conexión:** Singleton pattern con MongoDB Atlas
-- **Tests:** 13/63 pasando (21%), otros pendientes fixtures
-- **Líneas de código:** ~793 + tests
+- **Tests:** 218/265 pasando (82%), 47 fallando por fixtures incompletas
+- **Líneas de código:** ~793 + ~500 tests
 - **Documentación:** [FASE_3_DATABASE_CRUD.md](docs/FASE_3_DATABASE_CRUD.md)
 
 ## FASE 4: Autenticación y OTP ⏳ PLANEADA
