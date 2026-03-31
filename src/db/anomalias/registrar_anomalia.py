@@ -19,7 +19,7 @@ Excepciones:
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def registrar_anomalia(usuario_id: str, tipo: str, descripcion: str) -> dict:

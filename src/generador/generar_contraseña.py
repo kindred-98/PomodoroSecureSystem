@@ -6,7 +6,7 @@ basadas en parámetros del usuario.
 
 import secrets
 import string
-from .asegurar_tipos_caracteres import asegurar_tipos_caracteres
+from src.generador.asegurar_tipos_caracteres import asegurar_tipos_caracteres
 
 
 def generar_contraseña(parametros: dict) -> str:

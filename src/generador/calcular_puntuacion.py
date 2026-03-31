@@ -5,10 +5,10 @@ de evaluación de contraseñas en un sistema de puntuación unificado.
 """
 
 import math
-from .generar_contraseña import generar_contraseña
-from .detectar_patrones import detectar_patrones
-from .evaluar_fortaleza import evaluar_fortaleza
-from .mezclar_contraseña import mezclar_contraseña as mezclar
+from src.generador.generar_contraseña import generar_contraseña
+from src.generador.detectar_patrones import detectar_patrones
+from src.generador.evaluar_fortaleza import evaluar_fortaleza
+from src.generador.mezclar_contraseña import mezclar_contraseña as mezclar
 
 
 def calcular_puntuacion(contraseña: str, incluir_analisis: bool = False) -> dict:

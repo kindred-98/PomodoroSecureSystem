@@ -4,7 +4,7 @@ Responsabilidad: Buscar un equipo por su ID.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def buscar_por_id(equipo_id: str) -> dict:

@@ -4,9 +4,9 @@ Responsabilidad: Cambio manual de contraseña por el usuario.
 Requiere que la nueva contraseña alcance nivel "Muy Fuerte" (99%+).
 """
 
-from ..db.conexion import conexion_global
-from ..seguridad.encriptacion import hashear_contraseña, cifrar
-from ..generador import evaluar_fortaleza
+from src.db.conexion import conexion_global
+from src.seguridad.encriptacion import hashear_contraseña, cifrar
+from src.generador import evaluar_fortaleza
 
 
 def cambiar_contraseña(usuario_id: str, nueva_contraseña: str) -> dict:

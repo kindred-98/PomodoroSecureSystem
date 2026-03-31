@@ -5,7 +5,7 @@ Responsabilidad: Crear un nuevo equipo.
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "") -> dict:

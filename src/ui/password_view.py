@@ -4,7 +4,7 @@ Responsabilidad: Gestión de contraseña del usuario (ver, regenerar, cambiar, e
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class PasswordView(ctk.CTkFrame):
@@ -181,7 +181,7 @@ class PasswordView(ctk.CTkFrame):
             self.label_ver_resultado.configure(text="Introduce tu contraseña", text_color=PELIGRO)
             return
         try:
-            from ..auth import ver_contraseña
+            from src.auth import ver_contraseña
             resultado = ver_contraseña(str(self.usuario['_id']), pw)
             self.label_ver_resultado.configure(
                 text=f"Tu contraseña: {resultado}", text_color=COMPLETADO
@@ -191,7 +191,7 @@ class PasswordView(ctk.CTkFrame):
 
     def _regenerar(self):
         try:
-            from ..auth import regenerar_contraseña
+            from src.auth import regenerar_contraseña
             params = self.usuario.get('parametros_contraseña', {
                 "longitud": 20, "usar_mayusculas": True,
                 "usar_numeros": True, "usar_simbolos": True,
@@ -213,7 +213,7 @@ class PasswordView(ctk.CTkFrame):
             )
             return
         try:
-            from ..auth import cambiar_contraseña
+            from src.auth import cambiar_contraseña
             resultado = cambiar_contraseña(str(self.usuario['_id']), pw)
             self.label_manual_resultado.configure(
                 text=resultado['mensaje'], text_color=COMPLETADO
@@ -223,7 +223,7 @@ class PasswordView(ctk.CTkFrame):
 
     def _exportar(self):
         try:
-            from ..auth import exportar_contraseña
+            from src.auth import exportar_contraseña
             from tkinter import filedialog
             ruta = filedialog.asksaveasfilename(
                 defaultextension=".enc",

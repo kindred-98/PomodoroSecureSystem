@@ -4,8 +4,8 @@ Responsabilidad: Ver la contraseña encriptada de un usuario.
 Requiere validación de identidad (contraseña de login).
 """
 
-from ..db.conexion import conexion_global
-from ..seguridad.encriptacion import verificar_contraseña, descifrar
+from src.db.conexion import conexion_global
+from src.seguridad.encriptacion import verificar_contraseña, descifrar
 
 
 def ver_contraseña(usuario_id: str, contraseña_login: str) -> str:

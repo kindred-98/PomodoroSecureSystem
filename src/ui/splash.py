@@ -4,7 +4,7 @@ Responsabilidad: Splash Screen de carga inicial.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class SplashView(ctk.CTkFrame):

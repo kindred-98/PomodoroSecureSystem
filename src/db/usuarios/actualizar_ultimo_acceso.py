@@ -5,7 +5,7 @@ Responsabilidad: Actualizar timestamp del último acceso del usuario.
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def actualizar_ultimo_acceso(usuario_id: str) -> dict:

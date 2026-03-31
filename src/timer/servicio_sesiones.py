@@ -6,7 +6,7 @@ NO sabe nada de threading ni lógica de ciclos.
 """
 
 from datetime import datetime, timezone
-from ..db.conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def registrar_sesion_pomodoro(usuario_id: str, datos_ciclo: dict, duracion_min: int) -> dict:

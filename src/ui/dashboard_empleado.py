@@ -4,7 +4,7 @@ Responsabilidad: Dashboard principal del empleado con timer Pomodoro.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class DashboardEmpleado(ctk.CTkFrame):
@@ -174,7 +174,7 @@ class DashboardEmpleado(ctk.CTkFrame):
     def _iniciar_ciclo(self):
         """Inicia un ciclo Pomodoro."""
         try:
-            from ..timer import iniciar_ciclo
+            from src.timer import iniciar_ciclo
             resultado = iniciar_ciclo(str(self.usuario['_id']))
             self.ciclo_activo = True
             self.estado_timer = "TRABAJANDO"
@@ -192,7 +192,7 @@ class DashboardEmpleado(ctk.CTkFrame):
     def _pausar_reanudar(self):
         """Pausa o reanuda el timer."""
         try:
-            from ..pausas import iniciar_pausa, finalizar_pausa
+            from src.pausas import iniciar_pausa, finalizar_pausa
             uid = str(self.usuario['_id'])
 
             if self.estado_timer == "PAUSADO":
@@ -237,7 +237,7 @@ class DashboardEmpleado(ctk.CTkFrame):
     def _manejar_pomodoro_completado(self):
         """Maneja la finalización de un pomodoro."""
         try:
-            from ..timer import manejar_evento_timer
+            from src.timer import manejar_evento_timer
             uid = str(self.usuario['_id'])
             resultado = manejar_evento_timer(uid, "pomodoro_completado")
 

@@ -16,7 +16,7 @@ Excepciones:
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def obtener_por_usuario(usuario_id: str, limite: int = 50) -> list:

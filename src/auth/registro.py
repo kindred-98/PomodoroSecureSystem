@@ -3,10 +3,10 @@ Módulo: registro.py
 Responsabilidad: Flujo completo de registro de nuevos usuarios.
 """
 
-from ..seguridad.encriptacion import hashear_contraseña, cifrar
-from ..generador import generar_contraseña
-from ..db.usuarios import crear_usuario
-from ..db.conexion import conexion_global
+from src.seguridad.encriptacion import hashear_contraseña, cifrar
+from src.generador import generar_contraseña
+from src.db.usuarios import crear_usuario
+from src.db.conexion import conexion_global
 
 
 def registrar_usuario(

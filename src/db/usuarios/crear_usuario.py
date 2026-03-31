@@ -5,7 +5,7 @@ Responsabilidad: Crear un nuevo usuario en la base de datos.
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "empleado") -> dict:

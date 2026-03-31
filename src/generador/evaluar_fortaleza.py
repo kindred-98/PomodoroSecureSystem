@@ -5,7 +5,7 @@ usando un sistema de puntuación integrado.
 """
 
 import math
-from .detectar_patrones import detectar_patrones
+from src.generador.detectar_patrones import detectar_patrones
 
 
 def evaluar_fortaleza(contraseña: str) -> dict:

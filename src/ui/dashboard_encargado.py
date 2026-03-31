@@ -4,7 +4,7 @@ Responsabilidad: Dashboard del encargado con timer + panel de equipo.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class DashboardEncargado(ctk.CTkFrame):
@@ -108,8 +108,8 @@ class DashboardEncargado(ctk.CTkFrame):
     def _cargar_equipo(self):
         """Carga los miembros del equipo del encargado."""
         try:
-            from ..db.equipos import obtener_por_encargado
-            from ..db.equipos import obtener_miembros
+            from src.db.equipos import obtener_por_encargado
+            from src.db.equipos import obtener_miembros
 
             equipo = obtener_por_encargado(str(self.usuario['_id']))
             if equipo:
@@ -158,7 +158,7 @@ class DashboardEncargado(ctk.CTkFrame):
     def _contar_anomalias_equipo(self, equipo_id):
         """Cuenta anomalías pendientes del equipo."""
         try:
-            from ..db.anomalias import obtener_por_equipo
+            from src.db.anomalias import obtener_por_equipo
             anomalias = obtener_por_equipo(str(equipo_id))
             pendientes = [a for a in anomalias if not a.get('resuelto', False)]
             if pendientes:

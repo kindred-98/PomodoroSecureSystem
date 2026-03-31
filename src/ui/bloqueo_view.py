@@ -5,7 +5,7 @@ Integración con OTP y bloqueo de Windows.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class BloqueoView(ctk.CTkToplevel):
@@ -147,7 +147,7 @@ class BloqueoView(ctk.CTkToplevel):
             return
 
         try:
-            from ..otp import verificar_otp
+            from src.otp import verificar_otp
             usuario_id = str(self.master.usuario_actual['_id'])
             resultado = verificar_otp(usuario_id, codigo)
 

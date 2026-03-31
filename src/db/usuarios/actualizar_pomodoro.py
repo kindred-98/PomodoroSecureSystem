@@ -4,7 +4,7 @@ Responsabilidad: Actualizar puntuación de Pomodoro del usuario.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def actualizar_pomodoro(usuario_id: str, incremento: int) -> dict:

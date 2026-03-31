@@ -4,7 +4,7 @@ Responsabilidad: Obtener historial de sesiones de un usuario.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def obtener_historial(usuario_id: str, limite: int = 50) -> list:

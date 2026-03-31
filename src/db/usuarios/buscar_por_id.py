@@ -4,7 +4,7 @@ Responsabilidad: Buscar un usuario por su ID.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def buscar_por_id(usuario_id: str) -> dict:

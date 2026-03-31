@@ -3,13 +3,13 @@ Módulo: generador/__init__.py
 Exporta todas las funciones del generador de contraseñas
 """
 
-from .generar_contraseña import generar_contraseña
-from .asegurar_tipos_caracteres import asegurar_tipos_caracteres
-from .construir_juego_caracteres import construir_juego_caracteres
-from .detectar_patrones import detectar_patrones
-from .mezclar_contraseña import mezclar_contraseña, mezclar_preservando_estructura
-from .evaluar_fortaleza import evaluar_fortaleza
-from .calcular_puntuacion import calcular_puntuacion, generar_y_evaluar
+from src.generador.generar_contraseña import generar_contraseña
+from src.generador.asegurar_tipos_caracteres import asegurar_tipos_caracteres
+from src.generador.construir_juego_caracteres import construir_juego_caracteres
+from src.generador.detectar_patrones import detectar_patrones
+from src.generador.mezclar_contraseña import mezclar_contraseña, mezclar_preservando_estructura
+from src.generador.evaluar_fortaleza import evaluar_fortaleza
+from src.generador.calcular_puntuacion import calcular_puntuacion, generar_y_evaluar
 
 __all__ = [
     # Funciones principales

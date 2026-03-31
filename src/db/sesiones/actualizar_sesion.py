@@ -4,7 +4,7 @@ Responsabilidad: Actualizar datos de una sesión activa.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def actualizar_sesion(sesion_id: str, actualizaciones: dict) -> dict:

@@ -5,7 +5,7 @@ Reglas: máximo 2 pausas por jornada, máximo 10 min cada una.
 """
 
 from datetime import datetime, timezone
-from ..db.conexion import conexion_global
+from src.db.conexion import conexion_global
 
 MAXIMO_PAUSAS = 2
 MAXIMO_DURACION_MIN = 10
@@ -176,7 +176,7 @@ def finalizar_pausa(usuario_id: str) -> dict:
     
     if excedida:
         # Registrar anomalía
-        from ..db.anomalias import registrar_anomalia
+        from src.db.anomalias import registrar_anomalia
         anomalia_registrada = registrar_anomalia(
             str(usuario_oid),
             'pausa_excedida',

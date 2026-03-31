@@ -5,7 +5,7 @@ Responsabilidad: Cerrar una sesión de trabajo.
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def cerrar_sesion(sesion_id: str, completada: bool = True) -> dict:

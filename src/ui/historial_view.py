@@ -4,7 +4,7 @@ Responsabilidad: Vista de historial de sesiones Pomodoro.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class HistorialView(ctk.CTkFrame):
@@ -70,7 +70,7 @@ class HistorialView(ctk.CTkFrame):
     def _cargar_sesiones(self):
         """Carga las sesiones del usuario desde BD."""
         try:
-            from ..db.conexion import conexion_global
+            from src.db.conexion import conexion_global
             from bson import ObjectId
 
             coleccion = conexion_global.obtener_coleccion('sesiones')

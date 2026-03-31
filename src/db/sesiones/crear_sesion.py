@@ -5,7 +5,7 @@ Responsabilidad: Crear una nueva sesión de trabajo.
 
 from datetime import datetime, timezone
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def crear_sesion(usuario_id: str, tipo_sesion: str = "pomodoro") -> dict:

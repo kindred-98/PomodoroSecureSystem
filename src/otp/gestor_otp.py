@@ -6,9 +6,9 @@ para validación de presencia del trabajador.
 
 import secrets
 from datetime import datetime, timedelta, timezone
-from ..seguridad.encriptacion import hashear_contraseña, verificar_contraseña
-from ..db.conexion import conexion_global
-from ..db.anomalias import registrar_anomalia
+from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseña
+from src.db.conexion import conexion_global
+from src.db.anomalias import registrar_anomalia
 
 DURACION_OTP_SEGUNDOS = 420  # 7 minutos
 MAXIMO_INTENTOS = 3

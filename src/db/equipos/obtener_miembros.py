@@ -4,7 +4,7 @@ Responsabilidad: Obtener lista de miembros de un equipo.
 """
 
 from bson import ObjectId
-from ..conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def obtener_miembros(equipo_id: str) -> list:

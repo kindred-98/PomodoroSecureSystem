@@ -4,7 +4,7 @@ Responsabilidad: Configuración de descansos fijos de empresa (solo supervisor).
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class ConfigDescansosView(ctk.CTkToplevel):
@@ -96,7 +96,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
             widget.destroy()
 
         try:
-            from ..db.equipos import obtener_por_encargado
+            from src.db.equipos import obtener_por_encargado
             equipo = obtener_por_encargado(str(self.usuario['_id']))
 
             if not equipo:
@@ -144,8 +144,8 @@ class ConfigDescansosView(ctk.CTkToplevel):
 
         try:
             duracion_int = int(duracion)
-            from ..db.equipos import obtener_por_encargado
-            from ..db.conexion import conexion_global
+            from src.db.equipos import obtener_por_encargado
+            from src.db.conexion import conexion_global
 
             equipo = obtener_por_encargado(str(self.usuario['_id']))
             if not equipo:

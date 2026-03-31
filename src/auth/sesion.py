@@ -4,7 +4,7 @@ Responsabilidad: Gestión de sesiones activas de usuario.
 """
 
 from datetime import datetime, timezone
-from ..db.conexion import conexion_global
+from src.db.conexion import conexion_global
 
 
 def crear_sesion(usuario_id: str, token_sesion: str) -> dict:

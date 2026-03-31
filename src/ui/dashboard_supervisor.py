@@ -4,7 +4,7 @@ Responsabilidad: Dashboard del supervisor con gestión global.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class DashboardSupervisor(ctk.CTkFrame):
@@ -137,8 +137,8 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _cargar_equipos(self):
         """Carga todos los equipos."""
         try:
-            from ..db.equipos import obtener_por_encargado
-            from ..db.conexion import conexion_global
+            from src.db.equipos import obtener_por_encargado
+            from src.db.conexion import conexion_global
 
             coleccion = conexion_global.obtener_coleccion('equipos')
             equipos = list(coleccion.find())
@@ -172,7 +172,7 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _cargar_anomalias(self):
         """Carga anomalías recientes."""
         try:
-            from ..db.conexion import conexion_global
+            from src.db.conexion import conexion_global
 
             coleccion = conexion_global.obtener_coleccion('anomalias')
             anomalias = list(coleccion.find().sort('fecha_registro', -1).limit(20))
@@ -222,7 +222,7 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _marcar_anomalia(self, anomalia):
         """Marca una anomalía como revisada."""
         try:
-            from ..db.anomalias import marcar_revisada
+            from src.db.anomalias import marcar_revisada
             marcar_revisada(str(anomalia['_id']))
             self._cargar_anomalias()
         except Exception:
@@ -231,7 +231,7 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _ver_descansos_fijos(self):
         """Abre la vista de configuración de descansos fijos."""
         try:
-            from .config_descansos_view import ConfigDescansosView
+            from src.ui.config_descansos_view import ConfigDescansosView
             vista = ConfigDescansosView(self, self.usuario)
             vista.grab_set()
         except Exception:

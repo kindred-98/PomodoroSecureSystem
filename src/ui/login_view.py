@@ -4,7 +4,7 @@ Responsabilidad: Pantalla de login con email y contraseña.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class LoginView(ctk.CTkFrame):

@@ -4,9 +4,9 @@ Responsabilidad: Autenticación de usuarios con email y contraseña.
 """
 
 from datetime import datetime, timezone
-from ..db.conexion import conexion_global
-from ..seguridad.encriptacion import verificar_contraseña, generar_token_sesion
-from .sesion import crear_sesion
+from src.db.conexion import conexion_global
+from src.seguridad.encriptacion import verificar_contraseña, generar_token_sesion
+from src.auth.sesion import crear_sesion
 
 
 def iniciar_sesion(email: str, contraseña: str) -> dict:

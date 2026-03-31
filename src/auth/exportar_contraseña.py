@@ -5,8 +5,8 @@ Responsabilidad: Exportar contraseña del usuario a archivo JSON encriptado.
 
 import json
 import os
-from ..db.conexion import conexion_global
-from ..seguridad.encriptacion import descifrar, cifrar
+from src.db.conexion import conexion_global
+from src.seguridad.encriptacion import descifrar, cifrar
 
 
 def exportar_contraseña(usuario_id: str, ruta_destino: str) -> str:

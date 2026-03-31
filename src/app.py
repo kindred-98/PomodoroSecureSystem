@@ -5,15 +5,15 @@ Gestiona navegación entre vistas y estado global.
 """
 
 import customtkinter as ctk
-from .config.colores import *
-from .ui.splash import SplashView
-from .ui.login_view import LoginView
-from .ui.registro_view import RegistroView
-from .ui.dashboard_empleado import DashboardEmpleado
-from .ui.dashboard_encargado import DashboardEncargado
-from .ui.dashboard_supervisor import DashboardSupervisor
-from .ui.password_view import PasswordView
-from .ui.historial_view import HistorialView
+from src.config.colores import *
+from src.ui.splash import SplashView
+from src.ui.login_view import LoginView
+from src.ui.registro_view import RegistroView
+from src.ui.dashboard_empleado import DashboardEmpleado
+from src.ui.dashboard_encargado import DashboardEncargado
+from src.ui.dashboard_supervisor import DashboardSupervisor
+from src.ui.password_view import PasswordView
+from src.ui.historial_view import HistorialView
 
 
 class PomodoroSecureApp(ctk.CTk):
@@ -118,7 +118,7 @@ class PomodoroSecureApp(ctk.CTk):
 
     def _on_login(self, email, contraseña):
         """Callback cuando el usuario intenta login."""
-        from .auth import iniciar_sesion
+        from src.auth import iniciar_sesion
         try:
             resultado = iniciar_sesion(email, contraseña)
             self.usuario_actual = resultado['usuario']
@@ -132,7 +132,7 @@ class PomodoroSecureApp(ctk.CTk):
         """Callback cuando el usuario cierra sesión."""
         if self.usuario_actual:
             try:
-                from .db.conexion import conexion_global
+                from src.db.conexion import conexion_global
                 coleccion = conexion_global.obtener_coleccion('sesiones_auth')
                 coleccion.update_many(
                     {'usuario_id': self.usuario_actual['_id'], 'activa': True},

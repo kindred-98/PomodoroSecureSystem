@@ -3,9 +3,9 @@ Módulo: regenerar_contraseña.py
 Responsabilidad: Regenerar la contraseña de un usuario con nuevos parámetros.
 """
 
-from ..db.conexion import conexion_global
-from ..seguridad.encriptacion import hashear_contraseña, cifrar
-from ..generador import generar_contraseña
+from src.db.conexion import conexion_global
+from src.seguridad.encriptacion import hashear_contraseña, cifrar
+from src.generador import generar_contraseña
 
 
 def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:

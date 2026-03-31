@@ -5,7 +5,7 @@ Gestiona estados, callbacks de eventos y registro en BD.
 """
 
 from datetime import datetime, timezone
-from .estados import (
+from src.timer.estados import (
     ESTADO_INACTIVO,
     ESTADO_TRABAJANDO,
     ESTADO_DESCANSO_CORTO,
@@ -13,7 +13,7 @@ from .estados import (
     ESTADO_PAUSADO,
     TRANSICIONES_VALIDAS,
 )
-from ..db.conexion import conexion_global
+from src.db.conexion import conexion_global
 
 # Callbacks registrados por otros módulos (FASE 6 los usará)
 _callbacks = {
@@ -255,7 +255,7 @@ def manejar_evento_timer(usuario_id: str, evento: str) -> dict:
     
     if evento == "pomodoro_completado":
         # Registrar sesión del pomodoro completado
-        from .servicio_sesiones import registrar_sesion_pomodoro
+        from src.timer.servicio_sesiones import registrar_sesion_pomodoro
         registrar_sesion_pomodoro(usuario_id, ciclo, config['pomodoro_min'])
         
         # Incrementar contador

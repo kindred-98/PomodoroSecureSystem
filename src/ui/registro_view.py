@@ -4,7 +4,7 @@ Responsabilidad: Flujo de registro de 4 pasos.
 """
 
 import customtkinter as ctk
-from ..config.colores import *
+from src.config.colores import *
 
 
 class RegistroView(ctk.CTkFrame):
@@ -113,7 +113,7 @@ class RegistroView(ctk.CTkFrame):
     def _verificar_primer_usuario(self) -> bool:
         """Retorna True si no hay usuarios en la BD (primer registro)."""
         try:
-            from ..db.conexion import conexion_global
+            from src.db.conexion import conexion_global
             coleccion = conexion_global.obtener_coleccion('usuarios')
             return coleccion.count_documents({}) == 0
         except Exception:
@@ -373,7 +373,7 @@ class RegistroView(ctk.CTkFrame):
                 return
             # Registrar usuario
             try:
-                from ..auth import registrar_usuario
+                from src.auth import registrar_usuario
                 parametros = {
                     "longitud": int(self.slider_longitud.get()),
                     "usar_mayusculas": self.var_mayus.get(),

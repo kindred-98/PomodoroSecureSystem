@@ -3,7 +3,7 @@ Módulo: logout.py
 Responsabilidad: Cierre de sesión de usuarios.
 """
 
-from .sesion import cerrar_sesion_por_token
+from src.auth.sesion import cerrar_sesion_por_token
 
 
 def cerrar_sesion(token_sesion: str) -> bool:

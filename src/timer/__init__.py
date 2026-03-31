@@ -3,8 +3,8 @@ Módulo: timer/__init__.py
 Responsabilidad: Exportar funciones del módulo Pomodoro Timer.
 """
 
-from .banco_tiempo import validar_configuracion_descansos, calcular_descanso_largo
-from .estados import (
+from src.timer.banco_tiempo import validar_configuracion_descansos, calcular_descanso_largo
+from src.timer.estados import (
     calcular_ciclos_jornada,
     obtener_transiciones_validas,
     ESTADO_INACTIVO,
@@ -13,13 +13,13 @@ from .estados import (
     ESTADO_DESCANSO_LARGO,
     ESTADO_PAUSADO,
 )
-from .ciclo_pomodoro import (
+from src.timer.ciclo_pomodoro import (
     iniciar_ciclo,
     obtener_estado_ciclo,
     manejar_evento_timer,
     registrar_callback,
 )
-from .servicio_sesiones import registrar_sesion_pomodoro
+from src.timer.servicio_sesiones import registrar_sesion_pomodoro
 
 __all__ = [
     # Banco de tiempo
