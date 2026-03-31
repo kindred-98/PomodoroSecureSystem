@@ -1,6 +1,6 @@
 # 📋 RESUMEN BREVE DE FASES - PomodoroSecureSystem
 
-**Última Actualización:** 31 de Marzo de 2026
+**Última Actualización:** 31 de Marzo de 2026 (tarde)
 
 ---
 
@@ -162,11 +162,71 @@ Warnings: 0
 
 ---
 
-## ⏳ FASE 5-6: Planificadas
+## ✅ FASE 5: Timer & Pomodoro Core (COMPLETADA)
 
-**FASE 5:** Timer & Pomodoro Core (ciclo timer, pausas manuales, banco tiempo)  
-**FASE 6:** OTP & Bloqueo (generación OTP, bloqueo Windows, anomalías integradas)  
-**FASE 7:** Interfaz Gráfica (CustomTkinter/Dashboards por rol)  
+**Status:** ✅ 81 tests | 100% pasando  
+**Documentación:** [FASE/FASE_5_TIMER_POMODORO.md](FASE/FASE_5_TIMER_POMODORO.md)
+
+### Logros:
+- ✅ 9 funciones implementadas en 2 módulos nuevos (timer + pausas)
+- ✅ 81 tests modularizados en 5 archivos
+- ✅ Máquina de estados completa (5 estados, 10 transiciones)
+- ✅ Ciclos adaptables a horarios variables (6h, 7h, 8h)
+- ✅ Pomodoro configurable por usuario (no hardcodeado)
+- ✅ Sistema de pausas manuales (máx 2 × 10 min)
+- ✅ Hooks de callbacks preparados para FASE 6
+- ✅ Capa intermedia servicio_sesiones (clean architecture)
+- ✅ 2 nuevas colecciones MongoDB: `ciclos_pomodoro`, `pausas_manuales`
+
+### Módulo Timer (6 funciones):
+- `validar_configuracion_descansos()` - Reglas banco 50 min (4 cortos + 1 largo)
+- `calcular_descanso_largo()` - Cálculo directo banco - cortos
+- `calcular_ciclos_jornada()` - Adapta ciclos al horario del trabajador
+- `obtener_transiciones_validas()` - Mapa de la máquina de estados
+- `iniciar_ciclo()` - Crea ciclo en BD, arranca primer pomodoro
+- `obtener_estado_ciclo()` - Estado actual del ciclo del usuario
+- `manejar_evento_timer()` - Motor principal: transiciones + registro sesiones
+- `registrar_callback()` - Registro de callbacks para FASE 6
+
+### Módulo Pausas (2 funciones):
+- `iniciar_pausa()` - Validación reglas (máx 2, sin ciclo, sin pausa activa)
+- `finalizar_pausa()` - Duración real + anomalía si > 10 min
+
+### Servicio Sesiones (1 función):
+- `registrar_sesion_pomodoro()` - Capa intermedia Timer → MongoDB
+
+### Adaptación a Horarios Variables:
+```
+Trabajador 08:00-16:00 (8h) → 3 ciclos completos + 30 min
+Trabajador 09:00-15:00 (6h) → 2 ciclos completos + ciclo reducido
+Trabajador 09:00-16:00 (7h) → 2 ciclos completos + 120 min sobran
+Pomodoro configurable: 25 min (default) o personalizado por usuario
+```
+
+### Hooks para FASE 6:
+- `descanso_iniciado` → FASE 6: generar OTP + mostrar bloqueo
+- `descanso_finalizado` → FASE 6: solicitar OTP al usuario
+- `ciclo_completado` → FASE 6: mostrar resumen jornada
+- `anomalia_generada` → FASE 6: registrar en BD
+
+### Métricas:
+```
+Funciones: 9/9 ✅
+Tests: 81/81 ✅
+Tests Totales Proyecto: 441/441 ✅
+Cobertura: 100% módulos timer + pausas
+Líneas Código: ~480 (nuevo)
+Líneas Tests: ~520 (nuevo)
+Tiempo Test: 10.99s
+Warnings: 0
+```
+
+---
+
+## ⏳ FASE 6-8: Planificadas
+
+**FASE 6:** OTP & Bloqueo (generación OTP 6 dígitos, hash bcrypt, bloqueo Windows, pantalla fullscreen, 3 intentos, anomalías)  
+**FASE 7:** Interfaz Gráfica (CustomTkinter/Dashboards por rol, descansos fijos empresa)  
 **FASE 8:** Pipeline (cobertura ≥80%, GitHub Actions, PyInstaller .exe)
 
 ---
@@ -174,11 +234,11 @@ Warnings: 0
 ## 📊 Progreso General
 
 ```
-████████████████████████████████░░░░░░░░░░░░░░ 65% Completo
-(Generador 100% | BD 100% | Auth 100% | Timer 0% | OTP 0% | UI 0%)
+██████████████████████████████████████░░░░░░░░ 80% Completo
+(Generador 100% | BD 100% | Auth 100% | Timer 100% | OTP 0% | UI 0%)
 ```
 
 ---
 
 ## 🎯 Próximo Paso
-→ Completar FASE 5: Timer & Pomodoro Core (ciclo timer, pausas, banco tiempo)
+→ Completar FASE 6: OTP & Bloqueo (generación OTP, hash bcrypt, bloqueo Windows, pantalla fullscreen)
