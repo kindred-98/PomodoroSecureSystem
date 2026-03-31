@@ -1,4 +1,4 @@
-# 🍅🔐 PomodoroSecure System
+# 🍅 PomodoroSecure System 🔐
 
 > Aplicación de escritorio Windows para la gestión del tiempo laboral de equipos de programación.  
 > Combina la técnica Pomodoro con un sistema de autenticación segura, control de presencia real y trazabilidad de anomalías.
@@ -133,7 +133,7 @@ pytest --cov=src --cov-fail-under=80
 ## 📁 Documentación
 
 - [`docs/PLANIFICACION_COMPLETA.md`](docs/PLANIFICACION_COMPLETA.md) — Arquitectura y decisiones de diseño completas
-- [`docs/asistencia_ia.md`](docs/asistencia_ia.md) — Registro de prompts utilizados con IA
+<!-- - [`docs/asistencia_ia.md`](docs/asistencia_ia.md) — Registro de prompts utilizados con IA -->
 
 ---
 
