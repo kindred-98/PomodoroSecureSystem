@@ -314,21 +314,59 @@ Paleta colores: 30+ constantes
 
 ---
 
-## ⏳ FASE 7B-8: Pendientes
+## ✅ FASE 7B: Dashboards Avanzados (COMPLETADA)
 
-**FASE 7B:** Dashboards avanzados (Encargado panel equipo, Supervisor gestión global, historial, descansos fijos)  
-**FASE 8:** Pipeline (cobertura ≥80%, GitHub Actions, PyInstaller .exe)
+**Status:** ✅ 4 pantallas nuevas | 479 tests backend intactos  
+**Documentación:** [FASES/FASE_7B_DASHBOARDS_AVANZADOS.md](FASES/FASE_7B_DASHBOARDS_AVANZADOS.md)
+
+### Logros:
+- ✅ 4 archivos de UI nuevos (~550 líneas)
+- ✅ Dashboard Encargado (panel equipo + estados miembros + badge anomalías)
+- ✅ Dashboard Supervisor (resumen general + equipos + anomalías globales + marcar vistas)
+- ✅ Historial sesiones (resumen + lista scrolleable últimas 50)
+- ✅ Configuración descansos fijos (modal + formulario + BD)
+- ✅ Routing por rol en app.py (empleado/encargado/supervisor)
+- ✅ 10 pantallas totales del proyecto
+- ✅ Backend 479 tests intactos
+
+### Pantallas nuevas (4):
+- **Dashboard Encargado** → timer + panel equipo con estados 🟢🟡🔴⚫
+- **Dashboard Supervisor** → gestión global, equipos, anomalías, marcar vistas
+- **Historial** → sesiones pasadas con resumen (pomodoros + tiempo)
+- **Config Descansos** → modal para crear descansos fijos de empresa
+
+### Routing por rol:
+```
+Login → rol del usuario
+├── "empleado"   → DashboardEmpleado
+├── "encargado"  → DashboardEncargado (equipo + anomalías)
+└── "supervisor" → DashboardSupervisor (global + gestión)
+```
+
+### Métricas:
+```
+Archivos UI nuevos: 4 + 2 actualizados
+Líneas UI nuevas: ~550
+Total pantallas proyecto: 10 ✅
+Backend tests: 479/479 ✅
+```
+
+---
+
+## ⏳ FASE 8: Pipeline
+
+**FASE 8:** Cobertura ≥80%, GitHub Actions CI/CD, PyInstaller .exe Windows
 
 ---
 
 ## 📊 Progreso General
 
 ```
-█████████████████████████████████████████████████████░ 95% Completo
-(Generador 100% | BD 100% | Auth 100% | Timer 100% | OTP 100% | UI 7A 100%)
+█████████████████████████████████████████████████████████░ 98% Completo
+(Generador 100% | BD 100% | Auth 100% | Timer 100% | OTP 100% | UI 100%)
 ```
 
 ---
 
 ## 🎯 Próximo Paso
-→ Completar FASE 7B: Dashboards avanzados (Encargado, Supervisor, historial, descansos fijos empresa)
+→ Completar FASE 8: Pipeline (cobertura ≥80%, GitHub Actions, PyInstaller .exe)

@@ -10,7 +10,10 @@ from .ui.splash import SplashView
 from .ui.login_view import LoginView
 from .ui.registro_view import RegistroView
 from .ui.dashboard_empleado import DashboardEmpleado
+from .ui.dashboard_encargado import DashboardEncargado
+from .ui.dashboard_supervisor import DashboardSupervisor
 from .ui.password_view import PasswordView
+from .ui.historial_view import HistorialView
 
 
 class PomodoroSecureApp(ctk.CTk):
@@ -63,12 +66,42 @@ class PomodoroSecureApp(ctk.CTk):
         self.vista_actual = vista
 
     def _mostrar_dashboard(self):
+        """Muestra el dashboard según el rol del usuario."""
         self._limpiar_vista()
-        vista = DashboardEmpleado(
+        rol = self.usuario_actual.get('rol', 'empleado')
+
+        if rol == 'supervisor':
+            vista = DashboardSupervisor(
+                self,
+                usuario=self.usuario_actual,
+                on_logout=self._on_logout,
+                on_ver_contraseña=self._mostrar_password,
+                on_ver_historial=self._mostrar_historial,
+            )
+        elif rol == 'encargado':
+            vista = DashboardEncargado(
+                self,
+                usuario=self.usuario_actual,
+                on_logout=self._on_logout,
+                on_ver_contraseña=self._mostrar_password,
+                on_ver_historial=self._mostrar_historial,
+            )
+        else:
+            vista = DashboardEmpleado(
+                self,
+                usuario=self.usuario_actual,
+                on_logout=self._on_logout,
+                on_ver_contraseña=self._mostrar_password,
+            )
+        vista.pack(fill="both", expand=True)
+        self.vista_actual = vista
+
+    def _mostrar_historial(self):
+        self._limpiar_vista()
+        vista = HistorialView(
             self,
             usuario=self.usuario_actual,
-            on_logout=self._on_logout,
-            on_ver_contraseña=self._mostrar_password,
+            on_volver=self._mostrar_dashboard,
         )
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista
