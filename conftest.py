@@ -13,6 +13,17 @@ import mongomock
 
 
 # ====================
+# FIXTURE GLOBAL - BLOQUEO WINDOWS
+# ====================
+
+@pytest.fixture(autouse=True)
+def _mock_lock_workstation():
+    """Evita que LockWorkStation() se ejecute de verdad durante los tests."""
+    with patch('ctypes.windll.user32.LockWorkStation', return_value=1):
+        yield
+
+
+# ====================
 # FIXTURES - GENERADOR
 # ====================
 
