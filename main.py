@@ -34,6 +34,17 @@ def main():
         print("")
         return
 
+    from src.db.conexion import conexion_global
+
+    # Conectar a MongoDB
+    try:
+        conexion_global.conectar()
+        print("Conectado a MongoDB Atlas")
+    except Exception as e:
+        print(f"Error al conectar a MongoDB: {e}")
+        print("Verifica tu MONGODB_URI en .env")
+        return
+
     from src.app import PomodoroSecureApp
 
     app = PomodoroSecureApp()

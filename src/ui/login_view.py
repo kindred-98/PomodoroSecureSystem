@@ -23,7 +23,7 @@ class LoginView(ctk.CTkFrame):
             fg_color=FONDO_CARD,
             corner_radius=16,
             width=400,
-            height=420,
+            height=480,
         )
         card.place(relx=0.5, rely=0.5, anchor="center")
         card.pack_propagate(False)
@@ -123,16 +123,18 @@ class LoginView(ctk.CTkFrame):
         )
         self.boton_login.pack(fill="x", padx=40, pady=(0, 15))
 
-        # Link registro
-        link = ctk.CTkLabel(
+        # Botón Registro
+        ctk.CTkButton(
             card,
             text="¿Primera vez? Regístrate",
-            font=("JetBrains Mono", 12, "underline"),
+            font=("JetBrains Mono", 12),
+            fg_color=BOTON_SECUNDARIO,
+            hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=INFORMACION,
-            cursor="hand2",
-        )
-        link.pack()
-        link.bind("<Button-1>", lambda e: self.on_ir_registro())
+            height=36,
+            corner_radius=8,
+            command=self.on_ir_registro,
+        ).pack(fill="x", padx=40, pady=(0, 5))
 
         # Footer
         ctk.CTkLabel(
