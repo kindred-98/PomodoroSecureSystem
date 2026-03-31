@@ -4,6 +4,8 @@
 .env
 *.key
 claves/
+config.py
+SOLUCION_SONAR_CREDENCIALES.md
 
 # ============================
 # ENTORNO VIRTUAL
