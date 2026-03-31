@@ -2,10 +2,11 @@
 # SEGURIDAD — NUNCA A GITHUB
 # ============================
 .env
+.env.local
 *.key
+secret_keys/
 claves/
-config.py
-SOLUCION_SONAR_CREDENCIALES.md
+credenciales.json
 
 # ============================
 # ENTORNO VIRTUAL
