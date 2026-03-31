@@ -3,7 +3,9 @@ conftest.py - Configuración de pytest y fixtures compartidos
 Aquí se definen todas las fixtures reutilizables para los tests
 """
 
+import os
 import pytest
+from contextlib import ExitStack
 from unittest.mock import Mock, MagicMock, patch
 from datetime import datetime, timezone
 from bson import ObjectId
@@ -188,27 +190,103 @@ def conexion_mongodb_mock(mongodb_db):
 
 @pytest.fixture
 def mock_conexion_global(conexion_mongodb_mock):
-    """Fixture: Parchea conexion_global en todos los módulos"""
-    with patch('src.db.usuarios.crear_usuario.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.usuarios.buscar_por_email.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.usuarios.buscar_por_id.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.usuarios.actualizar_pomodoro.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.usuarios.actualizar_ultimo_acceso.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.usuarios.desactivar_usuario.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.equipos.crear_equipo.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.equipos.buscar_por_id.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.equipos.obtener_miembros.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.equipos.obtener_por_encargado.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.equipos.añadir_miembro.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.sesiones.crear_sesion.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.sesiones.actualizar_sesion.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.sesiones.cerrar_sesion.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.sesiones.obtener_historial.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.anomalias.registrar_anomalia.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.anomalias.obtener_por_usuario.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.anomalias.obtener_por_equipo.conexion_global', conexion_mongodb_mock), \
-         patch('src.db.anomalias.marcar_revisada.conexion_global', conexion_mongodb_mock):
+    """Fixture: Parchea conexion_global en todos los módulos (db + auth)"""
+    modulos_db = [
+        'src.db.usuarios.crear_usuario',
+        'src.db.usuarios.buscar_por_email',
+        'src.db.usuarios.buscar_por_id',
+        'src.db.usuarios.actualizar_pomodoro',
+        'src.db.usuarios.actualizar_ultimo_acceso',
+        'src.db.usuarios.desactivar_usuario',
+        'src.db.equipos.crear_equipo',
+        'src.db.equipos.buscar_por_id',
+        'src.db.equipos.obtener_miembros',
+        'src.db.equipos.obtener_por_encargado',
+        'src.db.equipos.añadir_miembro',
+        'src.db.sesiones.crear_sesion',
+        'src.db.sesiones.actualizar_sesion',
+        'src.db.sesiones.cerrar_sesion',
+        'src.db.sesiones.obtener_historial',
+        'src.db.anomalias.registrar_anomalia',
+        'src.db.anomalias.obtener_por_usuario',
+        'src.db.anomalias.obtener_por_equipo',
+        'src.db.anomalias.marcar_revisada',
+    ]
+    modulos_auth = [
+        'src.auth.sesion',
+        'src.auth.login',
+        'src.auth.ver_contraseña',
+        'src.auth.regenerar_contraseña',
+        'src.auth.cambiar_contraseña',
+        'src.auth.exportar_contraseña',
+        'src.auth.registro',
+    ]
+    
+    with ExitStack() as stack:
+        for modulo in modulos_db + modulos_auth:
+            stack.enter_context(
+                patch(f'{modulo}.conexion_global', conexion_mongodb_mock)
+            )
         yield conexion_mongodb_mock
+
+
+@pytest.fixture
+def fernet_key_env():
+    """Fixture: Genera una clave Fernet de test y la establece en os.environ"""
+    from cryptography.fernet import Fernet
+    clave_test = Fernet.generate_key().decode()
+    with patch.dict(os.environ, {'FERNET_KEY': clave_test}):
+        yield clave_test
+
+
+@pytest.fixture
+def parametros_contraseña_defecto():
+    """Fixture: Parámetros por defecto para generación de contraseña en auth"""
+    return {
+        "longitud": 16,
+        "usar_mayusculas": True,
+        "usar_numeros": True,
+        "usar_simbolos": True,
+        "excluir_ambiguos": False
+    }
+
+
+@pytest.fixture
+def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contraseña_defecto):
+    """Fixture: Usuario completamente registrado con hash + encriptado en BD"""
+    from src.seguridad.encriptacion import hashear_contraseña, cifrar
+    from src.generador import generar_contraseña
+    
+    contraseña = generar_contraseña(parametros_contraseña_defecto)
+    hash_pw = hashear_contraseña(contraseña)
+    enc_pw = cifrar(contraseña)
+    
+    coleccion = mock_conexion_global.obtener_coleccion('usuarios')
+    usuario = {
+        'email': 'auth@test.com',
+        'nombre': 'Usuario Auth',
+        'contraseña_hash': hash_pw,
+        'contraseña_encriptada': enc_pw,
+        'parametros_contraseña': parametros_contraseña_defecto,
+        'rol': 'empleado',
+        'activo': True,
+        'fecha_registro': datetime.now(timezone.utc),
+        'ultimo_acceso': datetime.now(timezone.utc),
+        'puntuacion_pomodoro': 0,
+        'team_id': None,
+        'metadata': {
+            'ciclos_completados': 0,
+            'pausas_utilizadas': 0,
+            'anomalias_registradas': 0
+        }
+    }
+    resultado = coleccion.insert_one(usuario)
+    usuario['_id'] = resultado.inserted_id
+    
+    return {
+        'usuario': usuario,
+        'contraseña': contraseña
+    }
 
 
 @pytest.fixture
