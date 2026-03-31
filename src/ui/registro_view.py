@@ -110,6 +110,15 @@ class RegistroView(ctk.CTkFrame):
 
         self._mostrar_paso_1()
 
+    def _verificar_primer_usuario(self) -> bool:
+        """Retorna True si no hay usuarios en la BD (primer registro)."""
+        try:
+            from ..db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            return coleccion.count_documents({}) == 0
+        except Exception:
+            return True
+
     def _limpiar_contenido(self):
         for widget in self.contenido.winfo_children():
             widget.destroy()
@@ -151,9 +160,30 @@ class RegistroView(ctk.CTkFrame):
             font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
+        # Determinar opciones según si hay usuarios en BD
+        es_primer_usuario = self._verificar_primer_usuario()
+
+        if es_primer_usuario:
+            # Primer usuario: puede elegir cualquier rol (incluido supervisor)
+            roles_disponibles = ["supervisor", "encargado", "empleado"]
+            ctk.CTkLabel(
+                self.contenido,
+                text="✅ Eres el primer usuario. Elige tu rol de administrador.",
+                font=("JetBrains Mono", 10), text_color=COMPLETADO,
+            ).pack(anchor="w", pady=(3, 5))
+        else:
+            # Ya hay usuarios: solo empleado por defecto
+            roles_disponibles = ["empleado"]
+            ctk.CTkLabel(
+                self.contenido,
+                text="Solo puedes registrarte como empleado.\n"
+                     "Un supervisor puede cambiarte el rol después.",
+                font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+            ).pack(anchor="w", pady=(3, 5))
+
         self.combo_rol = ctk.CTkComboBox(
             self.contenido,
-            values=["empleado", "encargado", "supervisor"],
+            values=roles_disponibles,
             font=("JetBrains Mono", 13),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
@@ -164,7 +194,7 @@ class RegistroView(ctk.CTkFrame):
             corner_radius=8,
         )
         self.combo_rol.pack(fill="x", pady=(3, 10))
-        self.combo_rol.set("empleado")
+        self.combo_rol.set(roles_disponibles[0])
 
     def _mostrar_paso_2(self):
         """Paso 2: Parámetros de contraseña."""
