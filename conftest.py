@@ -226,9 +226,12 @@ def mock_conexion_global(conexion_mongodb_mock):
         'src.timer.servicio_sesiones',
         'src.pausas.gestor_pausas',
     ]
+    modulos_otp = [
+        'src.otp.gestor_otp',
+    ]
     
     with ExitStack() as stack:
-        for modulo in modulos_db + modulos_auth + modulos_timer:
+        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp:
             stack.enter_context(
                 patch(f'{modulo}.conexion_global', conexion_mongodb_mock)
             )

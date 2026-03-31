@@ -1,6 +1,6 @@
 # 📋 RESUMEN BREVE DE FASES - PomodoroSecureSystem
 
-**Última Actualización:** 31 de Marzo de 2026 (tarde)
+**Última Actualización:** 31 de Marzo de 2026 (noche)
 
 ---
 
@@ -223,10 +223,55 @@ Warnings: 0
 
 ---
 
-## ⏳ FASE 6-8: Planificadas
+## ✅ FASE 6: OTP & Bloqueo (COMPLETADA)
 
-**FASE 6:** OTP & Bloqueo (generación OTP 6 dígitos, hash bcrypt, bloqueo Windows, pantalla fullscreen, 3 intentos, anomalías)  
-**FASE 7:** Interfaz Gráfica (CustomTkinter/Dashboards por rol, descansos fijos empresa)  
+**Status:** ✅ 38 tests | 100% pasando  
+**Documentación:** [FASES/FASE_6_OTP_BLOQUEO.md](FASES/FASE_6_OTP_BLOQUEO.md)
+
+### Logros:
+- ✅ 5 funciones implementadas en 2 módulos nuevos (otp + bloqueo)
+- ✅ 38 tests modularizados en 2 archivos
+- ✅ OTP de 6 dígitos con `secrets` (criptográficamente seguro)
+- ✅ Hash bcrypt del OTP (reutiliza seguridad existente)
+- ✅ 3 escenarios de verificación: correcto, 3 fallos, expirado
+- ✅ Anomalías automáticas: `tercer_intento_otp`, `otp_expirado`
+- ✅ Wrapper LockWorkStation testeable (mock ctypes)
+- ✅ Nueva colección MongoDB: `eventos_otp`
+- ✅ Hooks FASE 5 conectables sin dependencias
+
+### Módulo OTP (4 funciones):
+- `generar_otp()` - Código 6 dígitos + hash bcrypt + guarda en BD
+- `verificar_otp()` - Verifica contra hash, 3 intentos, 7 min expiración
+- `obtener_estado_otp()` - Countdown + intentos restantes (para UI)
+- `cancelar_otp()` - Cancelación activa
+
+### Módulo Bloqueo (1 función):
+- `bloquear_escritorio()` - Wrapper ctypes LockWorkStation, multiplataforma
+
+### Seguridad OTP:
+```
+secrets.randbelow(900000) + 100000 → 6 dígitos
+bcrypt hash (rounds=12) → nunca en texto plano
+bcrypt.checkpw() → verificación sin exponer hash
+```
+
+### Métricas:
+```
+Funciones: 5/5 ✅
+Tests: 38/38 ✅
+Tests Totales Proyecto: 479/479 ✅
+Cobertura: 100% módulos otp + bloqueo
+Líneas Código: ~250 (nuevo)
+Líneas Tests: ~280 (nuevo)
+Tiempo Test: 17.23s
+Warnings: 0
+```
+
+---
+
+## ⏳ FASE 7-8: Planificadas
+
+**FASE 7:** Interfaz Gráfica (CustomTkinter/Dashboards por rol, descansos fijos empresa, pantalla bloqueo fullscreen)  
 **FASE 8:** Pipeline (cobertura ≥80%, GitHub Actions, PyInstaller .exe)
 
 ---
@@ -234,11 +279,11 @@ Warnings: 0
 ## 📊 Progreso General
 
 ```
-██████████████████████████████████████░░░░░░░░ 80% Completo
-(Generador 100% | BD 100% | Auth 100% | Timer 100% | OTP 0% | UI 0%)
+██████████████████████████████████████████████░ 90% Completo
+(Generador 100% | BD 100% | Auth 100% | Timer 100% | OTP 100% | UI 0%)
 ```
 
 ---
 
 ## 🎯 Próximo Paso
-→ Completar FASE 6: OTP & Bloqueo (generación OTP, hash bcrypt, bloqueo Windows, pantalla fullscreen)
+→ Completar FASE 7: Interfaz Gráfica (CustomTkinter, dashboards, pantalla bloqueo fullscreen)
