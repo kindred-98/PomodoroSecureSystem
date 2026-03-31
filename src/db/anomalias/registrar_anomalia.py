@@ -17,7 +17,7 @@ Excepciones:
     Exception: Si usuario no existe o falla operación MongoDB
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -60,7 +60,7 @@ def registrar_anomalia(usuario_id: str, tipo: str, descripcion: str) -> dict:
         'usuario_id': usuario_oid,
         'tipo': tipo.strip(),
         'descripcion': descripcion.strip(),
-        'fecha_registro': datetime.utcnow(),
+        'fecha_registro': datetime.now(timezone.utc),
         'revisada': False,
     }
     

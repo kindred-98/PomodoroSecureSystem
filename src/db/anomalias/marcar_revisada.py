@@ -14,7 +14,7 @@ Excepciones:
     Exception: Si anomalía no existe
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -48,7 +48,7 @@ def marcar_revisada(anomalia_id: str) -> dict:
     # Actualizar documento: marcar como revisada y registrar fecha de revisión
     actualizaciones = {
         'revisada': True,
-        'fecha_revision': datetime.utcnow(),
+        'fecha_revision': datetime.now(timezone.utc),
     }
     
     coleccion_anomalias.update_one(

@@ -3,7 +3,7 @@ Módulo: cerrar_sesion.py
 Responsabilidad: Cerrar una sesión de trabajo.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -41,7 +41,7 @@ def cerrar_sesion(sesion_id: str, completada: bool = True) -> dict:
         raise Exception(f"Sesión con ID '{sesion_id}' no existe")
     
     # Calcular duración
-    fin = datetime.utcnow()
+    fin = datetime.now(timezone.utc)
     duracion = (fin - sesion['inicio']).total_seconds()
     
     # Actualizar

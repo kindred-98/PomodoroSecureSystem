@@ -3,7 +3,7 @@ Módulo: crear_sesion.py
 Responsabilidad: Crear una nueva sesión de trabajo.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -59,7 +59,7 @@ def crear_sesion(usuario_id: str, tipo_sesion: str = "pomodoro") -> dict:
     sesion = {
         'usuario_id': usuario_objeto_id,
         'tipo_sesion': tipo_sesion,
-        'inicio': datetime.utcnow(),
+        'inicio': datetime.now(timezone.utc),
         'fin': None,
         'duracion_segundos': None,
         'pausas_utilizadas': 0,

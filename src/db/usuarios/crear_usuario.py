@@ -3,7 +3,7 @@ Módulo: crear_usuario.py
 Responsabilidad: Crear un nuevo usuario en la base de datos.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -76,7 +76,7 @@ def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "em
         'contraseña_hash': contraseña_hash,
         'rol': rol,
         'activo': True,
-        'fecha_registro': datetime.utcnow(),
+        'fecha_registro': datetime.now(timezone.utc),
         'ultimo_acceso': None,
         'puntuacion_pomodoro': 0,
         'team_id': None,

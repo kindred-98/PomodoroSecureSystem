@@ -1,7 +1,7 @@
 """Tests para buscar_por_email()"""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from unittest.mock import patch
 from src.db.usuarios.buscar_por_email import buscar_por_email
@@ -33,8 +33,8 @@ class TestBuscarPorEmailExitoso:
             'contraseña_hash': 'hash',
             'rol': 'empleado',
             'activo': True,
-            'fecha_registro': datetime.utcnow(),
-            'ultimo_acceso': datetime.utcnow(),
+            'fecha_registro': datetime.now(timezone.utc),
+            'ultimo_acceso': datetime.now(timezone.utc),
             'puntuacion_pomodoro': 0,
             'metadata': {}
         }
@@ -60,8 +60,8 @@ class TestBuscarPorEmailExitoso:
             'contraseña_hash': 'hash',
             'rol': 'empleado',
             'activo': True,
-            'fecha_registro': datetime.utcnow(),
-            'ultimo_acceso': datetime.utcnow(),
+            'fecha_registro': datetime.now(timezone.utc),
+            'ultimo_acceso': datetime.now(timezone.utc),
             'puntuacion_pomodoro': 0,
             'metadata': {}
         }

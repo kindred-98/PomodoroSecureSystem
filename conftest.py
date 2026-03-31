@@ -5,7 +5,7 @@ Aquí se definen todas las fixtures reutilizables para los tests
 
 import pytest
 from unittest.mock import Mock, MagicMock, patch
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 import mongomock
 
@@ -244,8 +244,8 @@ def usuario_en_db(coleccion_usuarios):
         'contraseña_hash': 'hash_seguro',
         'rol': 'empleado',
         'activo': True,
-        'fecha_registro': datetime.utcnow(),
-        'ultimo_acceso': datetime.utcnow(),
+        'fecha_registro': datetime.now(timezone.utc),
+        'ultimo_acceso': datetime.now(timezone.utc),
         'puntuacion_pomodoro': 0,
         'metadata': {}
     }
@@ -262,7 +262,7 @@ def equipo_en_db(coleccion_equipos, usuario_en_db):
         'encargado_id': usuario_en_db['_id'],
         'descripcion': 'Test team',
         'miembros': [usuario_en_db['_id']],
-        'fecha_creacion': datetime.utcnow(),
+        'fecha_creacion': datetime.now(timezone.utc),
         'activo': True
     }
     resultado = coleccion_equipos.insert_one(equipo)
@@ -276,7 +276,7 @@ def sesion_en_db(coleccion_sesiones, usuario_en_db):
     sesion = {
         'usuario_id': usuario_en_db['_id'],
         'tipo_sesion': 'pomodoro',
-        'inicio': datetime.utcnow(),
+        'inicio': datetime.now(timezone.utc),
         'fin': None,
         'duracion_segundos': None,
         'pausas_utilizadas': 0,

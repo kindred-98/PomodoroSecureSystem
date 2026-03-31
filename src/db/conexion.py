@@ -3,9 +3,12 @@ Módulo: conexion.py
 Responsabilidad: Gestionar conexión a MongoDB Atlas y proporcionar cliente global.
 """
 
+import logging
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure
 import os
+
+logger = logging.getLogger(__name__)
 
 
 class ConexionMongoDB:
@@ -49,9 +52,9 @@ class ConexionMongoDB:
             self._cliente = MongoClient(uri, serverSelectionTimeoutMS=5000)
             # Verificar conexión
             self._cliente.admin.command('ping')
-            print("✅ Conectado a MongoDB Atlas")
+            logger.info("Conectado a MongoDB Atlas")
             # Seleccionar base de datos
-            self._base_datos = self._cliente['pomodoreso_secure']
+            self._base_datos = self._cliente['pomodoro_secure']
         except (ServerSelectionTimeoutError, ConnectionFailure) as e:
             raise ConnectionFailure(f"No se pudo conectar a MongoDB: {e}")
     
@@ -61,7 +64,7 @@ class ConexionMongoDB:
             self._cliente.close()
             self._cliente = None
             self._base_datos = None
-            print("✅ Desconectado de MongoDB")
+            logger.info("Desconectado de MongoDB")
     
     def obtener_base_datos(self):
         """

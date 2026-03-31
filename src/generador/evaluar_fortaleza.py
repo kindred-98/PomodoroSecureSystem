@@ -4,6 +4,7 @@ Responsabilidad: Evaluar y calificar la fortaleza de una contraseña
 usando un sistema de puntuación integrado.
 """
 
+import math
 from .detectar_patrones import detectar_patrones
 
 
@@ -143,8 +144,6 @@ def evaluar_fortaleza(contraseña: str) -> dict:
     if tiene_simbolos:
         tamaño_charset += 32  # Aproximado para puntuación
     
-    # Fórmula: bits = length * log2(charset_size)
-    import math
     if tamaño_charset > 0:
         entropia_bits = len(contraseña) * math.log2(tamaño_charset)
     else:

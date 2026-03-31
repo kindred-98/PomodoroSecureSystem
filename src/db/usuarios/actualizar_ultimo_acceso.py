@@ -3,7 +3,7 @@ Módulo: actualizar_ultimo_acceso.py
 Responsabilidad: Actualizar timestamp del último acceso del usuario.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from ..conexion import conexion_global
 
@@ -34,7 +34,7 @@ def actualizar_ultimo_acceso(usuario_id: str) -> dict:
     coleccion = conexion_global.obtener_coleccion('usuarios')
     resultado = coleccion.find_one_and_update(
         {'_id': objeto_id},
-        {'$set': {'ultimo_acceso': datetime.utcnow()}},
+        {'$set': {'ultimo_acceso': datetime.now(timezone.utc)}},
         return_document=True
     )
     

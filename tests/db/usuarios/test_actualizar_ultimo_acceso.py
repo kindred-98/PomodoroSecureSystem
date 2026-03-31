@@ -1,7 +1,7 @@
 """Tests para actualizar_ultimo_acceso()"""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.usuarios.actualizar_ultimo_acceso import actualizar_ultimo_acceso
 
@@ -37,13 +37,14 @@ class TestActualizarUltimoAccesoExito:
     
     def test_timestamp_es_reciente(self, mock_conexion_global, usuario_en_db, coleccion_usuarios):
         """Timestamp debe ser muy reciente (menos de 5 segundos)"""
-        from datetime import timedelta
-        
-        ahora_antes = datetime.utcnow()
+        ahora_antes = datetime.now(timezone.utc)
         resultado = actualizar_ultimo_acceso(str(usuario_en_db['_id']))
-        ahora_despues = datetime.utcnow()
+        ahora_despues = datetime.now(timezone.utc)
         
         ts = resultado['ultimo_acceso']
+        # mongomock puede devolver datetime naive, normalizar para comparar
+        if ts.tzinfo is None:
+            ahora_antes = ahora_antes.replace(tzinfo=None)
         # El timestamp debería ser cercano a ahora (dentro de 5 segundos)
         assert abs((ts - ahora_antes).total_seconds()) < 5
     

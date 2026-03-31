@@ -4,6 +4,7 @@ Responsabilidad: Wrapper final que integra todas las funciones
 de evaluación de contraseñas en un sistema de puntuación unificado.
 """
 
+import math
 from .generar_contraseña import generar_contraseña
 from .detectar_patrones import detectar_patrones
 from .evaluar_fortaleza import evaluar_fortaleza
@@ -47,7 +48,6 @@ def calcular_puntuacion(contraseña: str, incluir_analisis: bool = False) -> dic
     
     # Estimar tiempo de crackeo (modelo exponencial simplificado)
     # Basado en puntuación y longitud
-    import math
     tamaño_charset = 95  # ASCII imprimibles
     longitud = len(contraseña)
     
@@ -123,7 +123,6 @@ def generar_y_evaluar(parametros: dict, mezclar_resultado: bool = False) -> dict
     puntuacion = evaluacion['puntuacion']
     
     # Estimar tiempo de crackeo
-    import math
     tamaño_charset = 95
     longitud = len(contraseña)
     promedio_intentos = (tamaño_charset ** longitud) / 2
