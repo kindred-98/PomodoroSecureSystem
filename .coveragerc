@@ -1,0 +1,19 @@
+[run]
+source = src
+omit =
+    src/ui/*
+    src/main.py
+    src/app.py
+    src/config/colores.py
+    src/config/config.py
+    src/__init__.py
+    src/componentes/*
+    src/notificaciones/*
+
+[report]
+fail_under = 80
+show_missing = true
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
