@@ -227,13 +227,15 @@ class RegistroView(ctk.CTkFrame):
             button_hover_color=TRABAJO_ACTIVO,
         )
         self.slider_longitud.pack(fill="x", pady=(5, 0))
-        self.slider_longitud.set(20)
 
         self.label_longitud = ctk.CTkLabel(
             self.contenido, text="20 caracteres",
             font=("JetBrains Mono", 12), text_color=TRABAJO_ACTIVO,
         )
         self.label_longitud.pack(anchor="e")
+
+        # Slider se configura al final para evitar callbacks prematuros
+        self.slider_longitud.set(20)
         self.slider_longitud.configure(command=self._actualizar_longitud)
 
         # Toggles
@@ -348,7 +350,8 @@ class RegistroView(ctk.CTkFrame):
             ).pack(pady=10)
 
     def _actualizar_longitud(self, valor):
-        self.label_longitud.configure(text=f"{int(valor)} caracteres")
+        if hasattr(self, 'label_longitud') and self.label_longitud.winfo_exists():
+            self.label_longitud.configure(text=f"{int(valor)} caracteres")
 
     def _copiar_contraseña(self):
         if self.resultado_registro:
@@ -371,21 +374,21 @@ class RegistroView(ctk.CTkFrame):
         if self.paso_actual == 1:
             if not self._validar_paso_1():
                 return
-            # Registrar usuario
+            # Registrar usuario con parámetros por defecto (se ajustan en paso 2)
             try:
                 from src.auth import registrar_usuario
-                parametros = {
-                    "longitud": int(self.slider_longitud.get()),
-                    "usar_mayusculas": self.var_mayus.get(),
-                    "usar_numeros": self.var_num.get(),
-                    "usar_simbolos": self.var_simb.get(),
-                    "excluir_ambiguos": self.var_ambig.get(),
+                parametros_defecto = {
+                    "longitud": 20,
+                    "usar_mayusculas": True,
+                    "usar_numeros": True,
+                    "usar_simbolos": True,
+                    "excluir_ambiguos": False,
                 }
                 self.resultado_registro = registrar_usuario(
                     self.entry_email.get().strip(),
                     self.entry_nombre.get().strip(),
                     self.combo_rol.get(),
-                    parametros,
+                    parametros_defecto,
                 )
                 self.paso_actual = 2
                 self._mostrar_paso_2()
@@ -394,6 +397,25 @@ class RegistroView(ctk.CTkFrame):
                 return
 
         elif self.paso_actual == 2:
+            # Regenerar con parámetros del usuario (si los cambió)
+            if hasattr(self, 'slider_longitud'):
+                try:
+                    from src.auth import regenerar_contraseña
+                    nuevos_params = {
+                        "longitud": int(self.slider_longitud.get()),
+                        "usar_mayusculas": self.var_mayus.get(),
+                        "usar_numeros": self.var_num.get(),
+                        "usar_simbolos": self.var_simb.get(),
+                        "excluir_ambiguos": self.var_ambig.get(),
+                    }
+                    uid = str(self.resultado_registro['usuario']['_id'])
+                    self.resultado_registro = regenerar_contraseña(uid, nuevos_params)
+                    self.resultado_registro['usuario'] = self.resultado_registro.get('usuario', {})
+                    if 'nueva_contraseña' in self.resultado_registro:
+                        self.resultado_registro['contraseña_generada'] = self.resultado_registro['nueva_contraseña']
+                except Exception as e:
+                    self.label_error.configure(text=str(e))
+                    return
             self.paso_actual = 3
             self._mostrar_paso_3()
 
