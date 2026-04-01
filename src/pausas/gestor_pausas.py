@@ -55,7 +55,7 @@ def iniciar_pausa(usuario_id: str) -> dict:
     })
     
     if ciclo_activo is None:
-        raise Exception("No hay ciclo Pomodoro activo. Inicia un ciclo primero.")
+        raise RuntimeError("No hay ciclo Pomodoro activo. Inicia un ciclo primero.")
     
     # Verificar que no hay pausa activa
     coleccion_pausas = conexion_global.obtener_coleccion('pausas_manuales')
@@ -146,7 +146,7 @@ def finalizar_pausa(usuario_id: str) -> dict:
     })
     
     if pausa_activa is None:
-        raise Exception("No hay pausa activa para finalizar")
+        raise RuntimeError("No hay pausa activa para finalizar")
     
     ahora = datetime.now(timezone.utc)
     inicio = pausa_activa['inicio']
