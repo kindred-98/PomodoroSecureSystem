@@ -108,7 +108,7 @@ class ServicioTimer:
     def tick(self) -> dict:
         """
         Avanza el timer 1 segundo.
-        Retorna el evento ocurrido (si lo hay) y el estado actual.
+        Calcula tiempo restante desde timestamp real (persistente).
         """
         evento = None
 
@@ -118,12 +118,95 @@ class ServicioTimer:
         if self.estado == ESTADO_PAUSADO:
             return {'evento': None, **self.obtener_estado()}
 
-        if self.segundos_restantes > 0:
-            self.segundos_restantes -= 1
-        else:
+        # Calcular segundos restantes desde timestamp real
+        if self._inicio_estado:
+            ahora = datetime.now(timezone.utc)
+            inicio = self._inicio_estado
+            # Manejar datetime naive
+            if hasattr(inicio, 'tzinfo') and inicio.tzinfo is None and hasattr(ahora, 'tzinfo') and ahora.tzinfo is not None:
+                ahora = ahora.replace(tzinfo=None)
+            elapsed = (ahora - inicio).total_seconds()
+            self.segundos_restantes = max(0, int(self.segundos_totales - elapsed))
+
+        if self.segundos_restantes <= 0:
             evento = self._manejar_fin_estado()
 
+        self._guardar_estado_bd()
+
         return {'evento': evento, **self.obtener_estado()}
+
+    def _guardar_estado_bd(self):
+        """Guarda el estado actual del timer en MongoDB."""
+        if not self.usuario_id:
+            return
+        try:
+            coleccion = conexion_global.obtener_coleccion('timer_estado')
+            coleccion.update_one(
+                {'usuario_id': self._parsear_oid(self.usuario_id)},
+                {'$set': {
+                    'estado': self.estado,
+                    'segundos_totales': self.segundos_totales,
+                    'pomodoro_actual': self.pomodoro_actual,
+                    'pomodoros_totales': self.pomodoros_totales,
+                    'pausas_usadas': self.pausas_usadas,
+                    'ciclo_activo': self.ciclo_activo,
+                    'inicio_estado': self._inicio_estado,
+                    'configuracion': self._configuracion,
+                    'descansos_restantes': self._descansos_restantes,
+                    'descanso_largo': self._descanso_largo,
+                    'ciclo_id': self._ciclo_id,
+                    'ultima_actualizacion': datetime.now(timezone.utc),
+                }},
+                upsert=True,
+            )
+        except Exception:
+            pass
+
+    def restaurar_desde_bd(self, usuario_id: str) -> bool:
+        """
+        Restaura el estado del timer desde MongoDB.
+        Llamar al hacer login. Retorna True si había estado guardado.
+        """
+        try:
+            coleccion = conexion_global.obtener_coleccion('timer_estado')
+            doc = coleccion.find_one({
+                'usuario_id': self._parsear_oid(usuario_id)
+            })
+
+            if doc is None or not doc.get('ciclo_activo', False):
+                return False
+
+            self.usuario_id = usuario_id
+            self._ciclo_id = doc.get('ciclo_id')
+            self.estado = doc.get('estado', ESTADO_INACTIVO)
+            self.segundos_totales = doc.get('segundos_totales', 1500)
+            self.pomodoro_actual = doc.get('pomodoro_actual', 1)
+            self.pomodoros_totales = doc.get('pomodoros_totales', 4)
+            self.pausas_usadas = doc.get('pausas_usadas', 0)
+            self.ciclo_activo = doc.get('ciclo_activo', False)
+            self._inicio_estado = doc.get('inicio_estado')
+            self._configuracion = doc.get('configuracion', {})
+            self._descansos_restantes = doc.get('descansos_restantes', [])
+            self._descanso_largo = doc.get('descanso_largo', 30)
+
+            # Recalcular segundos restantes desde timestamp
+            if self._inicio_estado and self.estado != ESTADO_PAUSADO:
+                ahora = datetime.now(timezone.utc)
+                inicio = self._inicio_estado
+                if hasattr(inicio, 'tzinfo') and inicio.tzinfo is None:
+                    ahora = ahora.replace(tzinfo=None)
+                elapsed = (ahora - inicio).total_seconds()
+                self.segundos_restantes = max(0, int(self.segundos_totales - elapsed))
+
+                if self.segundos_restantes <= 0:
+                    # El estado terminó mientras estaba desconectado
+                    self._manejar_fin_estado()
+            else:
+                self.segundos_restantes = self.segundos_totales
+
+            return True
+        except Exception:
+            return False
 
     def _manejar_fin_estado(self) -> str:
         """Maneja la transición cuando un estado llega a 0."""

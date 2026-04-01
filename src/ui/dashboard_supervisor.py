@@ -105,6 +105,22 @@ class DashboardSupervisor(ctk.CTkFrame):
         )
         self.frame_equipos.pack(fill="x", padx=20, pady=(0, 15))
 
+        # ── Usuarios ──
+        usuarios_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
+        usuarios_card.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            usuarios_card, text="Usuarios",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        self.frame_usuarios = ctk.CTkScrollableFrame(
+            usuarios_card, fg_color="transparent",
+            height=150,
+            scrollbar_button_color=BORDE,
+        )
+        self.frame_usuarios.pack(fill="x", padx=20, pady=(0, 15))
+
         # ── Anomalías ──
         anomalias_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
         anomalias_card.pack(fill="both", expand=True)
@@ -132,6 +148,7 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _cargar_datos(self):
         """Carga los datos del supervisor."""
         self._cargar_equipos()
+        self._cargar_usuarios()
         self._cargar_anomalias()
 
     def _cargar_equipos(self):
@@ -168,6 +185,87 @@ class DashboardSupervisor(ctk.CTkFrame):
             )
         except Exception as e:
             self.label_stats.configure(text=f"Error: {e}")
+
+    def _cargar_usuarios(self):
+        """Carga todos los usuarios con opción de cambiar rol."""
+        for widget in self.frame_usuarios.winfo_children():
+            widget.destroy()
+
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            usuarios = list(coleccion.find({'activo': True}))
+
+            if not usuarios:
+                ctk.CTkLabel(
+                    self.frame_usuarios,
+                    text="No hay usuarios registrados.",
+                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                ).pack(pady=10)
+                return
+
+            for usr in usuarios:
+                frame = ctk.CTkFrame(self.frame_usuarios, fg_color=FONDO_SECUNDARIO, corner_radius=6)
+                frame.pack(fill="x", pady=2)
+
+                nombre = usr.get('nombre', 'Sin nombre')
+                email = usr.get('email', '')
+                rol = usr.get('rol', 'empleado')
+
+                info = ctk.CTkFrame(frame, fg_color="transparent")
+                info.pack(side="left", fill="x", expand=True, padx=10, pady=6)
+
+                ctk.CTkLabel(
+                    info, text=f"{nombre} ({email})",
+                    font=("JetBrains Mono", 11), text_color=TEXTO_PRINCIPAL, anchor="w",
+                ).pack(fill="x")
+
+                rol_label = ctk.CTkLabel(
+                    info, text=rol.upper(),
+                    font=("JetBrains Mono", 9, "bold"),
+                    text_color=self._color_rol(rol),
+                    anchor="w",
+                )
+                rol_label.pack(fill="x")
+
+                # Combo para cambiar rol
+                combo = ctk.CTkComboBox(
+                    frame, values=["empleado", "encargado", "supervisor"],
+                    font=("JetBrains Mono", 10), width=120, height=28,
+                    fg_color=FONDO_CARD, text_color=TEXTO_PRINCIPAL,
+                    button_color=TRABAJO_ACTIVO,
+                    command=lambda r, u=usr, rl=rol_label: self._cambiar_rol(u, r, rl),
+                )
+                combo.set(rol)
+                combo.pack(side="right", padx=10)
+
+        except Exception as e:
+            ctk.CTkLabel(
+                self.frame_usuarios,
+                text=f"Error: {e}",
+                font=("JetBrains Mono", 12), text_color=PELIGRO,
+            ).pack(pady=10)
+
+    def _cambiar_rol(self, usuario, nuevo_rol, label_rol):
+        """Cambia el rol de un usuario."""
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            coleccion.update_one(
+                {'_id': usuario['_id']},
+                {'$set': {'rol': nuevo_rol}}
+            )
+            label_rol.configure(text=nuevo_rol.upper(), text_color=self._color_rol(nuevo_rol))
+        except Exception:
+            pass
+
+    @staticmethod
+    def _color_rol(rol):
+        return {
+            'supervisor': AVISO,
+            'encargado': INFORMACION,
+            'empleado': TEXTO_SECUNDARIO,
+        }.get(rol, TEXTO_SECUNDARIO)
 
     def _cargar_anomalias(self):
         """Carga anomalías recientes."""

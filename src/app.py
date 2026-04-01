@@ -128,12 +128,57 @@ class PomodoroSecureApp(ctk.CTk):
             from src.auth.pin_diario import generar_pin_diario
             generar_pin_diario(str(self.usuario_actual['_id']))
 
+            # Restaurar timer desde BD (si había ciclo activo)
+            from src.timer.servicio_timer import servicio_timer
+            servicio_timer.restaurar_desde_bd(str(self.usuario_actual['_id']))
+
+            # Vincular empleado a equipo si no tiene
+            self._vincular_a_equipo()
+
             # Verificar si necesita configurar descansos
             self.after(500, self._verificar_config_descansos)
         except Exception as e:
             if hasattr(self.vista_actual, 'mostrar_error'):
                 self.vista_actual.mostrar_error(str(e))
             raise
+
+    def _vincular_a_equipo(self):
+        """Vincula el usuario al equipo del supervisor si no tiene equipo."""
+        try:
+            from src.db.conexion import conexion_global
+            coleccion_equipos = conexion_global.obtener_coleccion('equipos')
+
+            # Verificar si ya está en algún equipo
+            equipo_existente = coleccion_equipos.find_one({
+                'miembros': self.usuario_actual['_id']
+            })
+            if equipo_existente:
+                return
+
+            # Buscar equipo del supervisor
+            if self.usuario_actual.get('rol') == 'supervisor':
+                # Supervisor crea su propio equipo si no tiene
+                equipo = coleccion_equipos.find_one({
+                    'encargado_id': self.usuario_actual['_id']
+                })
+                if not equipo:
+                    coleccion_equipos.insert_one({
+                        'nombre': f"Equipo {self.usuario_actual.get('nombre', 'Principal')}",
+                        'encargado_id': self.usuario_actual['_id'],
+                        'miembros': [self.usuario_actual['_id']],
+                        'descansos_fijos': [],
+                        'horario': {'inicio': '09:00', 'fin': '16:00'},
+                    })
+            else:
+                # Empleado/encargado se vincula al primer equipo disponible
+                equipo = coleccion_equipos.find_one()
+                if equipo:
+                    coleccion_equipos.update_one(
+                        {'_id': equipo['_id']},
+                        {'$addToSet': {'miembros': self.usuario_actual['_id']}}
+                    )
+        except Exception:
+            pass
 
     def _verificar_config_descansos(self):
         """Muestra popup de descansos si no están configurados."""
