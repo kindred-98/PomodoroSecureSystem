@@ -91,27 +91,40 @@ class ConfigDescansosView(ctk.CTkToplevel):
         ).pack(side="right")
 
     def _cargar_descansos(self):
-        """Carga descansos fijos actuales del equipo."""
+        """Carga descansos fijos actuales."""
         for widget in self.frame_descansos.winfo_children():
             widget.destroy()
 
         try:
-            from src.db.equipos import obtener_por_encargado
-            equipo = obtener_por_encargado(str(self.usuario['_id']))
+            from src.db.conexion import conexion_global
+
+            # Buscar equipo del usuario (como encargado o supervisor)
+            coleccion = conexion_global.obtener_coleccion('equipos')
+            rol = self.usuario.get('rol', 'empleado')
+            uid = self.usuario['_id']
+
+            if rol == 'supervisor':
+                # Supervisor ve el primer equipo disponible o crea uno
+                equipo = coleccion.find_one()
+            else:
+                equipo = coleccion.find_one({'encargado_id': uid})
 
             if not equipo:
                 ctk.CTkLabel(
                     self.frame_descansos,
-                    text="No tienes un equipo asignado.",
+                    text="No hay equipo configurado.",
                     font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
+                self._equipo_actual = None
                 return
 
+            self._equipo_actual = equipo
             descansos = equipo.get('descansos_fijos', [])
+
             if not descansos:
                 ctk.CTkLabel(
                     self.frame_descansos,
-                    text="No hay descansos fijos configurados.",
+                    text="No hay descansos fijos. Usa el formulario de abajo para agregar.",
                     font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 return
@@ -122,7 +135,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
 
                 ctk.CTkLabel(
                     frame,
-                    text=f"☕ {desc.get('nombre', '')} — {desc.get('hora_inicio', '')} — {desc.get('duracion_min', 0)} min",
+                    text=f"{desc.get('nombre', '')}  |  {desc.get('hora_inicio', '')}  |  {desc.get('duracion_min', 0)} min",
                     font=("JetBrains Mono", 12), text_color=TEXTO_PRINCIPAL,
                 ).pack(side="left", padx=10, pady=8)
 
@@ -144,29 +157,33 @@ class ConfigDescansosView(ctk.CTkToplevel):
 
         try:
             duracion_int = int(duracion)
-            from src.db.equipos import obtener_por_encargado
-            from src.db.conexion import conexion_global
+        except ValueError:
+            return
 
-            equipo = obtener_por_encargado(str(self.usuario['_id']))
-            if not equipo:
-                return
+        equipo = getattr(self, '_equipo_actual', None)
+        if equipo is None:
+            return
 
-            nuevo = {
-                'nombre': nombre,
-                'hora_inicio': hora,
-                'duracion_min': duracion_int,
-            }
+        nuevo = {
+            'nombre': nombre,
+            'hora_inicio': hora,
+            'duracion_min': duracion_int,
+        }
 
-            coleccion = conexion_global.obtener_coleccion('equipos')
-            coleccion.update_one(
-                {'_id': equipo['_id']},
-                {'$push': {'descansos_fijos': nuevo}}
-            )
+        from src.db.conexion import conexion_global
+        coleccion = conexion_global.obtener_coleccion('equipos')
 
-            self.entry_nombre.delete(0, "end")
-            self.entry_hora.delete(0, "end")
-            self.entry_duracion.delete(0, "end")
+        # Usar $set con fallback por si descansos_fijos no existe
+        descansos_actuales = equipo.get('descansos_fijos', [])
+        descansos_actuales.append(nuevo)
 
-            self._cargar_descansos()
-        except (ValueError, Exception):
-            pass
+        coleccion.update_one(
+            {'_id': equipo['_id']},
+            {'$set': {'descansos_fijos': descansos_actuales}}
+        )
+
+        self.entry_nombre.delete(0, "end")
+        self.entry_hora.delete(0, "end")
+        self.entry_duracion.delete(0, "end")
+
+        self._cargar_descansos()

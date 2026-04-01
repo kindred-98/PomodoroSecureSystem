@@ -107,37 +107,54 @@ class DashboardEncargado(ctk.CTkFrame):
 
     def _cargar_equipo(self):
         """Carga los miembros del equipo del encargado."""
+        self._miembros_cache = []
+        self._equipo_id = None
         try:
             from src.db.equipos import obtener_por_encargado
             from src.db.equipos import obtener_miembros
 
             equipo = obtener_por_encargado(str(self.usuario['_id']))
             if equipo:
+                self._equipo_id = equipo['_id']
                 miembros = obtener_miembros(str(equipo['_id']))
-                self._mostrar_miembros(miembros)
-                # Contar anomalías del equipo
+                self._miembros_cache = miembros
+                self._actualizar_miembros()
                 self._contar_anomalias_equipo(equipo['_id'])
+                self._iniciar_polling_equipo()
             else:
                 self.label_vacio.configure(text="No tienes un equipo asignado.")
         except Exception as e:
             self.label_vacio.configure(text=f"Error al cargar equipo: {e}")
 
-    def _mostrar_miembros(self, miembros):
-        """Muestra los miembros del equipo con su estado."""
-        self.label_vacio.pack_forget()
+    def _iniciar_polling_equipo(self):
+        """Refresca el estado del equipo cada 5 segundos."""
+        self._job_equipo = self.after(5000, self._refrescar_equipo)
 
-        for miembro in miembros:
+    def _refrescar_equipo(self):
+        """Refresca el estado real de los miembros."""
+        try:
+            self._actualizar_miembros()
+        except Exception:
+            pass
+        self._job_equipo = self.after(5000, self._refrescar_equipo)
+
+    def _actualizar_miembros(self):
+        """Reconstruye la lista de miembros con estado real."""
+        for widget in self.frame_miembros.winfo_children():
+            widget.destroy()
+
+        from src.db.conexion import conexion_global
+        coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
+
+        for miembro in self._miembros_cache:
+            estado, color, texto = self._obtener_estado_miembro(miembro, coleccion_ciclos)
+
             frame = ctk.CTkFrame(self.frame_miembros, fg_color=FONDO_SECUNDARIO, corner_radius=8)
             frame.pack(fill="x", pady=3)
 
-            # Estado (simulado por ahora)
-            estado_emoji = "⚫"
-            estado_texto = "Fuera de jornada"
-            estado_color = TEXTO_SECUNDARIO
-
             ctk.CTkLabel(
-                frame, text=estado_emoji,
-                font=("Segoe UI Emoji", 18), text_color=estado_color,
+                frame, text=estado,
+                font=("Segoe UI Emoji", 18), text_color=color,
             ).pack(side="left", padx=(10, 5), pady=8)
 
             info = ctk.CTkFrame(frame, fg_color="transparent")
@@ -150,10 +167,43 @@ class DashboardEncargado(ctk.CTkFrame):
             ).pack(fill="x")
 
             ctk.CTkLabel(
-                info, text=f"{miembro.get('rol', 'empleado').title()} — {estado_texto}",
-                font=("JetBrains Mono", 10), text_color=estado_color,
+                info, text=f"{miembro.get('rol', 'empleado').title()} — {texto}",
+                font=("JetBrains Mono", 10), text_color=color,
                 anchor="w",
             ).pack(fill="x")
+
+    @staticmethod
+    def _obtener_estado_miembro(miembro, coleccion_ciclos):
+        """Obtiene el estado real de un miembro desde la BD."""
+        try:
+            mid = miembro.get('_id')
+            if mid is None:
+                return "⚫", TEXTO_SECUNDARIO, "Sin ID"
+
+            ciclo = coleccion_ciclos.find_one({
+                'usuario_id': mid,
+                'completado': False,
+            })
+
+            if ciclo is None:
+                return "⚫", TEXTO_SECUNDARIO, "Fuera de jornada"
+
+            estado = ciclo.get('estado_actual', 'INACTIVO')
+
+            if estado == 'TRABAJANDO':
+                pom = ciclo.get('pomodoro_actual', 1)
+                total = ciclo.get('pomodoros_totales', 4)
+                return "🟢", COMPLETADO, f"Trabajando (Pom {pom}/{total})"
+            elif estado == 'PAUSADO':
+                return "🟡", AVISO, "En pausa"
+            elif estado in ('DESCANSO_CORTO', 'DESCANSO_LARGO'):
+                tipo = "corto" if 'CORTO' in estado else "largo"
+                return "☕", TIMER_DESCANSO_CORTO if tipo == "corto" else TIMER_DESCANSO_LARGO, f"Descanso {tipo}"
+            else:
+                return "⚫", TEXTO_SECUNDARIO, "Inactivo"
+
+        except Exception:
+            return "⚫", TEXTO_SECUNDARIO, "Sin conexion"
 
     def _contar_anomalias_equipo(self, equipo_id):
         """Cuenta anomalías pendientes del equipo."""

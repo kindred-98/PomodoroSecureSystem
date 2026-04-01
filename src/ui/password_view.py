@@ -107,7 +107,46 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_reg_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN C: Cambio manual ──
+        # ── OPCIÓN C: Contraseña personalizada ──
+        card_custom = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
+        card_custom.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            card_custom, text="Contraseña personalizada",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        ctk.CTkLabel(
+            card_custom,
+            text="El sistema mezcla tus caracteres para crear una contrasena fuerte.",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", padx=20)
+
+        frame_custom = ctk.CTkFrame(card_custom, fg_color="transparent")
+        frame_custom.pack(fill="x", padx=20, pady=(10, 15))
+
+        self.entry_semilla_pw = ctk.CTkEntry(
+            frame_custom, placeholder_text="Ej: ADEV1130$yasuo05 (min 8 chars)",
+            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+        )
+        self.entry_semilla_pw.pack(side="left", fill="x", expand=True, padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_custom, text="Generar",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, width=90, height=38, corner_radius=8,
+            command=self._generar_personalizada,
+        ).pack(side="right")
+
+        self.label_custom_resultado = ctk.CTkLabel(
+            card_custom, text="", font=("JetBrains Mono", 12),
+            text_color=COMPLETADO,
+        )
+        self.label_custom_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+
+        # ── OPCIÓN D: Cambio manual ──
         card_manual = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_manual.pack(fill="x", pady=(0, 15))
 
@@ -123,10 +162,10 @@ class PasswordView(ctk.CTkFrame):
         ).pack(anchor="w", padx=20)
 
         frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
-        frame_manual.pack(fill="x", padx=20, pady=(10, 15))
+        frame_manual.pack(fill="x", padx=20, pady=(10, 5))
 
         self.entry_manual = ctk.CTkEntry(
-            frame_manual, placeholder_text="Nueva contraseña",
+            frame_manual, placeholder_text="Nueva contrasena",
             font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
@@ -139,6 +178,24 @@ class PasswordView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, width=100, height=38, corner_radius=8,
             command=self._cambiar_manual,
         ).pack(side="right")
+
+        # Indicador de fortaleza en tiempo real
+        self.label_fortaleza_tiempo = ctk.CTkLabel(
+            card_manual, text="Escribe tu contrasena...",
+            font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+        )
+        self.label_fortaleza_tiempo.pack(anchor="w", padx=20)
+
+        self.barra_fortaleza = ctk.CTkProgressBar(
+            card_manual,
+            fg_color=FONDO_SECUNDARIO,
+            progress_color=TEXTO_SECUNDARIO,
+            height=6, corner_radius=3,
+        )
+        self.barra_fortaleza.pack(fill="x", padx=20, pady=(2, 10))
+        self.barra_fortaleza.set(0)
+
+        self.entry_manual.bind("<KeyRelease>", self._actualizar_fortaleza_tiempo)
 
         self.label_manual_resultado = ctk.CTkLabel(
             card_manual, text="", font=("JetBrains Mono", 12),
@@ -189,6 +246,42 @@ class PasswordView(ctk.CTkFrame):
         except Exception as e:
             self.label_ver_resultado.configure(text=str(e), text_color=PELIGRO)
 
+    def _actualizar_fortaleza_tiempo(self, event=None):
+        """Actualiza el indicador de fortaleza en cada keystroke."""
+        pw = self.entry_manual.get()
+        if not pw:
+            self.label_fortaleza_tiempo.configure(text="Escribe tu contrasena...", text_color=TEXTO_SECUNDARIO)
+            self.barra_fortaleza.set(0)
+            self.barra_fortaleza.configure(progress_color=TEXTO_SECUNDARIO)
+            return
+
+        try:
+            from src.generador import evaluar_fortaleza
+            resultado = evaluar_fortaleza(pw)
+            puntuacion = resultado.get('puntuacion', 0)
+            nivel = resultado.get('nivel', 'Muy Debil')
+
+            self.label_fortaleza_tiempo.configure(
+                text=f"{nivel} ({puntuacion}/100)",
+                text_color=self._color_fortaleza(puntuacion),
+            )
+            self.barra_fortaleza.set(puntuacion / 100)
+            self.barra_fortaleza.configure(progress_color=self._color_fortaleza(puntuacion))
+        except Exception:
+            pass
+
+    @staticmethod
+    def _color_fortaleza(puntuacion):
+        """Retorna el color segun la puntuacion."""
+        if puntuacion >= 80:
+            return COMPLETADO
+        elif puntuacion >= 60:
+            return AVISO
+        elif puntuacion >= 40:
+            return INFORMACION
+        else:
+            return PELIGRO
+
     def _regenerar(self):
         try:
             from src.auth import regenerar_contraseña
@@ -204,6 +297,38 @@ class PasswordView(ctk.CTkFrame):
             )
         except Exception as e:
             self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _generar_personalizada(self):
+        """Genera contraseña usando los caracteres del usuario."""
+        semilla = self.entry_semilla_pw.get().strip()
+        if len(semilla) < 8:
+            self.label_custom_resultado.configure(
+                text="Minimo 8 caracteres", text_color=PELIGRO
+            )
+            return
+        try:
+            from src.generador import generar_contraseña_personalizada
+            from src.seguridad.encriptacion import hashear_contraseña, cifrar
+            from src.db.conexion import conexion_global
+
+            pw = generar_contraseña_personalizada(semilla)
+            nuevo_hash = hashear_contraseña(pw)
+            nueva_enc = cifrar(pw)
+
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            coleccion.update_one(
+                {'_id': self.usuario['_id']},
+                {'$set': {
+                    'contraseña_hash': nuevo_hash,
+                    'contraseña_encriptada': nueva_enc,
+                }}
+            )
+
+            self.label_custom_resultado.configure(
+                text=f"Tu contrasena: {pw}", text_color=COMPLETADO
+            )
+        except Exception as e:
+            self.label_custom_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _cambiar_manual(self):
         pw = self.entry_manual.get()

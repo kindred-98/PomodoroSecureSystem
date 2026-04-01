@@ -1,6 +1,7 @@
 """
 Módulo: dashboard_empleado.py
 Responsabilidad: Dashboard principal del empleado con timer Pomodoro.
+Lee el estado del servicio_timer (no lo posee).
 """
 
 import customtkinter as ctk
@@ -15,20 +16,21 @@ class DashboardEmpleado(ctk.CTkFrame):
         self.usuario = usuario
         self.on_logout = on_logout
         self.on_ver_contraseña = on_ver_contraseña
-        self.ciclo_activo = False
-        self.estado_timer = "INACTIVO"
-        self.segundos_restantes = 0
-        self._job_timer = None
+        self._job_refresh = None
         self._crear_widgets()
+        self._sincronizar_con_servicio()
+        self._iniciar_refresh()
 
     def _crear_widgets(self):
-        # ── HEADER ──
+        from src.timer.servicio_timer import servicio_timer
+
+        # HEADER
         header = ctk.CTkFrame(self, fg_color=FONDO_SECUNDARIO, height=60)
         header.pack(fill="x")
         header.pack_propagate(False)
 
         ctk.CTkLabel(
-            header, text="🍅 PomodoroSecure",
+            header, text="PomodoroSecure",
             font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
@@ -39,22 +41,22 @@ class DashboardEmpleado(ctk.CTkFrame):
             font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="right", padx=20)
 
-        # ── BODY (panel lateral + central) ──
+        # BODY
         body = ctk.CTkFrame(self, fg_color="transparent")
         body.pack(fill="both", expand=True, padx=15, pady=15)
 
-        # Panel lateral izquierdo
+        # Panel lateral
         lateral = ctk.CTkFrame(body, fg_color=FONDO_SECUNDARIO, width=220, corner_radius=12)
         lateral.pack(side="left", fill="y", padx=(0, 15))
         lateral.pack_propagate(False)
 
         ctk.CTkLabel(
-            lateral, text="📊 Hoy",
+            lateral, text="Hoy",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 5))
 
         self.label_ciclos = ctk.CTkLabel(
-            lateral, text="Ciclos: 0/∞",
+            lateral, text="Ciclos: 0/inf",
             font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_ciclos.pack(anchor="w", padx=15)
@@ -65,26 +67,31 @@ class DashboardEmpleado(ctk.CTkFrame):
         )
         self.label_trabajado.pack(anchor="w", padx=15, pady=(3, 0))
 
-        # Separador
         ctk.CTkFrame(lateral, fg_color=BORDE, height=1).pack(fill="x", padx=15, pady=15)
 
         ctk.CTkLabel(
-            lateral, text="⏸ Pausas",
+            lateral, text="Pausas",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15)
 
         self.label_pausas = ctk.CTkLabel(
-            lateral, text="○ ○  (0 usadas)",
+            lateral, text="O O  (0 usadas)",
             font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_pausas.pack(anchor="w", padx=15, pady=(5, 0))
 
-        # Separador
         ctk.CTkFrame(lateral, fg_color=BORDE, height=1).pack(fill="x", padx=15, pady=15)
 
-        # Botones laterales
         ctk.CTkButton(
-            lateral, text="🔑 Contraseña",
+            lateral, text="Descansos",
+            font=("JetBrains Mono", 12),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+            command=self._ver_descansos,
+        ).pack(fill="x", padx=15, pady=3)
+
+        ctk.CTkButton(
+            lateral, text="Contrasena",
             font=("JetBrains Mono", 12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
@@ -92,7 +99,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         ).pack(fill="x", padx=15, pady=3)
 
         ctk.CTkButton(
-            lateral, text="🚪 Cerrar Sesión",
+            lateral, text="Cerrar Sesion",
             font=("JetBrains Mono", 12),
             fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
@@ -108,7 +115,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         timer_card.pack(fill="x", pady=(0, 15))
 
         self.label_estado = ctk.CTkLabel(
-            timer_card, text="🍅 INACTIVO",
+            timer_card, text="INACTIVO",
             font=("JetBrains Mono", 18, "bold"), text_color=TEXTO_SECUNDARIO,
         )
         self.label_estado.pack(pady=(25, 5))
@@ -119,23 +126,20 @@ class DashboardEmpleado(ctk.CTkFrame):
         )
         self.label_countdown.pack()
 
-        # Barra de progreso del pomodoro
         self.progreso_pomodoro = ctk.CTkProgressBar(
             timer_card,
             fg_color=FONDO_SECUNDARIO,
             progress_color=TRABAJO_ACTIVO,
-            height=8,
-            corner_radius=4,
+            height=8, corner_radius=4,
         )
         self.progreso_pomodoro.pack(fill="x", padx=40, pady=(5, 15))
         self.progreso_pomodoro.set(0)
 
-        # Botones de control
         botones_control = ctk.CTkFrame(timer_card, fg_color="transparent")
         botones_control.pack(pady=(0, 25))
 
         self.boton_iniciar = ctk.CTkButton(
-            botones_control, text="▶ Iniciar Jornada",
+            botones_control, text="Iniciar Jornada",
             font=("JetBrains Mono", 14, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=180, corner_radius=10,
@@ -144,7 +148,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         self.boton_iniciar.pack(side="left", padx=5)
 
         self.boton_pausar = ctk.CTkButton(
-            botones_control, text="⏸ Pausar",
+            botones_control, text="Pausar",
             font=("JetBrains Mono", 13),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=130, corner_radius=10,
@@ -158,7 +162,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         descansos_card.pack(fill="x")
 
         ctk.CTkLabel(
-            descansos_card, text="Próximos descansos",
+            descansos_card, text="Proximos descansos",
             font=("JetBrains Mono", 13, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
@@ -166,117 +170,134 @@ class DashboardEmpleado(ctk.CTkFrame):
             descansos_card,
             text="Corto 1: 5 min\nCorto 2: 5 min\nCorto 3: 5 min\nCorto 4: 5 min\nLargo: 30 min",
             font=("JetBrains Mono", 11),
-            text_color=TEXTO_SECUNDARIO,
-            justify="left",
+            text_color=TEXTO_SECUNDARIO, justify="left",
         )
         self.label_descansos.pack(anchor="w", padx=20, pady=(0, 15))
 
-    def _iniciar_ciclo(self):
-        """Inicia un ciclo Pomodoro."""
+    def _sincronizar_con_servicio(self):
+        """Lee el estado del servicio y actualiza la UI."""
+        from src.timer.servicio_timer import servicio_timer
+        estado = servicio_timer.obtener_estado()
+
+        self._actualizar_labels(estado)
+
+    def _iniciar_refresh(self):
+        """Inicia el loop de actualización cada 1 segundo."""
+        self._job_refresh = self.after(1000, self._refrescar)
+
+    def _refrescar(self):
+        """Lee el estado del servicio y actualiza la UI."""
         try:
-            from src.timer import iniciar_ciclo
-            resultado = iniciar_ciclo(str(self.usuario['_id']))
-            self.ciclo_activo = True
-            self.estado_timer = "TRABAJANDO"
-            config = resultado.get('configuracion', {})
-            self.segundos_restantes = config.get('pomodoro_min', 25) * 60
+            from src.timer.servicio_timer import servicio_timer
+            resultado = servicio_timer.tick()
+            estado = resultado
 
+            self._actualizar_labels(estado)
+        except Exception:
+            pass
+
+        self._job_refresh = self.after(1000, self._refrescar)
+
+    def _actualizar_labels(self, estado):
+        """Actualiza todos los labels con el estado del servicio."""
+        est = estado.get('estado', 'INACTIVO')
+        seg = estado.get('segundos_restantes', 0)
+        total = estado.get('segundos_totales', 1)
+        pom_actual = estado.get('pomodoro_actual', 0)
+        pom_total = estado.get('pomodoros_totales', 4)
+        pausas = estado.get('pausas_usadas', 0)
+        pausas_max = estado.get('pausas_maximas', 2)
+        activo = estado.get('ciclo_activo', False)
+
+        # Countdown
+        minutos = seg // 60
+        segundos = seg % 60
+        self.label_countdown.configure(text=f"{minutos:02d}:{segundos:02d}")
+
+        # Progreso
+        if total > 0:
+            progreso = 1 - (seg / total)
+            self.progreso_pomodoro.set(progreso)
+
+        # Estado
+        if est == "INACTIVO":
+            self.label_estado.configure(text="INACTIVO", text_color=TEXTO_SECUNDARIO)
+            self.boton_iniciar.configure(state="normal")
+            self.boton_pausar.configure(state="disabled", text="Pausar")
+            self.progreso_pomodoro.set(0)
+        elif est == "TRABAJANDO":
+            self.label_estado.configure(
+                text=f"TRABAJANDO (Pom {pom_actual}/{pom_total})",
+                text_color=TRABAJO_ACTIVO
+            )
             self.boton_iniciar.configure(state="disabled")
-            self.boton_pausar.configure(state="normal")
-            self.label_estado.configure(text="🍅 TRABAJANDO", text_color=TRABAJO_ACTIVO)
+            self.boton_pausar.configure(state="normal", text="Pausar")
+        elif est == "PAUSADO":
+            self.label_estado.configure(text="PAUSADO", text_color=TIMER_PAUSADO)
+            self.boton_pausar.configure(state="normal", text="Reanudar")
+        elif est == "DESCANSO_CORTO":
+            self.label_estado.configure(
+                text=f"DESCANSO CORTO ({seg // 60 + 1} min)",
+                text_color=TIMER_DESCANSO_CORTO
+            )
+            self.boton_iniciar.configure(state="disabled")
+            self.boton_pausar.configure(state="disabled")
+        elif est == "DESCANSO_LARGO":
+            self.label_estado.configure(
+                text=f"DESCANSO LARGO ({seg // 60 + 1} min)",
+                text_color=TIMER_DESCANSO_LARGO
+            )
+            self.boton_iniciar.configure(state="disabled")
+            self.boton_pausar.configure(state="disabled")
 
-            self._actualizar_countdown()
+        # Pausas
+        estados_p = []
+        for i in range(pausas_max):
+            estados_p.append("X" if i < pausas else "O")
+        self.label_pausas.configure(text=f"{' '.join(estados_p)}  ({pausas}/{pausas_max})")
+
+    def _iniciar_ciclo(self):
+        """Inicia un ciclo Pomodoro via servicio."""
+        try:
+            from src.timer.servicio_timer import servicio_timer
+            uid = str(self.usuario['_id'])
+            servicio_timer.iniciar(uid)
+            self._sincronizar_con_servicio()
         except Exception as e:
             self.label_estado.configure(text=f"Error: {e}", text_color=PELIGRO)
 
     def _pausar_reanudar(self):
-        """Pausa o reanuda el timer."""
+        """Pausa o reanuda via servicio."""
         try:
-            from src.pausas import iniciar_pausa, finalizar_pausa
-            uid = str(self.usuario['_id'])
+            from src.timer.servicio_timer import servicio_timer
+            estado = servicio_timer.obtener_estado()
 
-            if self.estado_timer == "PAUSADO":
-                finalizar_pausa(uid)
-                self.estado_timer = "TRABAJANDO"
-                self.boton_pausar.configure(text="⏸ Pausar")
-                self.label_estado.configure(text="🍅 TRABAJANDO", text_color=TRABAJO_ACTIVO)
-                self._actualizar_countdown()
+            if estado['estado'] == "PAUSADO":
+                servicio_timer.reanudar()
             else:
-                iniciar_pausa(uid)
-                self.estado_timer = "PAUSADO"
-                self.boton_pausar.configure(text="▶ Reanudar")
-                self.label_estado.configure(text="⏸ PAUSADO", text_color=TIMER_PAUSADO)
-                if self._job_timer:
-                    self.after_cancel(self._job_timer)
+                servicio_timer.pausar()
+
+            self._sincronizar_con_servicio()
         except Exception as e:
             self.label_estado.configure(text=str(e), text_color=PELIGRO)
 
-    def _actualizar_countdown(self):
-        """Actualiza el countdown cada segundo."""
-        if self.estado_timer == "PAUSADO":
-            return
-
-        if self.segundos_restantes > 0:
-            self.segundos_restantes -= 1
-            minutos = self.segundos_restantes // 60
-            segundos = self.segundos_restantes % 60
-            self.label_countdown.configure(text=f"{minutos:02d}:{segundos:02d}")
-
-            # Actualizar progreso
-            total = 25 * 60
-            progreso = 1 - (self.segundos_restantes / total)
-            self.progreso_pomodoro.set(progreso)
-
-            self._job_timer = self.after(1000, self._actualizar_countdown)
-        else:
-            # Pomodoro completado
-            self.label_countdown.configure(text="00:00")
-            self.progreso_pomodoro.set(1)
-            self._manejar_pomodoro_completado()
-
-    def _manejar_pomodoro_completado(self):
-        """Maneja la finalización de un pomodoro."""
+    def _ver_descansos(self):
+        """Abre la vista de configuracion de descansos."""
         try:
-            from src.timer import manejar_evento_timer
-            uid = str(self.usuario['_id'])
-            resultado = manejar_evento_timer(uid, "pomodoro_completado")
-
-            accion = resultado.get('accion', '')
-            duracion = resultado.get('datos_extra', {}).get('duracion_min', 5)
-
-            if 'descanso' in accion:
-                self.estado_timer = "DESCANSO"
-                self.segundos_restantes = duracion * 60
-                self.label_estado.configure(
-                    text=f"☕ DESCANSO ({duracion} min)",
-                    text_color=TIMER_DESCANSO_CORTO if 'corto' in accion else TIMER_DESCANSO_LARGO,
-                )
-                self._actualizar_countdown()
+            from src.ui.config_descansos_view import ConfigDescansosView
+            vista = ConfigDescansosView(self, self.usuario)
+            vista.grab_set()
         except Exception:
-            self.estado_timer = "INACTIVO"
-            self.boton_iniciar.configure(state="normal")
-            self.boton_pausar.configure(state="disabled")
+            pass
 
     def _on_logout_click(self):
-        if self._job_timer:
-            self.after_cancel(self._job_timer)
+        from src.timer.servicio_timer import servicio_timer
+        servicio_timer.destruir()
+        if self._job_refresh:
+            self.after_cancel(self._job_refresh)
         self.on_logout()
 
-    def actualizar_pausas(self, usadas):
-        """Actualiza el indicador de pausas."""
-        estados = []
-        for i in range(2):
-            estados.append("●" if i < usadas else "○")
-        self.label_pausas.configure(text=f"{' '.join(estados)}  ({usadas} usadas)")
-
-    def limpiar(self):
-        """Resetea el dashboard."""
-        if self._job_timer:
-            self.after_cancel(self._job_timer)
-        self.ciclo_activo = False
-        self.estado_timer = "INACTIVO"
-        self.label_estado.configure(text="🍅 INACTIVO", text_color=TEXTO_SECUNDARIO)
-        self.label_countdown.configure(text="25:00")
-        self.progreso_pomodoro.set(0)
-        self.boton_iniciar.configure(state="normal")
-        self.boton_pausar.configure(state="disabled", text="⏸ Pausar")
+    def destroy(self):
+        if self._job_refresh:
+            self.after_cancel(self._job_refresh)
+        super().destroy()

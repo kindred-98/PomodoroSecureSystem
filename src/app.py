@@ -123,10 +123,27 @@ class PomodoroSecureApp(ctk.CTk):
             resultado = iniciar_sesion(email, contraseña)
             self.usuario_actual = resultado['usuario']
             self._mostrar_dashboard()
+
+            # Verificar si necesita configurar descansos
+            self.after(500, self._verificar_config_descansos)
         except Exception as e:
             if hasattr(self.vista_actual, 'mostrar_error'):
                 self.vista_actual.mostrar_error(str(e))
             raise
+
+    def _verificar_config_descansos(self):
+        """Muestra popup de descansos si no están configurados."""
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            usuario = coleccion.find_one({'_id': self.usuario_actual['_id']})
+
+            if not usuario.get('config_descansos'):
+                from src.ui.config_bloque_descansos import ConfigBloqueDescansos
+                popup = ConfigBloqueDescansos(self, self.usuario_actual)
+                popup.grab_set()
+        except Exception:
+            pass
 
     def _on_logout(self):
         """Callback cuando el usuario cierra sesión."""

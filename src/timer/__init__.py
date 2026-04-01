@@ -20,6 +20,7 @@ from src.timer.ciclo_pomodoro import (
     registrar_callback,
 )
 from src.timer.servicio_sesiones import registrar_sesion_pomodoro
+from src.timer.servicio_timer import ServicioTimer, servicio_timer
 
 __all__ = [
     # Banco de tiempo
@@ -40,4 +41,7 @@ __all__ = [
     "registrar_callback",
     # Servicio sesiones
     "registrar_sesion_pomodoro",
+    # Servicio timer
+    "ServicioTimer",
+    "servicio_timer",
 ]

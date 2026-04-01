@@ -256,6 +256,51 @@ class RegistroView(ctk.CTkFrame):
                 fg_color=FONDO_SECUNDARIO, checkmark_color=TEXTO_PRINCIPAL,
             ).pack(anchor="w", pady=(8, 0))
 
+        # Opcion contrasena personalizada
+        ctk.CTkFrame(self.contenido, fg_color=BORDE, height=1).pack(fill="x", pady=(15, 10))
+
+        self.tipo_contraseña = ctk.StringVar(value="sistema")
+
+        ctk.CTkRadioButton(
+            self.contenido, text="Generada por el sistema (recomendado)",
+            variable=self.tipo_contraseña, value="sistema",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
+            command=self._toggle_tipo_contraseña,
+        ).pack(anchor="w")
+
+        ctk.CTkRadioButton(
+            self.contenido, text="Personalizada (tu decides los caracteres)",
+            variable=self.tipo_contraseña, value="personalizada",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
+            command=self._toggle_tipo_contraseña,
+        ).pack(anchor="w", pady=(2, 5))
+
+        self.frame_semilla = ctk.CTkFrame(self.contenido, fg_color="transparent")
+        self.frame_semilla.pack(fill="x", pady=(0, 5))
+
+        ctk.CTkLabel(
+            self.frame_semilla, text="Tus caracteres:",
+            font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w")
+
+        self.entry_semilla = ctk.CTkEntry(
+            self.frame_semilla,
+            placeholder_text="Ej: ADEV1130$yasuo05",
+            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+        )
+        self.entry_semilla.pack(fill="x")
+
+        ctk.CTkLabel(
+            self.frame_semilla,
+            text="Min 8 caracteres. El sistema los mezclara para crear tu contrasena.",
+            font=("JetBrains Mono", 9), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", pady=(2, 0))
+
+        self.frame_semilla.pack_forget()  # Oculto por defecto
+
         # Preview fortaleza
         self.label_preview = ctk.CTkLabel(
             self.contenido,
@@ -358,6 +403,13 @@ class RegistroView(ctk.CTkFrame):
             self.clipboard_clear()
             self.clipboard_append(self.resultado_registro['contraseña_generada'])
 
+    def _toggle_tipo_contraseña(self):
+        """Muestra/oculta el campo de semilla personalizada."""
+        if self.tipo_contraseña.get() == "personalizada":
+            self.frame_semilla.pack(fill="x", pady=(0, 5))
+        else:
+            self.frame_semilla.pack_forget()
+
     def _validar_paso_1(self):
         nombre = self.entry_nombre.get().strip()
         email = self.entry_email.get().strip()
@@ -397,27 +449,53 @@ class RegistroView(ctk.CTkFrame):
                 return
 
         elif self.paso_actual == 2:
-            # Regenerar con parámetros del usuario (si los cambió)
-            if hasattr(self, 'slider_longitud'):
-                try:
-                    from src.auth import regenerar_contraseña
-                    nuevos_params = {
-                        "longitud": int(self.slider_longitud.get()),
-                        "usar_mayusculas": self.var_mayus.get(),
-                        "usar_numeros": self.var_num.get(),
-                        "usar_simbolos": self.var_simb.get(),
-                        "excluir_ambiguos": self.var_ambig.get(),
-                    }
-                    uid = str(self.resultado_registro['usuario']['_id'])
-                    self.resultado_registro = regenerar_contraseña(uid, nuevos_params)
-                    self.resultado_registro['usuario'] = self.resultado_registro.get('usuario', {})
-                    if 'nueva_contraseña' in self.resultado_registro:
-                        self.resultado_registro['contraseña_generada'] = self.resultado_registro['nueva_contraseña']
-                except Exception as e:
-                    self.label_error.configure(text=str(e))
-                    return
-            self.paso_actual = 3
-            self._mostrar_paso_3()
+            try:
+                uid = str(self.resultado_registro['usuario']['_id'])
+
+                if hasattr(self, 'tipo_contraseña') and self.tipo_contraseña.get() == "personalizada":
+                    # Contrasena personalizada con semilla
+                    semilla = self.entry_semilla.get().strip()
+                    if len(semilla) < 8:
+                        self.label_error.configure(text="La semilla debe tener minimo 8 caracteres")
+                        return
+                    from src.generador import generar_contraseña_personalizada
+                    from src.seguridad.encriptacion import hashear_contraseña, cifrar
+                    from src.db.conexion import conexion_global
+
+                    pw = generar_contraseña_personalizada(semilla)
+                    nuevo_hash = hashear_contraseña(pw)
+                    nueva_enc = cifrar(pw)
+
+                    coleccion = conexion_global.obtener_coleccion('usuarios')
+                    coleccion.update_one(
+                        {'_id': self.resultado_registro['usuario']['_id']},
+                        {'$set': {
+                            'contraseña_hash': nuevo_hash,
+                            'contraseña_encriptada': nueva_enc,
+                        }}
+                    )
+                    self.resultado_registro['contraseña_generada'] = pw
+                else:
+                    # Contrasena generada por el sistema
+                    if hasattr(self, 'slider_longitud'):
+                        from src.auth import regenerar_contraseña
+                        nuevos_params = {
+                            "longitud": int(self.slider_longitud.get()),
+                            "usar_mayusculas": self.var_mayus.get(),
+                            "usar_numeros": self.var_num.get(),
+                            "usar_simbolos": self.var_simb.get(),
+                            "excluir_ambiguos": self.var_ambig.get(),
+                        }
+                        self.resultado_registro = regenerar_contraseña(uid, nuevos_params)
+                        self.resultado_registro['usuario'] = self.resultado_registro.get('usuario', {})
+                        if 'nueva_contraseña' in self.resultado_registro:
+                            self.resultado_registro['contraseña_generada'] = self.resultado_registro['nueva_contraseña']
+
+                self.paso_actual = 3
+                self._mostrar_paso_3()
+            except Exception as e:
+                self.label_error.configure(text=str(e))
+                return
 
         elif self.paso_actual == 3:
             self.paso_actual = 4

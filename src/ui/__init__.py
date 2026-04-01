@@ -13,6 +13,7 @@ from src.ui.bloqueo_view import BloqueoView
 from src.ui.password_view import PasswordView
 from src.ui.historial_view import HistorialView
 from src.ui.config_descansos_view import ConfigDescansosView
+from src.ui.config_bloque_descansos import ConfigBloqueDescansos
 
 __all__ = [
     "SplashView",
@@ -25,4 +26,5 @@ __all__ = [
     "PasswordView",
     "HistorialView",
     "ConfigDescansosView",
+    "ConfigBloqueDescansos",
 ]

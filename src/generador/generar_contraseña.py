@@ -67,3 +67,59 @@ def generar_contraseña(parametros: dict) -> str:
     contraseña = asegurar_tipos_caracteres(contraseña, parametros)
     
     return "".join(contraseña)
+
+
+def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
+    """
+    Genera una contraseña fuerte usando SOLO los caracteres de la semilla.
+    
+    La semilla proporcionada por el usuario se usa como pool de caracteres.
+    Se mezcla con Fisher-Yates y se asegura diversidad.
+    
+    Args:
+        semilla (str): Caracteres que el usuario quiere usar (mín 8 chars únicos)
+        longitud (int): Longitud deseada. Si 0, usa el largo de la semilla.
+    
+    Returns:
+        str: Contraseña generada solo con caracteres de la semilla
+    
+    Raises:
+        TypeError: Si semilla no es string
+        ValueError: Si semilla tiene menos de 8 caracteres o muy pocos únicos
+    """
+    if not isinstance(semilla, str):
+        raise TypeError(f"semilla debe ser string, recibido: {type(semilla).__name__}")
+    if not semilla:
+        raise ValueError("semilla no puede estar vacía")
+    
+    # Caracteres únicos
+    unicos = list(set(semilla))
+    
+    if len(unicos) < 4:
+        raise ValueError(
+            f"La semilla debe tener al menos 4 caracteres unicos. "
+            f"Tienes {len(unicos)}: {''.join(unicos)}"
+        )
+    
+    if len(semilla) < 8:
+        raise ValueError(
+            f"La semilla debe tener al menos 8 caracteres. "
+            f"Tienes {len(semilla)}"
+        )
+    
+    # Longitud de la contraseña
+    if longitud <= 0:
+        longitud = len(semilla)
+    
+    # Pool: repetir caracteres únicos hasta cubrir la longitud
+    pool = list(semilla)
+    while len(pool) < longitud:
+        pool.extend(unicos)
+    
+    # Mezclar con Fisher-Yates (secrets)
+    pool = pool[:longitud]
+    for i in range(len(pool) - 1, 0, -1):
+        j = secrets.randbelow(i + 1)
+        pool[i], pool[j] = pool[j], pool[i]
+    
+    return "".join(pool)
