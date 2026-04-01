@@ -65,7 +65,7 @@ def iniciar_pausa(usuario_id: str) -> dict:
     })
     
     if pausa_activa is not None:
-        raise Exception("Ya tienes una pausa activa. Finalízala antes de iniciar otra.")
+        raise RuntimeError("Ya tienes una pausa activa. Finalízala antes de iniciar otra.")
     
     # Contar pausas de hoy
     hoy_inicio = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -75,7 +75,7 @@ def iniciar_pausa(usuario_id: str) -> dict:
     })
     
     if pausas_hoy >= MAXIMO_PAUSAS:
-        raise Exception(
+        raise ValueError(
             f"Máximo de pausas alcanzado ({MAXIMO_PAUSAS}/{MAXIMO_PAUSAS}). "
             f"Ya no puedes tomar más pausas hoy."
         )
