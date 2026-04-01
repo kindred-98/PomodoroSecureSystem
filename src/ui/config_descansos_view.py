@@ -98,21 +98,30 @@ class ConfigDescansosView(ctk.CTkToplevel):
         try:
             from src.db.conexion import conexion_global
 
-            # Buscar equipo del usuario (como encargado o supervisor)
             coleccion = conexion_global.obtener_coleccion('equipos')
             rol = self.usuario.get('rol', 'empleado')
             uid = self.usuario['_id']
 
             if rol == 'supervisor':
-                # Supervisor ve el primer equipo disponible o crea uno
                 equipo = coleccion.find_one()
+                if equipo is None:
+                    # Crear equipo por defecto para supervisor
+                    equipo = {
+                        'nombre': 'Equipo Principal',
+                        'encargado_id': uid,
+                        'miembros': [],
+                        'descansos_fijos': [],
+                        'horario': {'inicio': '09:00', 'fin': '16:00'},
+                    }
+                    resultado = coleccion.insert_one(equipo)
+                    equipo['_id'] = resultado.inserted_id
             else:
                 equipo = coleccion.find_one({'encargado_id': uid})
 
             if not equipo:
                 ctk.CTkLabel(
                     self.frame_descansos,
-                    text="No hay equipo configurado.",
+                    text="No tienes un equipo asignado. Contacta a tu supervisor.",
                     font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 self._equipo_actual = None
@@ -173,14 +182,16 @@ class ConfigDescansosView(ctk.CTkToplevel):
         from src.db.conexion import conexion_global
         coleccion = conexion_global.obtener_coleccion('equipos')
 
-        # Usar $set con fallback por si descansos_fijos no existe
-        descansos_actuales = equipo.get('descansos_fijos', [])
+        descansos_actuales = list(equipo.get('descansos_fijos', []))
         descansos_actuales.append(nuevo)
 
         coleccion.update_one(
             {'_id': equipo['_id']},
             {'$set': {'descansos_fijos': descansos_actuales}}
         )
+
+        # Actualizar cache local
+        self._equipo_actual['descansos_fijos'] = descansos_actuales
 
         self.entry_nombre.delete(0, "end")
         self.entry_hora.delete(0, "end")

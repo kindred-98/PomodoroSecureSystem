@@ -74,18 +74,8 @@ class ServicioTimer:
 
     def iniciar(self, usuario_id: str, configuracion: dict = None):
         """Inicia un nuevo ciclo Pomodoro."""
-        # Verificar si el ciclo en memoria es real o residual de sesión anterior
-        if self.ciclo_activo:
-            coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
-            ciclo_real = coleccion.find_one({
-                'usuario_id': self._parsear_oid(usuario_id),
-                'completado': False,
-            })
-            if ciclo_real is None:
-                # Ciclo fantasma en memoria, resetear
-                self._inicializar()
-            else:
-                raise Exception("Ya hay un ciclo Pomodoro activo")
+        # Forzar reset del estado (ciclos residuales se cierran en ciclo_pomodoro)
+        self._inicializar()
 
         if configuracion is None:
             configuracion = {}

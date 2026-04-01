@@ -41,12 +41,13 @@ class TestIniciarCiclo:
         assert resultado['configuracion']['descansos_cortos'] == [8, 8, 8, 8]
         assert resultado['configuracion']['descanso_largo'] == 18
     
-    def test_dos_ciclos_consecutivos_falla(self, mock_conexion_global, usuario_en_db):
-        """No debe permitir dos ciclos activos"""
+    def test_ciclo_anterior_se_autocierra(self, mock_conexion_global, usuario_en_db):
+        """Ciclo anterior se cierra automáticamente al iniciar uno nuevo"""
         iniciar_ciclo(str(usuario_en_db['_id']))
         
-        with pytest.raises(Exception, match="ciclo.*activo"):
-            iniciar_ciclo(str(usuario_en_db['_id']))
+        # Segundo ciclo debe iniciar sin error (auto-cierra el anterior)
+        resultado = iniciar_ciclo(str(usuario_en_db['_id']))
+        assert 'ciclo_id' in resultado
     
     def test_numero_ciclo_incremental(self, mock_conexion_global, usuario_en_db):
         """Cada ciclo nuevo debe tener número mayor"""

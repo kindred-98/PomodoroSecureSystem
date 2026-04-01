@@ -106,13 +106,12 @@ def iniciar_ciclo(usuario_id: str, configuracion: dict = None) -> dict:
     
     # Verificar que no hay ciclo activo
     coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
-    ciclo_activo = coleccion_ciclos.find_one({
-        'usuario_id': usuario_oid,
-        'completado': False,
-    })
-    
-    if ciclo_activo is not None:
-        raise Exception("El usuario ya tiene un ciclo Pomodoro activo")
+
+    # Cerrar ciclos residuales de sesiones anteriores (crash, force close, etc.)
+    coleccion_ciclos.update_many(
+        {'usuario_id': usuario_oid, 'completado': False},
+        {'$set': {'completado': True, 'estado_actual': 'INACTIVO'}}
+    )
     
     # Contar ciclos previos para número de ciclo
     ciclos_previos = coleccion_ciclos.count_documents({'usuario_id': usuario_oid})
