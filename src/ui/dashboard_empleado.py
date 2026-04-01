@@ -82,13 +82,15 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkFrame(lateral, fg_color=BORDE, height=1).pack(fill="x", padx=15, pady=15)
 
-        ctk.CTkButton(
-            lateral, text="Descansos",
-            font=("JetBrains Mono", 12),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
-            command=self._ver_descansos,
-        ).pack(fill="x", padx=15, pady=3)
+        # Botón Descansos solo para supervisor
+        if self.usuario.get('rol') == 'supervisor':
+            ctk.CTkButton(
+                lateral, text="Descansos (empresa)",
+                font=("JetBrains Mono", 12),
+                fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+                text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+                command=self._ver_descansos,
+            ).pack(fill="x", padx=15, pady=3)
 
         ctk.CTkButton(
             lateral, text="Contrasena",

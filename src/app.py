@@ -124,6 +124,10 @@ class PomodoroSecureApp(ctk.CTk):
             self.usuario_actual = resultado['usuario']
             self._mostrar_dashboard()
 
+            # Generar PIN diario
+            from src.auth.pin_diario import generar_pin_diario
+            generar_pin_diario(str(self.usuario_actual['_id']))
+
             # Verificar si necesita configurar descansos
             self.after(500, self._verificar_config_descansos)
         except Exception as e:

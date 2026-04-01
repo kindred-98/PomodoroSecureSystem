@@ -44,13 +44,13 @@ class PasswordView(ctk.CTkFrame):
         card_ver.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_ver, text="👁 Ver contraseña actual",
+            card_ver, text="Ver contrasena actual",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_ver,
-            text="Introduce tu contraseña de login para verificar tu identidad.",
+            text="Introduce tu PIN de 6 digitos (generado al iniciar sesion).",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
@@ -58,7 +58,7 @@ class PasswordView(ctk.CTkFrame):
         frame_ver.pack(fill="x", padx=20, pady=(10, 15))
 
         self.entry_ver = ctk.CTkEntry(
-            frame_ver, placeholder_text="Contraseña de login", show="•",
+            frame_ver, placeholder_text="PIN de 6 digitos",
             font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
@@ -157,19 +157,35 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card_manual,
-            text="La contraseña debe ser nivel 'Muy Fuerte' (≥80 puntos).",
+            text="La contrasena debe ser nivel 'Muy Fuerte' (>=80 pts). Se pedira la actual para confirmar.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
-        frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
-        frame_manual.pack(fill="x", padx=20, pady=(10, 5))
+        # Contraseña actual
+        frame_manual_actual = ctk.CTkFrame(card_manual, fg_color="transparent")
+        frame_manual_actual.pack(fill="x", padx=20, pady=(10, 2))
 
+        ctk.CTkLabel(frame_manual_actual, text="Actual:", font=("JetBrains Mono", 10),
+                     text_color=TEXTO_SECUNDARIO).pack(side="left")
+        self.entry_manual_actual = ctk.CTkEntry(
+            frame_manual_actual, placeholder_text="Contrasena actual",
+            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8, show="•",
+        )
+        self.entry_manual_actual.pack(side="left", fill="x", expand=True, padx=(5, 0))
+
+        # Nueva contraseña
+        frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
+        frame_manual.pack(fill="x", padx=20, pady=(2, 5))
+
+        ctk.CTkLabel(frame_manual, text="Nueva:", font=("JetBrains Mono", 10),
+                     text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_manual = ctk.CTkEntry(
             frame_manual, placeholder_text="Nueva contrasena",
             font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
-            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
         )
-        self.entry_manual.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.entry_manual.pack(side="left", fill="x", expand=True, padx=(5, 10))
 
         ctk.CTkButton(
             frame_manual, text="Cambiar",
@@ -233,15 +249,35 @@ class PasswordView(ctk.CTkFrame):
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
     def _ver_contraseña(self):
-        pw = self.entry_ver.get()
-        if not pw:
-            self.label_ver_resultado.configure(text="Introduce tu contraseña", text_color=PELIGRO)
+        pin = self.entry_ver.get().strip()
+        if not pin:
+            self.label_ver_resultado.configure(text="Introduce tu PIN", text_color=PELIGRO)
             return
         try:
-            from src.auth import ver_contraseña
-            resultado = ver_contraseña(str(self.usuario['_id']), pw)
+            from src.auth.pin_diario import verificar_pin_diario
+            uid = str(self.usuario['_id'])
+
+            if not verificar_pin_diario(uid, pin):
+                self.label_ver_resultado.configure(text="PIN incorrecto", text_color=PELIGRO)
+                return
+
+            # PIN correcto, desencriptar contraseña
+            from src.db.conexion import conexion_global
+            from src.seguridad.encriptacion import descifrar
+
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            usuario = coleccion.find_one({'_id': self.usuario['_id']})
+            enc = usuario.get('contraseña_encriptada', '')
+
+            if not enc:
+                self.label_ver_resultado.configure(
+                    text="No hay contrasena encriptada", text_color=PELIGRO
+                )
+                return
+
+            pw = descifrar(enc)
             self.label_ver_resultado.configure(
-                text=f"Tu contraseña: {resultado}", text_color=COMPLETADO
+                text=f"Tu contrasena: {pw}", text_color=COMPLETADO
             )
         except Exception as e:
             self.label_ver_resultado.configure(text=str(e), text_color=PELIGRO)
@@ -331,18 +367,37 @@ class PasswordView(ctk.CTkFrame):
             self.label_custom_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _cambiar_manual(self):
-        pw = self.entry_manual.get()
-        if not pw:
+        pw_actual = self.entry_manual_actual.get()
+        pw_nueva = self.entry_manual.get()
+
+        if not pw_actual or not pw_nueva:
             self.label_manual_resultado.configure(
-                text="Introduce una contraseña", text_color=PELIGRO
+                text="Ambos campos son obligatorios", text_color=PELIGRO
             )
             return
+
         try:
+            # Verificar contraseña actual
+            from src.seguridad.encriptacion import verificar_contraseña
+            from src.db.conexion import conexion_global
+
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            usuario = coleccion.find_one({'_id': self.usuario['_id']})
+
+            if not verificar_contraseña(pw_actual, usuario.get('contraseña_hash', '')):
+                self.label_manual_resultado.configure(
+                    text="Contrasena actual incorrecta", text_color=PELIGRO
+                )
+                return
+
+            # Contraseña actual correcta, cambiar a la nueva
             from src.auth import cambiar_contraseña
-            resultado = cambiar_contraseña(str(self.usuario['_id']), pw)
+            resultado = cambiar_contraseña(str(self.usuario['_id']), pw_nueva)
             self.label_manual_resultado.configure(
                 text=resultado['mensaje'], text_color=COMPLETADO
             )
+            self.entry_manual_actual.delete(0, "end")
+            self.entry_manual.delete(0, "end")
         except Exception as e:
             self.label_manual_resultado.configure(text=str(e), text_color=PELIGRO)
 

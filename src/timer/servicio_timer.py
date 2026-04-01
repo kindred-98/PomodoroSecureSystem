@@ -48,6 +48,15 @@ class ServicioTimer:
         self._inicio_estado = None
         self._pausa_inicio = None
 
+    @staticmethod
+    def _parsear_oid(usuario_id):
+        """Convierte string a ObjectId de forma segura."""
+        from bson import ObjectId
+        try:
+            return ObjectId(usuario_id)
+        except Exception:
+            return usuario_id
+
     def obtener_estado(self) -> dict:
         """Retorna el estado actual del timer."""
         return {
@@ -65,8 +74,18 @@ class ServicioTimer:
 
     def iniciar(self, usuario_id: str, configuracion: dict = None):
         """Inicia un nuevo ciclo Pomodoro."""
+        # Verificar si el ciclo en memoria es real o residual de sesión anterior
         if self.ciclo_activo:
-            raise Exception("Ya hay un ciclo Pomodoro activo")
+            coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
+            ciclo_real = coleccion.find_one({
+                'usuario_id': self._parsear_oid(usuario_id),
+                'completado': False,
+            })
+            if ciclo_real is None:
+                # Ciclo fantasma en memoria, resetear
+                self._inicializar()
+            else:
+                raise Exception("Ya hay un ciclo Pomodoro activo")
 
         if configuracion is None:
             configuracion = {}
