@@ -22,7 +22,7 @@ jobs:
         run: pip install bandit
 
       - name: Run Bandit Security Scan
-        run: bandit -r . -f txt -o bandit_report.txt --ignoreDirs PomodoroSecureSystem
+        run: bandit -r src -f txt -o bandit_report.txt -x tests,.venv,venv
 
       - name: Display Bandit Results
         run: cat bandit_report.txt || echo "No issues found"
@@ -35,13 +35,13 @@ jobs:
           path: bandit_report.txt
           retention-days: 30
 
-      - name: Fail on high/critical issues
+      - name: Fail on high/medium issues
         run: |
-          if grep -q "High\|Critical" bandit_report.txt 2>/dev/null; then
-            echo "⚠️ Security issues found! Please review the report."
+          if grep -q "High\|Medium" bandit_report.txt 2>/dev/null; then
+            echo "Security issues found! Please review the report."
             exit 1
           else
-            echo "✅ No high/critical security issues found"
+            echo "No high/medium security issues found"
           fi
 
   dependency-check:
