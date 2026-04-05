@@ -1,0 +1,30 @@
+feat: mejoras completas de seguridad, UI y gestion de equipos
+
+Bug Fixes:
+- Corregida expiracion de sesion despues de 12 horas
+  (agregada verificacion en tick() antes de continuar)
+
+New Features:
+- Panel de contrasena: campo 'Repetir contrasena' y generador de PIN 6 digitos
+- Dashboard Encargado: timer Pomodoro, pausas, fin de jornada, panel de equipo
+- Dashboard Supervisor: busqueda de empleados, estado online/offline
+- Gestion de equipos: CRUD completo (crear, editar, asignar miembros)
+- Modulo de reportes: estadisticas y exportacion de datos
+- Estado de conexion: usuarios conectados/desconectados en tiempo real
+
+New DB Functions:
+- equipos/listar_todos.py: listar todos los equipos
+- equipos/editar_equipo.py: editar nombre, asignar/quitar encargado y miembros
+- usuarios/estado_conexion.py: obtener estado de conexion de usuarios
+- reportes.py: generar reportes de actividad
+
+New UI Components:
+- gestion_equipos_view.py: interfaz completa de gestion de equipos
+- Panel de busqueda y estado en dashboard_supervisor.py
+- Timer y controles en dashboard_encargado.py
+
+CI/CD:
+- GitHub Actions workflow para security audit
+- Configuracion pytest con coverage
+
+Tests: 620 tests passing (83% coverage)
