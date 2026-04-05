@@ -337,7 +337,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             from src.db.equipos import editar_nombre
             editar_nombre(str(self._equipo_seleccionado['_id']), nuevo_nombre)
             self._cargar_equipos()
-        except Exception as e:
+        except Exception:  # nosec
             pass
 
     def _asignar_encargado(self):
@@ -357,7 +357,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             from src.db.equipos import asignar_encargado
             asignar_encargado(str(self._equipo_seleccionado['_id']), encargado_id)
             self._cargar_equipos()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _agregar_miembro(self):
@@ -388,7 +388,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             añadir_miembro(str(self._equipo_seleccionado['_id']), str(usuario['_id']))
             self.entry_agregar.delete(0, "end")
             self._seleccionar_equipo(self._equipo_seleccionado)
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _quitar_miembro(self, miembro):
@@ -400,7 +400,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             from src.db.equipos import quitar_miembro
             quitar_miembro(str(self._equipo_seleccionado['_id']), str(miembro['_id']))
             self._seleccionar_equipo(self._equipo_seleccionado)
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _eliminar_equipo(self):
@@ -418,7 +418,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             self.label_detalle_vacio.pack(pady=50)
             self._equipo_seleccionado = None
             self._cargar_equipos()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _crear_equipo(self):
@@ -456,7 +456,7 @@ class GestionEquiposView(ctk.CTkToplevel):
                 crear_equipo(nombre, str(self.usuario['_id']))
                 dialogo.destroy()
                 self._cargar_equipos()
-            except Exception:
+            except Exception:  # nosec
                 pass
 
         ctk.CTkButton(

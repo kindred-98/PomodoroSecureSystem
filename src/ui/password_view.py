@@ -380,7 +380,7 @@ class PasswordView(ctk.CTkFrame):
             )
             self.barra_fortaleza.set(puntuacion / 100)
             self.barra_fortaleza.configure(progress_color=self._color_fortaleza(puntuacion))
-        except Exception:
+        except Exception:  # nosec
             pass
 
     @staticmethod

@@ -48,8 +48,8 @@ def _emitir_evento(evento: str, datos: dict):
     for callback in _callbacks.get(evento, []):
         try:
             callback(datos)
-        except Exception:
-            pass  # Un callback fallido no rompe el timer
+        except Exception:  # nosec - un callback fallido no rompe el timer
+            pass
 
 
 def iniciar_ciclo(usuario_id: str, configuracion: dict = None) -> dict:

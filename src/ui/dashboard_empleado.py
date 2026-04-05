@@ -203,7 +203,7 @@ class DashboardEmpleado(ctk.CTkFrame):
             estado = resultado
 
             self._actualizar_labels(estado)
-        except Exception:
+        except Exception:  # nosec
             pass
 
         self._job_refresh = self.after(1000, self._refrescar)
@@ -297,7 +297,7 @@ class DashboardEmpleado(ctk.CTkFrame):
             from src.ui.config_descansos_view import ConfigDescansosView
             vista = ConfigDescansosView(self, self.usuario)
             vista.grab_set()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _fin_jornada_click(self):

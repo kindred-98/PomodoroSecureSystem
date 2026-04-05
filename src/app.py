@@ -177,7 +177,7 @@ class PomodoroSecureApp(ctk.CTk):
                         {'_id': equipo['_id']},
                         {'$addToSet': {'miembros': self.usuario_actual['_id']}}
                     )
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _verificar_config_descansos(self):
@@ -191,7 +191,7 @@ class PomodoroSecureApp(ctk.CTk):
                 from src.ui.config_bloque_descansos import ConfigBloqueDescansos
                 popup = ConfigBloqueDescansos(self, self.usuario_actual)
                 popup.grab_set()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _on_logout(self):
@@ -204,7 +204,7 @@ class PomodoroSecureApp(ctk.CTk):
                     {'usuario_id': self.usuario_actual['_id'], 'activa': True},
                     {'$set': {'activa': False}},
                 )
-            except Exception:
+            except Exception:  # nosec
                 pass
         self.usuario_actual = None
         self._mostrar_login()

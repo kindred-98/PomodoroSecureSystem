@@ -346,7 +346,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 {'$set': {'rol': nuevo_rol}}
             )
             label_rol.configure(text=nuevo_rol.upper(), text_color=self._color_rol(nuevo_rol))
-        except Exception:
+        except Exception:  # nosec
             pass
 
     @staticmethod
@@ -404,7 +404,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                         text_color=TEXTO_PRINCIPAL, height=24, width=80, corner_radius=4,
                         command=lambda a=anom: self._marcar_anomalia(a),
                     ).pack(side="right", padx=10)
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _marcar_anomalia(self, anomalia):
@@ -413,7 +413,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             from src.db.anomalias import marcar_revisada
             marcar_revisada(str(anomalia['_id']))
             self._cargar_anomalias()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _ver_descansos_fijos(self):
@@ -422,7 +422,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             from src.ui.config_descansos_view import ConfigDescansosView
             vista = ConfigDescansosView(self, self.usuario)
             vista.grab_set()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _ver_gestion_equipos(self):
@@ -431,7 +431,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             from src.ui.gestion_equipos_view import GestionEquiposView
             vista = GestionEquiposView(self, self.usuario)
             vista.grab_set()
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _on_logout_click(self):

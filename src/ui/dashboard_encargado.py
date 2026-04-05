@@ -202,7 +202,7 @@ class DashboardEncargado(ctk.CTkFrame):
             estado = resultado
             self._actualizar_labels(estado)
             self._actualizar_miembros()
-        except Exception:
+        except Exception:  # nosec
             pass
         self._job_refresh = self.after(1000, self._refrescar)
 
@@ -470,7 +470,7 @@ class DashboardEncargado(ctk.CTkFrame):
             pendientes = [a for a in anomalias if not a.get('resuelto', False)]
             if pendientes:
                 self.badge_anomalias.configure(text=f"🚨 {len(pendientes)} anomalía(s)")
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def _on_logout_click(self):

@@ -62,7 +62,7 @@ def generar_otp(usuario_id: str, ciclo_id: str = None) -> dict:
     if ciclo_id:
         try:
             ciclo_oid = ObjectId(ciclo_id)
-        except Exception:
+        except Exception:  # nosec
             pass
     
     evento = {

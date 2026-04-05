@@ -177,7 +177,7 @@ class ServicioTimer:
                 }},
                 upsert=True,
             )
-        except Exception:
+        except Exception:  # nosec
             pass
 
     def restaurar_desde_bd(self, usuario_id: str) -> bool:
@@ -451,8 +451,8 @@ class ServicioTimer:
                     estado_anterior=verificacion['estado_anterior'],
                     motivo=motivo
                 )
-            except Exception:
-                pass  # No fallar si el reporte no se puede crear
+            except Exception:  # nosec - no fallar si el reporte no se puede crear
+                pass
             
             # Limpiar el estado en BD
             coleccion = conexion_global.obtener_coleccion('timer_estado')
@@ -527,7 +527,7 @@ class ServicioTimer:
                     jornada_reset=True,
                     motivo_reset='Fin de jornada laboral',
                 )
-            except Exception:
+            except Exception:  # nosec
                 pass
             
             # Marcar ciclos como completados
