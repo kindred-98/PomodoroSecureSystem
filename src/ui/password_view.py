@@ -107,7 +107,39 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_reg_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN C: Contraseña personalizada ──
+        # ── OPCIÓN C: Generar PIN de 6 dígitos ──
+        card_pin = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
+        card_pin.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            card_pin, text="🔐 Generar PIN de 6 dígitos",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        ctk.CTkLabel(
+            card_pin,
+            text="Genera un PIN para ver tu contraseña actual (válido solo para hoy).",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", padx=20)
+
+        frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
+        frame_pin.pack(fill="x", padx=20, pady=(10, 15))
+
+        ctk.CTkButton(
+            frame_pin, text="Generar PIN",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color="#9B59B6", hover_color="#8E44AD",
+            text_color=TEXTO_PRINCIPAL, width=120, height=38, corner_radius=8,
+            command=self._generar_pin,
+        ).pack(side="left")
+
+        self.label_pin_resultado = ctk.CTkLabel(
+            card_pin, text="", font=("JetBrains Mono", 14, "bold"),
+            text_color="#9B59B6",
+        )
+        self.label_pin_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+
+        # ── OPCIÓN D: Contraseña personalizada ──
         card_custom = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_custom.pack(fill="x", pady=(0, 15))
 
@@ -146,7 +178,7 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_custom_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN D: Cambio manual ──
+        # ── OPCIÓN E: Cambio manual ──
         card_manual = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_manual.pack(fill="x", pady=(0, 15))
 
@@ -176,7 +208,7 @@ class PasswordView(ctk.CTkFrame):
 
         # Nueva contraseña
         frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
-        frame_manual.pack(fill="x", padx=20, pady=(2, 5))
+        frame_manual.pack(fill="x", padx=20, pady=(2, 2))
 
         ctk.CTkLabel(frame_manual, text="Nueva:", font=("JetBrains Mono", 10),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
@@ -187,8 +219,21 @@ class PasswordView(ctk.CTkFrame):
         )
         self.entry_manual.pack(side="left", fill="x", expand=True, padx=(5, 10))
 
+        # Repetir contraseña
+        frame_manual_repetir = ctk.CTkFrame(card_manual, fg_color="transparent")
+        frame_manual_repetir.pack(fill="x", padx=20, pady=(2, 5))
+
+        ctk.CTkLabel(frame_manual_repetir, text="Repetir:", font=("JetBrains Mono", 10),
+                     text_color=TEXTO_SECUNDARIO).pack(side="left")
+        self.entry_manual_repetir = ctk.CTkEntry(
+            frame_manual_repetir, placeholder_text="Repetir nueva contrasena",
+            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+        )
+        self.entry_manual_repetir.pack(side="left", fill="x", expand=True, padx=(5, 10))
+
         ctk.CTkButton(
-            frame_manual, text="Cambiar",
+            frame_manual_repetir, text="Cambiar",
             font=("JetBrains Mono", 12, "bold"),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=38, corner_radius=8,
@@ -247,6 +292,38 @@ class PasswordView(ctk.CTkFrame):
             text_color=COMPLETADO,
         )
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+
+    def _generar_pin(self):
+        """Genera un nuevo PIN de 6 dígitos para hoy."""
+        try:
+            from src.auth.pin_diario import generar_pin_diario
+            uid = str(self.usuario['_id'])
+            generar_pin_diario(uid)
+            
+            # Obtener el PIN generado (solo para mostrar, en producción sería secreto)
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('pines_diarios')
+            from datetime import datetime
+            hoy = datetime.now().strftime("%Y-%m-%d")
+            pin_doc = coleccion.find_one({
+                'usuario_id': self.usuario['_id'],
+                'fecha': hoy
+            })
+            
+            if pin_doc:
+                # El PIN real debería mostrarse solo una vez y luego ocultarse
+                # Por ahora mostramos que se generó
+                self.label_pin_resultado.configure(
+                    text="PIN generado para hoy (úsalo en 'Ver contraseña')",
+                    text_color=COMPLETADO
+                )
+            else:
+                self.label_pin_resultado.configure(
+                    text="PIN ya existe para hoy",
+                    text_color=AVISO
+                )
+        except Exception as e:
+            self.label_pin_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _ver_contraseña(self):
         pin = self.entry_ver.get().strip()
@@ -369,10 +446,17 @@ class PasswordView(ctk.CTkFrame):
     def _cambiar_manual(self):
         pw_actual = self.entry_manual_actual.get()
         pw_nueva = self.entry_manual.get()
+        pw_repetir = self.entry_manual_repetir.get()
 
-        if not pw_actual or not pw_nueva:
+        if not pw_actual or not pw_nueva or not pw_repetir:
             self.label_manual_resultado.configure(
-                text="Ambos campos son obligatorios", text_color=PELIGRO
+                text="Todos los campos son obligatorios", text_color=PELIGRO
+            )
+            return
+
+        if pw_nueva != pw_repetir:
+            self.label_manual_resultado.configure(
+                text="Las contraseñas no coinciden", text_color=PELIGRO
             )
             return
 
@@ -398,6 +482,7 @@ class PasswordView(ctk.CTkFrame):
             )
             self.entry_manual_actual.delete(0, "end")
             self.entry_manual.delete(0, "end")
+            self.entry_manual_repetir.delete(0, "end")
         except Exception as e:
             self.label_manual_resultado.configure(text=str(e), text_color=PELIGRO)
 

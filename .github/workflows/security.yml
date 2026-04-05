@@ -1,0 +1,70 @@
+name: Security Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, develop]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit Security Scan
+        run: bandit -r . -f txt -o bandit_report.txt --ignoreDirs PomodoroSecureSystem
+
+      - name: Display Bandit Results
+        run: cat bandit_report.txt || echo "No issues found"
+
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit_report.txt
+          retention-days: 30
+
+      - name: Fail on high/critical issues
+        run: |
+          if grep -q "High\|Critical" bandit_report.txt 2>/dev/null; then
+            echo "⚠️ Security issues found! Please review the report."
+            exit 1
+          else
+            echo "✅ No high/critical security issues found"
+          fi
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Check dependencies
+        run: safety check --json --output safety_report.json || true
+
+      - name: Upload Safety Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safety-report
+          path: safety_report.json
+          retention-days: 30

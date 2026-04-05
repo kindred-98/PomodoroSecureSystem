@@ -101,6 +101,14 @@ class DashboardEmpleado(ctk.CTkFrame):
         ).pack(fill="x", padx=15, pady=3)
 
         ctk.CTkButton(
+            lateral, text="Fin de Jornada",
+            font=("JetBrains Mono", 12),
+            fg_color="#E67E22", hover_color="#D35400",
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+            command=self._fin_jornada_click,
+        ).pack(fill="x", padx=15, pady=(3, 0))
+
+        ctk.CTkButton(
             lateral, text="Cerrar Sesion",
             font=("JetBrains Mono", 12),
             fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
@@ -291,6 +299,89 @@ class DashboardEmpleado(ctk.CTkFrame):
             vista.grab_set()
         except Exception:
             pass
+
+    def _fin_jornada_click(self):
+        """Maneja el click en 'Fin de jornada laboral'."""
+        from src.timer.servicio_timer import servicio_timer
+        import customtkinter as ctk
+        
+        # Diálogo de confirmación
+        dialogo = ctk.CTkToplevel(self)
+        dialogo.title("Fin de Jornada")
+        dialogo.geometry("400x200")
+        dialogo.transient(self)
+        dialogo.grab_set()
+        
+        # Centrar
+        dialogo.update_idletasks()
+        x = (dialogo.winfo_screenwidth() // 2) - (400 // 2)
+        y = (dialogo.winfo_screenheight() // 2) - (200 // 2)
+        dialogo.geometry(f"400x200+{x}+{y}")
+        
+        # Contenido
+        ctk.CTkLabel(
+            dialogo,
+            text="¿Finalizar jornada laboral?",
+            font=("JetBrains Mono", 16, "bold"),
+            text_color=TEXTO_PRINCIPAL,
+        ).pack(pady=20)
+        
+        ctk.CTkLabel(
+            dialogo,
+            text="Se generará un reporte con tu actividad\ny se reiniciarán todos los contadores.",
+            font=("JetBrains Mono", 12),
+            text_color=TEXTO_SECUNDARIO,
+        ).pack(pady=10)
+        
+        botones = ctk.CTkFrame(dialogo, fg_color="transparent")
+        botones.pack(pady=20)
+        
+        def confirmar():
+            uid = str(self.usuario['_id'])
+            resultado = servicio_timer.fin_jornada_laboral(uid)
+            
+            if resultado.get('exito'):
+                resumen = resultado.get('resumen', {})
+                mensaje = (
+                    f"Jornada finalizada\n\n"
+                    f"Ciclos: {resumen.get('ciclos_iniciados', 0)}\n"
+                    f"Pomodoros: {resumen.get('pomodoros_totales', 0)}\n"
+                    f"Trabajado: {resumen.get('tiempo_trabajado', '0m')}"
+                )
+                ctk.CTkLabel(
+                    dialogo,
+                    text=mensaje,
+                    font=("JetBrains Mono", 12),
+                    text_color="#2ECC71",
+                ).pack(pady=20)
+                
+                dialogo.after(2000, dialogo.destroy)
+                self._sincronizar_con_servicio()
+            else:
+                ctk.CTkLabel(
+                    dialogo,
+                    text=f"Error: {resultado.get('error', 'Desconocido')}",
+                    font=("JetBrains Mono", 12),
+                    text_color=PELIGRO,
+                ).pack(pady=20)
+        
+        ctk.CTkButton(
+            botones, text="Confirmar",
+            font=("JetBrains Mono", 12),
+            fg_color="#27AE60", hover_color="#219A52",
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+            command=confirmar,
+            width=120,
+        ).pack(side="left", padx=10)
+        
+        ctk.CTkButton(
+            botones, text="Cancelar",
+            font=("JetBrains Mono", 12),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+            command=dialogo.destroy,
+            width=120,
+        ).pack(side="left", padx=10)
 
     def _on_logout_click(self):
         from src.timer.servicio_timer import servicio_timer

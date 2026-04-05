@@ -53,6 +53,7 @@ class DashboardSupervisor(ctk.CTkFrame):
         botones = [
             ("📋 Historial", self.on_ver_historial),
             ("☕ Descansos Fijos", self._ver_descansos_fijos),
+            ("👥 Equipos", self._ver_gestion_equipos),
             ("🔑 Contraseña", self.on_ver_contraseña),
             ("🚪 Cerrar Sesión", self._on_logout_click),
         ]
@@ -70,6 +71,32 @@ class DashboardSupervisor(ctk.CTkFrame):
         # ── Panel central ──
         central = ctk.CTkFrame(body, fg_color="transparent")
         central.pack(side="right", fill="both", expand=True)
+
+        # ── Buscador ──
+        buscador_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
+        buscador_card.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            buscador_card, text="🔍 Buscar empleado",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        frame_buscador = ctk.CTkFrame(buscador_card, fg_color="transparent")
+        frame_buscador.pack(fill="x", padx=20, pady=(0, 15))
+
+        self.entry_buscador = ctk.CTkEntry(
+            frame_buscador, placeholder_text="Escribe el nombre del empleado...",
+            font=("JetBrains Mono", 12), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+        )
+        self.entry_buscador.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.entry_buscador.bind("<KeyRelease>", self._buscar_empleado)
+
+        self.label_resultado_busqueda = ctk.CTkLabel(
+            frame_buscador, text="",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        )
+        self.label_resultado_busqueda.pack(side="right")
 
         # ── Resumen general ──
         resumen_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
@@ -151,14 +178,54 @@ class DashboardSupervisor(ctk.CTkFrame):
         self._cargar_usuarios()
         self._cargar_anomalias()
 
+    def _buscar_empleado(self, event=None):
+        """Busca un empleado por nombre y muestra su información."""
+        termino = self.entry_buscador.get().strip().lower()
+        
+        if not termino:
+            self.label_resultado_busqueda.configure(text="")
+            return
+        
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            
+            usuario = coleccion.find_one({
+                'nombre': {'$regex': termino, '$options': 'i'}
+            })
+            
+            if usuario:
+                nombre = usuario.get('nombre', 'Sin nombre')
+                email = usuario.get('email', '')
+                rol = usuario.get('rol', 'empleado').title()
+                
+                self.label_resultado_busqueda.configure(
+                    text=f"✓ {nombre} ({rol}) - {email}",
+                    text_color=COMPLETADO
+                )
+            else:
+                self.label_resultado_busqueda.configure(
+                    text="No encontrado",
+                    text_color=PELIGRO
+                )
+        except Exception as e:
+            self.label_resultado_busqueda.configure(
+                text=f"Error: {str(e)[:20]}",
+                text_color=PELIGRO
+            )
+
     def _cargar_equipos(self):
         """Carga todos los equipos."""
         try:
             from src.db.equipos import obtener_por_encargado
+            from src.db.usuarios.estado_conexion import obtener_estado_todos_los_usuarios
             from src.db.conexion import conexion_global
 
             coleccion = conexion_global.obtener_coleccion('equipos')
             equipos = list(coleccion.find())
+            
+            usuarios_estado = obtener_estado_todos_los_usuarios()
+            conectados = len([u for u in usuarios_estado if u.get('conectado', False)])
 
             total_usuarios = 0
             for widget in self.frame_equipos.winfo_children():
@@ -180,8 +247,9 @@ class DashboardSupervisor(ctk.CTkFrame):
                     font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
                 ).pack(side="right", padx=10)
 
+            conectados = len([e for e in usuarios_estado if e.get('conectado', False)])
             self.label_stats.configure(
-                text=f"Total: {len(equipos)} equipos | {total_usuarios} usuarios"
+                text=f"Total: {len(equipos)} equipos | {total_usuarios} usuarios | {conectados} conectados"
             )
         except Exception as e:
             self.label_stats.configure(text=f"Error: {e}")
@@ -192,9 +260,13 @@ class DashboardSupervisor(ctk.CTkFrame):
             widget.destroy()
 
         try:
+            from src.db.usuarios.estado_conexion import obtener_estado_todos_los_usuarios, obtener_tiempo_desconectado
             from src.db.conexion import conexion_global
+            
             coleccion = conexion_global.obtener_coleccion('usuarios')
             usuarios = list(coleccion.find({'activo': True}))
+            
+            estados = {u['usuario_id']: u for u in obtener_estado_todos_los_usuarios()}
 
             if not usuarios:
                 ctk.CTkLabel(
@@ -205,30 +277,48 @@ class DashboardSupervisor(ctk.CTkFrame):
                 return
 
             for usr in usuarios:
+                uid = str(usr['_id'])
                 frame = ctk.CTkFrame(self.frame_usuarios, fg_color=FONDO_SECUNDARIO, corner_radius=6)
                 frame.pack(fill="x", pady=2)
 
                 nombre = usr.get('nombre', 'Sin nombre')
                 email = usr.get('email', '')
                 rol = usr.get('rol', 'empleado')
+                
+                estado = estados.get(uid, {})
+                conectado = estado.get('conectado', False)
 
                 info = ctk.CTkFrame(frame, fg_color="transparent")
                 info.pack(side="left", fill="x", expand=True, padx=10, pady=6)
 
+                status_icon = "🟢" if conectado else "🔴"
+                status_text = "Conectado" if conectado else obtener_tiempo_desconectado(uid)
+                status_color = COMPLETADO if conectado else PELIGRO
+
                 ctk.CTkLabel(
-                    info, text=f"{nombre} ({email})",
+                    info, text=f"{status_icon} {nombre} ({email})",
                     font=("JetBrains Mono", 11), text_color=TEXTO_PRINCIPAL, anchor="w",
                 ).pack(fill="x")
 
+                meta_frame = ctk.CTkFrame(info, fg_color="transparent")
+                meta_frame.pack(fill="x")
+
                 rol_label = ctk.CTkLabel(
-                    info, text=rol.upper(),
+                    meta_frame, text=f"Rol: {rol.upper()}",
                     font=("JetBrains Mono", 9, "bold"),
                     text_color=self._color_rol(rol),
                     anchor="w",
                 )
-                rol_label.pack(fill="x")
+                rol_label.pack(side="left", padx=(0, 15))
 
-                # Combo para cambiar rol
+                status_label = ctk.CTkLabel(
+                    meta_frame, text=status_text,
+                    font=("JetBrains Mono", 9),
+                    text_color=status_color,
+                    anchor="w",
+                )
+                status_label.pack(side="left")
+
                 combo = ctk.CTkComboBox(
                     frame, values=["empleado", "encargado", "supervisor"],
                     font=("JetBrains Mono", 10), width=120, height=28,
@@ -331,6 +421,15 @@ class DashboardSupervisor(ctk.CTkFrame):
         try:
             from src.ui.config_descansos_view import ConfigDescansosView
             vista = ConfigDescansosView(self, self.usuario)
+            vista.grab_set()
+        except Exception:
+            pass
+
+    def _ver_gestion_equipos(self):
+        """Abre la vista de gestión de equipos."""
+        try:
+            from src.ui.gestion_equipos_view import GestionEquiposView
+            vista = GestionEquiposView(self, self.usuario)
             vista.grab_set()
         except Exception:
             pass

@@ -9,6 +9,11 @@ from src.db.usuarios.buscar_por_id import buscar_por_id
 from src.db.usuarios.actualizar_pomodoro import actualizar_pomodoro
 from src.db.usuarios.actualizar_ultimo_acceso import actualizar_ultimo_acceso
 from src.db.usuarios.desactivar_usuario import desactivar_usuario
+from src.db.usuarios.estado_conexion import (
+    obtener_estado_todos_los_usuarios,
+    esta_conectado,
+    obtener_tiempo_desconectado,
+)
 
 __all__ = [
     'crear_usuario',
@@ -17,4 +22,7 @@ __all__ = [
     'actualizar_pomodoro',
     'actualizar_ultimo_acceso',
     'desactivar_usuario',
+    'obtener_estado_todos_los_usuarios',
+    'esta_conectado',
+    'obtener_tiempo_desconectado',
 ]
