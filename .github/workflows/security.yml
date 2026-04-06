@@ -37,7 +37,7 @@ jobs:
 
       - name: Fail on high/medium issues
         run: |
-          if grep -q "High\|Medium" bandit_report.txt 2>/dev/null; then
+          if grep -E "^\s+(High|Medium):\s+[1-9]" bandit_report.txt 2>/dev/null; then
             echo "Security issues found! Please review the report."
             exit 1
           else
