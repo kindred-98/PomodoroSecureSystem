@@ -14,7 +14,6 @@ class PasswordView(ctk.CTkFrame):
         super().__init__(parent, fg_color=FONDO_PRINCIPAL)
         self.usuario = usuario
         self.on_volver = on_volver
-        self._ultima_frase_mostrada = None
         self._crear_widgets()
 
     def _crear_widgets(self):
@@ -36,8 +35,8 @@ class PasswordView(ctk.CTkFrame):
             font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
-        # Contenido con scroll para que todas las secciones sean accesibles
-        contenido = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        # Contenido
+        contenido = ctk.CTkFrame(self, fg_color="transparent")
         contenido.pack(fill="both", expand=True, padx=30, pady=20)
 
         # ── OPCIÓN A: Ver contraseña ──
@@ -79,108 +78,36 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_ver_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN B: Contraseñas Seguras ──
+        # ── OPCIÓN B: Regenerar contraseña ──
         card_reg = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_reg.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_reg, text="🔄 Contraseña Segura Automática",
+            card_reg, text="🔄 Regenerar contraseña",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_reg,
-            text="Genera una contraseña segura y aleatoria automáticamente.",
+            text="Genera una nueva contraseña con parámetros diferentes.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         ctk.CTkButton(
-            card_reg, text="🔄 Generar Contraseña Segura",
+            card_reg, text="Regenerar",
             font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
-            command=self._generar_segura_automatica,
-        ).pack(anchor="w", padx=20, pady=(10, 5))
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            command=self._regenerar,
+        ).pack(anchor="w", padx=20, pady=(10, 15))
 
         self.label_reg_resultado = ctk.CTkLabel(
-            card_reg, text="", font=("JetBrains Mono", 14, "bold"),
+            card_reg, text="", font=("JetBrains Mono", 12),
             text_color=COMPLETADO,
         )
-        self.label_reg_resultado.pack(anchor="w", padx=20, pady=(5, 15))
+        self.label_reg_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN C: Generar PIN de 6 dígitos ──
-        card_pin = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
-        card_pin.pack(fill="x", pady=(0, 15))
-
-        ctk.CTkLabel(
-            card_pin, text="🔐 Generar PIN de 6 dígitos",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
-        ).pack(anchor="w", padx=20, pady=(15, 5))
-
-        ctk.CTkLabel(
-            card_pin,
-            text="Genera un PIN para ver tu contraseña actual (válido solo para hoy). Solo se muestra una vez.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
-        ).pack(anchor="w", padx=20)
-
-        frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
-        frame_pin.pack(fill="x", padx=20, pady=(10, 5))
-
-        self.boton_generar_pin = ctk.CTkButton(
-            frame_pin, text="Generar PIN",
-            font=("JetBrains Mono", 12, "bold"),
-            fg_color="#9B59B6", hover_color="#8E44AD",
-            text_color=TEXTO_PRINCIPAL, width=120, height=38, corner_radius=8,
-            command=self._generar_pin,
-        )
-        self.boton_generar_pin.pack(side="left")
-        
-        self._verificar_bloqueo_pin()
-
-        # Caja que muestra el PIN generado (grande y visible)
-        frame_pin_resultado = ctk.CTkFrame(card_pin, fg_color="transparent")
-        frame_pin_resultado.pack(fill="x", padx=20, pady=(8, 2))
-        
-        self.label_pin_resultado = ctk.CTkLabel(
-            frame_pin_resultado, text="",
-            font=("JetBrains Mono", 22, "bold"),
-            text_color="#9B59B6",
-        )
-        self.label_pin_resultado.pack(side="left")
-        
-        ctk.CTkButton(
-            frame_pin_resultado, text="📋 Copiar",
-            font=("JetBrains Mono", 10),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, width=70, height=28,
-            command=self._copiar_pin,
-        ).pack(side="right", padx=(10, 0))
-
-        self.label_pin_aviso = ctk.CTkLabel(
-            card_pin, text="",
-            font=("JetBrains Mono", 10),
-            text_color=TEXTO_SECUNDARIO,
-        )
-        self.label_pin_aviso.pack(anchor="w", padx=20, pady=(0, 15))
-
-    def _copiar_pin(self):
-        """Copia el PIN al portapapeles."""
-        from tkinter import Tk
-        texto = self.label_pin_resultado.cget("text")
-        if texto:
-            self.clipboard_clear()
-            self.clipboard_append(texto)
-            self.label_pin_aviso.configure(text="✓ Copiado!", text_color=COMPLETADO)
-
-    def _copiar_frase_semilla(self):
-        """Copia la frase semilla al portapapeles."""
-        texto = self._ultima_frase_mostrada
-        if texto:
-            self.clipboard_clear()
-            self.clipboard_append(texto)
-            self.label_semilla_resultado.configure(text="✓ Copiado!", text_color=COMPLETADO)
-
-        # ── OPCIÓN D: Contraseña personalizada ──
+        # ── OPCIÓN C: Contraseña personalizada ──
         card_custom = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_custom.pack(fill="x", pady=(0, 15))
 
@@ -219,7 +146,7 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_custom_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN E: Cambio manual ──
+        # ── OPCIÓN D: Cambio manual ──
         card_manual = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_manual.pack(fill="x", pady=(0, 15))
 
@@ -249,7 +176,7 @@ class PasswordView(ctk.CTkFrame):
 
         # Nueva contraseña
         frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
-        frame_manual.pack(fill="x", padx=20, pady=(2, 2))
+        frame_manual.pack(fill="x", padx=20, pady=(2, 5))
 
         ctk.CTkLabel(frame_manual, text="Nueva:", font=("JetBrains Mono", 10),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
@@ -260,21 +187,8 @@ class PasswordView(ctk.CTkFrame):
         )
         self.entry_manual.pack(side="left", fill="x", expand=True, padx=(5, 10))
 
-        # Repetir contraseña
-        frame_manual_repetir = ctk.CTkFrame(card_manual, fg_color="transparent")
-        frame_manual_repetir.pack(fill="x", padx=20, pady=(2, 5))
-
-        ctk.CTkLabel(frame_manual_repetir, text="Repetir:", font=("JetBrains Mono", 10),
-                     text_color=TEXTO_SECUNDARIO).pack(side="left")
-        self.entry_manual_repetir = ctk.CTkEntry(
-            frame_manual_repetir, placeholder_text="Repetir nueva contrasena",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
-            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
-        )
-        self.entry_manual_repetir.pack(side="left", fill="x", expand=True, padx=(5, 10))
-
         ctk.CTkButton(
-            frame_manual_repetir, text="Cambiar",
+            frame_manual, text="Cambiar",
             font=("JetBrains Mono", 12, "bold"),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=38, corner_radius=8,
@@ -305,63 +219,7 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_manual_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN E: Frase Semilla (recuperación) ──
-        card_semilla = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
-        card_semilla.pack(fill="x", pady=(0, 15))
-
-        ctk.CTkLabel(
-            card_semilla, text="🔑 Frase Semilla de Recuperación",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
-        ).pack(anchor="w", padx=20, pady=(15, 5))
-
-        ctk.CTkLabel(
-            card_semilla,
-            text="12 palabras para recuperar tu cuenta. Solo se muestra UNA vez cada 90 dias.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
-        ).pack(anchor="w", padx=20)
-
-        ctk.CTkButton(
-            card_semilla, text="Generar Frase Semilla",
-            font=("JetBrains Mono", 12, "bold"),
-            fg_color="#E7952B", hover_color="#D7841B",
-            text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
-            command=self._generar_frase_semilla,
-        ).pack(anchor="w", padx=20, pady=(10, 5))
-
-        frame_semilla_botones = ctk.CTkFrame(card_semilla, fg_color="transparent")
-        frame_semilla_botones.pack(fill="x", padx=20, pady=(5, 10))
-
-        ctk.CTkButton(
-            frame_semilla_botones, text="📋 Copiar",
-            font=("JetBrains Mono", 11),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=32,
-            command=self._copiar_frase_semilla,
-        ).pack(side="left", padx=(0, 10))
-
-        ctk.CTkButton(
-            frame_semilla_botones, text="Exportar a TXT",
-            font=("JetBrains Mono", 11),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=32,
-            command=self._exportar_frase_semilla,
-        ).pack(side="left", padx=(0, 10))
-
-        ctk.CTkButton(
-            frame_semilla_botones, text="Exportar a JSON",
-            font=("JetBrains Mono", 11),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=32,
-            command=self._exportar_frase_semilla_json,
-        ).pack(side="left")
-
-        self.label_semilla_resultado = ctk.CTkLabel(
-            card_semilla, text="", font=("JetBrains Mono", 12),
-            text_color="#E7952B",
-        )
-        self.label_semilla_resultado.pack(anchor="w", padx=20, pady=(0, 15))
-
-        # ── OPCIÓN F: Exportar JSON ──
+        # ── OPCIÓN D: Exportar JSON ──
         card_export = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_export.pack(fill="x")
 
@@ -389,230 +247,6 @@ class PasswordView(ctk.CTkFrame):
             text_color=COMPLETADO,
         )
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
-
-    def _generar_pin(self):
-        """Genera un nuevo PIN de 6 dígitos para hoy y lo muestra UNA sola vez."""
-        try:
-            from src.auth.pin_diario import generar_pin_diario, eliminar_pin_diario, obtener_ultimo_pin
-            from datetime import datetime, timezone, timedelta
-            uid = str(self.usuario['_id'])
-            
-            # Verificar si está bloqueado
-            ultimo = obtener_ultimo_pin(uid)
-            if ultimo:
-                desde = ultimo.get('ultimo_intento')
-                if desde:
-                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
-                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
-                    if desde > limite:
-                        minutos = int((limite - desde).total_seconds() // 60) * -1
-                        self.label_pin_resultado.configure(
-                            text=f"⚠ Espera {minutos+1} min",
-                            text_color=AVISO,
-                        )
-                        self.label_pin_aviso.configure(
-                            text="Debes esperar 1 hora entre generaciones",
-                            text_color=TEXTO_SECUNDARIO,
-                        )
-                        return
-            
-            # Primero eliminar cualquier PIN existente para poder generar uno nuevo
-            eliminar_pin_diario(uid)
-            
-            pin = generar_pin_diario(uid)
-
-            if pin is not None:
-                # PIN recién generado: bloquear por 1 hora
-                self.boton_generar_pin.configure(state="disabled")
-                self.after(3600000, self._desbloquear_pin)
-                
-                self.label_pin_resultado.configure(
-                    text=pin,
-                    text_color="#9B59B6",
-                )
-                self.label_pin_aviso.configure(
-                    text="⚠ Guárdalo ahora — no se volvera a mostrar. Nuevo PIN en 1 hora.",
-                    text_color=AVISO,
-                )
-            else:
-                self.label_pin_resultado.configure(
-                    text="Ya tienes un PIN para hoy",
-                    text_color=AVISO,
-                )
-                self.label_pin_aviso.configure(
-                    text="El PIN de hoy ya fue generado.",
-                    text_color=TEXTO_SECUNDARIO,
-                )
-        except Exception as e:
-            self.label_pin_resultado.configure(text=str(e), text_color=PELIGRO)
-            self.label_pin_aviso.configure(text="", text_color=TEXTO_SECUNDARIO)
-    
-    def _desbloquear_pin(self):
-        """Desbloquea el botón de generar PIN."""
-        if hasattr(self, 'boton_generar_pin'):
-            self.boton_generar_pin.configure(state="normal")
-    
-    def _verificar_bloqueo_pin(self):
-        """Verifica si el boton debe estar bloqueado al abrir la vista."""
-        try:
-            from src.auth.pin_diario import obtener_ultimo_pin
-            from datetime import datetime, timezone, timedelta
-            uid = str(self.usuario['_id'])
-            
-            ultimo = obtener_ultimo_pin(uid)
-            if ultimo:
-                desde = ultimo.get('ultimo_intento')
-                if desde:
-                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
-                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
-                    if desde > limite:
-                        self.boton_generar_pin.configure(state="disabled")
-                        self.after(3600000, self._desbloquear_pin)
-        except Exception:
-            pass
-
-    def _generar_frase_semilla(self):
-        """Genera frase semilla de recuperacion."""
-        try:
-            from src.auth.frase_semilla import generar_frase_usuario, obtener_ultima_frase
-            from datetime import timedelta
-            uid = str(self.usuario['_id'])
-            
-            # Verificar si puede generar (90 dias)
-            ultima = obtener_ultima_frase(uid)
-            if ultima:
-                desde = ultima.get('generada_en')
-                if desde:
-                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
-                    limite = datetime.now(timezone.utc) - timedelta(days=90)
-                    if desde > limite:
-                        dias = 90 - int((datetime.now(timezone.utc) - desde).days)
-                        self.label_semilla_resultado.configure(
-                            text=f"⚠ Espera {dias} dias para nueva frase",
-                            text_color=AVISO,
-                        )
-                        return
-            
-            frase = generar_frase_usuario(uid)
-            
-            if frase:
-                self._ultima_frase_mostrada = frase
-                self.label_semilla_resultado.configure(
-                    text=f"📝 {frase}",
-                    text_color="#E7952B",
-                )
-            else:
-                self.label_semilla_resultado.configure(
-                    text="Ya generaste una frase recientemente. Espera 90 dias.",
-                    text_color=AVISO,
-                )
-        except Exception as e:
-            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
-
-    def _exportar_frase_semilla(self):
-        """Exporta frase semilla a TXT."""
-        try:
-            from src.auth.frase_semilla import obtener_ultima_frase
-            from tkinter import filedialog
-            from datetime import timedelta
-            
-            uid = str(self.usuario['_id'])
-            ultima = obtener_ultima_frase(uid)
-            
-            if not ultima:
-                self.label_semilla_resultado.configure(
-                    text="Primero genera una frase semilla", text_color=PELIGRO
-                )
-                return
-            
-            desde = ultima.get('generada_en')
-            if desde:
-                desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
-                limite = datetime.now(timezone.utc) - timedelta(days=90)
-                if desde <= limite:
-                    self.label_semilla_resultado.configure(
-                        text="Primero genera una frase semilla", text_color=PELIGRO
-                    )
-                    return
-            
-            ruta = filedialog.asksaveasfilename(
-                defaultextension=".txt",
-                filetypes=[("Texto plano", "*.txt")],
-                title="Exportar frase semilla",
-            )
-            
-            if not ruta:
-                return
-            
-            email = self.usuario.get('email', 'N/A')
-            fecha = desde.strftime('%Y-%m-%d %H:%M') if desde else 'N/A'
-            frase = self._ultima_frase_mostrada or "Genera una nueva frase"
-            
-            with open(ruta, 'w', encoding='utf-8') as f:
-                f.write(f"Usuario: {email}\n")
-                f.write(f"Fecha generacion: {fecha}\n")
-                f.write(f"Frase Semilla: {frase}\n")
-            
-            self.label_semilla_resultado.configure(
-                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
-            )
-        except Exception as e:
-            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
-
-    def _exportar_frase_semilla_json(self):
-        """Exporta frase semilla a JSON."""
-        try:
-            from src.auth.frase_semilla import obtener_ultima_frase
-            from tkinter import filedialog
-            import json
-            from datetime import timedelta
-            
-            uid = str(self.usuario['_id'])
-            ultima = obtener_ultima_frase(uid)
-            
-            if not ultima:
-                self.label_semilla_resultado.configure(
-                    text="Primero genera una frase semilla", text_color=PELIGRO
-                )
-                return
-            
-            desde = ultima.get('generada_en')
-            if desde:
-                desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
-                limite = datetime.now(timezone.utc) - timedelta(days=90)
-                if desde <= limite:
-                    self.label_semilla_resultado.configure(
-                        text="Primero genera una frase semilla", text_color=PELIGRO
-                    )
-                    return
-            
-            ruta = filedialog.asksaveasfilename(
-                defaultextension=".json",
-                filetypes=[("JSON", "*.json")],
-                title="Exportar frase semilla",
-            )
-            
-            if not ruta:
-                return
-            
-            email = self.usuario.get('email', 'N/A')
-            fecha = desde.strftime('%Y-%m-%d %H:%M') if desde else 'N/A'
-            
-            data = {
-                "usuario": email,
-                "fecha_generacion": fecha,
-                "frase_semilla": self._ultima_frase_mostrada or "Genera una nueva frase",
-                "instrucciones": "Guarda esta frase en un lugar seguro. La necesitaras si pierdes tu contrasena."
-            }
-            
-            with open(ruta, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            
-            self.label_semilla_resultado.configure(
-                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
-            )
-        except Exception as e:
-            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _ver_contraseña(self):
         pin = self.entry_ver.get().strip()
@@ -669,7 +303,7 @@ class PasswordView(ctk.CTkFrame):
             )
             self.barra_fortaleza.set(puntuacion / 100)
             self.barra_fortaleza.configure(progress_color=self._color_fortaleza(puntuacion))
-        except Exception:  # nosec
+        except Exception:
             pass
 
     @staticmethod
@@ -685,96 +319,18 @@ class PasswordView(ctk.CTkFrame):
             return PELIGRO
 
     def _regenerar(self):
-        """Genera contraseña segura usando la semilla introducida por el usuario."""
-        semilla = self.entry_semilla_reg.get().strip()
-        if len(semilla) < 8:
-            self.label_reg_resultado.configure(
-                text="Mínimo 8 caracteres en la semilla", text_color=PELIGRO
-            )
-            return
-        
-        # Confirmar antes de cambiar
-        import customtkinter as ctk
-        dialogo = ctk.CTkToplevel(self)
-        dialogo.title("Confirmar")
-        dialogo.geometry("350x150")
-        dialogo.transient(self)
-        dialogo.grab_set()
-        
-        ctk.CTkLabel(
-            dialogo,
-            text="¿Generar nueva contraseña segura?\nEsto modificará tu contraseña actual.",
-            font=("JetBrains Mono", 12),
-        ).pack(pady=20)
-        
-        def confirmar():
-            self._guardar_contraseña_segura(semilla, dialogo)
-        
-        ctk.CTkButton(
-            dialogo, text="Sí, generar",
-            font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
-            command=confirmar,
-        ).pack(side="left", padx=20, pady=10)
-        
-        ctk.CTkButton(
-            dialogo, text="Cancelar",
-            font=("JetBrains Mono", 12),
-            command=dialogo.destroy,
-        ).pack(side="right", padx=20, pady=10)
-
-    def _generar_segura_automatica(self):
-        """Genera una contraseña segura automáticamente (sin semilla)."""
         try:
-            from src.generador import generar_contraseña_segura
-            from src.seguridad.encriptacion import hashear_contraseña, cifrar
-            from src.db.conexion import conexion_global
-
-            pw = generar_contraseña_segura()
-            nuevo_hash = hashear_contraseña(pw)
-            nueva_enc = cifrar(pw)
-
-            coleccion = conexion_global.obtener_coleccion('usuarios')
-            coleccion.update_one(
-                {'_id': self.usuario['_id']},
-                {'$set': {
-                    'contraseña_hash': nuevo_hash,
-                    'contraseña_encriptada': nueva_enc,
-                }}
-            )
-
+            from src.auth import regenerar_contraseña
+            params = self.usuario.get('parametros_contraseña', {
+                "longitud": 20, "usar_mayusculas": True,
+                "usar_numeros": True, "usar_simbolos": True,
+                "excluir_ambiguos": False,
+            })
+            resultado = regenerar_contraseña(str(self.usuario['_id']), params)
             self.label_reg_resultado.configure(
-                text=f"✓ Generada: {pw}", text_color=COMPLETADO,
+                text=f"Nueva contraseña: {resultado['nueva_contraseña']}",
+                text_color=COMPLETADO,
             )
-        except Exception as e:
-            self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
-
-    def _guardar_contraseña_segura(self, semilla, dialogo=None):
-        """Guarda la contraseña segura generada."""
-        try:
-            from src.generador import generar_contraseña_personalizada
-            from src.seguridad.encriptacion import hashear_contraseña, cifrar
-            from src.db.conexion import conexion_global
-
-            pw = generar_contraseña_personalizada(semilla)
-            nuevo_hash = hashear_contraseña(pw)
-            nueva_enc = cifrar(pw)
-
-            coleccion = conexion_global.obtener_coleccion('usuarios')
-            coleccion.update_one(
-                {'_id': self.usuario['_id']},
-                {'$set': {
-                    'contraseña_hash': nuevo_hash,
-                    'contraseña_encriptada': nueva_enc,
-                }}
-            )
-
-            self.label_reg_resultado.configure(
-                text=f"Contraseña segura generada: {pw}", text_color=COMPLETADO,
-            )
-            self.entry_semilla_reg.delete(0, "end")
-            if dialogo:
-                dialogo.destroy()
         except Exception as e:
             self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
 
@@ -813,17 +369,10 @@ class PasswordView(ctk.CTkFrame):
     def _cambiar_manual(self):
         pw_actual = self.entry_manual_actual.get()
         pw_nueva = self.entry_manual.get()
-        pw_repetir = self.entry_manual_repetir.get()
 
-        if not pw_actual or not pw_nueva or not pw_repetir:
+        if not pw_actual or not pw_nueva:
             self.label_manual_resultado.configure(
-                text="Todos los campos son obligatorios", text_color=PELIGRO
-            )
-            return
-
-        if pw_nueva != pw_repetir:
-            self.label_manual_resultado.configure(
-                text="Las contraseñas no coinciden", text_color=PELIGRO
+                text="Ambos campos son obligatorios", text_color=PELIGRO
             )
             return
 
@@ -849,49 +398,22 @@ class PasswordView(ctk.CTkFrame):
             )
             self.entry_manual_actual.delete(0, "end")
             self.entry_manual.delete(0, "end")
-            self.entry_manual_repetir.delete(0, "end")
         except Exception as e:
             self.label_manual_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _exportar(self):
-        from tkinter import filedialog
-        import json
-        
-        opciones = [
-            ("Texto plano", "*.txt"),
-            ("JSON", "*.json"),
-        ]
-        ruta = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=opciones,
-            title="Exportar contraseña",
-        )
-        
-        if not ruta:
-            return
-            
         try:
-            from src.auth import obtener_contraseña
-            pw = obtener_contraseña(str(self.usuario['_id']))
-            email = self.usuario.get('email', 'N/A')
-            fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
-            
-            if ruta.endswith('.json'):
-                data = {
-                    "usuario": email,
-                    "fecha": fecha,
-                    "contraseña": pw
-                }
-                with open(ruta, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=2, ensure_ascii=False)
-            else:
-                with open(ruta, 'w', encoding='utf-8') as f:
-                    f.write(f"Usuario: {email}\n")
-                    f.write(f"Fecha: {fecha}\n")
-                    f.write(f"Contraseña: {pw}\n")
-            
-            self.label_export_resultado.configure(
-                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            from src.auth import exportar_contraseña
+            from tkinter import filedialog
+            ruta = filedialog.asksaveasfilename(
+                defaultextension=".enc",
+                filetypes=[("Encriptado", "*.enc")],
+                title="Guardar contraseña",
             )
+            if ruta:
+                exportar_contraseña(str(self.usuario['_id']), ruta)
+                self.label_export_resultado.configure(
+                    text=f"Exportado: {ruta}", text_color=COMPLETADO
+                )
         except Exception as e:
             self.label_export_resultado.configure(text=str(e), text_color=PELIGRO)
