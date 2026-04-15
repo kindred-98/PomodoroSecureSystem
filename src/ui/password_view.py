@@ -96,7 +96,7 @@ class PasswordView(ctk.CTkFrame):
         ctk.CTkButton(
             card_reg, text="🔄 Generar Contraseña Segura",
             font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_PRINCIPAL, hover_color=BOTON_PRINCIPAL_HOVER,
+            fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=self._generar_segura_automatica,
         ).pack(anchor="w", padx=20, pady=(10, 5))
