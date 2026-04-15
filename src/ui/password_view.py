@@ -125,13 +125,16 @@ class PasswordView(ctk.CTkFrame):
         frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
         frame_pin.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkButton(
+        self.boton_generar_pin = ctk.CTkButton(
             frame_pin, text="Generar PIN",
             font=("JetBrains Mono", 12, "bold"),
             fg_color="#9B59B6", hover_color="#8E44AD",
             text_color=TEXTO_PRINCIPAL, width=120, height=38, corner_radius=8,
             command=self._generar_pin,
-        ).pack(side="left")
+        )
+        self.boton_generar_pin.pack(side="left")
+        
+        self._verificar_bloqueo_pin()
 
         # Caja que muestra el PIN generado (grande y visible)
         self.label_pin_resultado = ctk.CTkLabel(
@@ -305,8 +308,28 @@ class PasswordView(ctk.CTkFrame):
     def _generar_pin(self):
         """Genera un nuevo PIN de 6 dígitos para hoy y lo muestra UNA sola vez."""
         try:
-            from src.auth.pin_diario import generar_pin_diario, eliminar_pin_diario
+            from src.auth.pin_diario import generar_pin_diario, eliminar_pin_diario, obtener_ultimo_pin
+            from datetime import datetime, timezone, timedelta
             uid = str(self.usuario['_id'])
+            
+            # Verificar si está bloqueado
+            ultimo = obtener_ultimo_pin(uid)
+            if ultimo:
+                desde = ultimo.get('ultimo_intento')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
+                    if desde > limite:
+                        minutos = int((limite - desde).total_seconds() // 60) * -1
+                        self.label_pin_resultado.configure(
+                            text=f"⚠ Espera {minutos+1} min",
+                            text_color=AVISO,
+                        )
+                        self.label_pin_aviso.configure(
+                            text="Debes esperar 1 hora entre generaciones",
+                            text_color=TEXTO_SECUNDARIO,
+                        )
+                        return
             
             # Primero eliminar cualquier PIN existente para poder generar uno nuevo
             eliminar_pin_diario(uid)
@@ -314,28 +337,54 @@ class PasswordView(ctk.CTkFrame):
             pin = generar_pin_diario(uid)
 
             if pin is not None:
-                # PIN recién generado: mostrarlo en grande
+                # PIN recién generado: bloquear por 1 hora
+                self.boton_generar_pin.configure(state="disabled")
+                self.after(3600000, self._desbloquear_pin)
+                
                 self.label_pin_resultado.configure(
                     text=pin,
                     text_color="#9B59B6",
                 )
                 self.label_pin_aviso.configure(
-                    text="⚠ Guárdalo ahora — no se volverá a mostrar. Úsalo en 'Ver contraseña'.",
+                    text="⚠ Guárdalo ahora — no se volvera a mostrar. Nuevo PIN en 1 hora.",
                     text_color=AVISO,
                 )
             else:
-                # Ya existe PIN para hoy, no recuperable
                 self.label_pin_resultado.configure(
                     text="Ya tienes un PIN para hoy",
                     text_color=AVISO,
                 )
                 self.label_pin_aviso.configure(
-                    text="El PIN se generó al iniciar sesión. Solo hay uno por día.",
+                    text="El PIN de hoy ya fue generado.",
                     text_color=TEXTO_SECUNDARIO,
                 )
         except Exception as e:
             self.label_pin_resultado.configure(text=str(e), text_color=PELIGRO)
             self.label_pin_aviso.configure(text="", text_color=TEXTO_SECUNDARIO)
+    
+    def _desbloquear_pin(self):
+        """Desbloquea el botón de generar PIN."""
+        if hasattr(self, 'boton_generar_pin'):
+            self.boton_generar_pin.configure(state="normal")
+    
+    def _verificar_bloqueo_pin(self):
+        """Verifica si el boton debe estar bloqueado al abrir la vista."""
+        try:
+            from src.auth.pin_diario import obtener_ultimo_pin
+            from datetime import datetime, timezone, timedelta
+            uid = str(self.usuario['_id'])
+            
+            ultimo = obtener_ultimo_pin(uid)
+            if ultimo:
+                desde = ultimo.get('ultimo_intento')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
+                    if desde > limite:
+                        self.boton_generar_pin.configure(state="disabled")
+                        self.after(3600000, self._desbloquear_pin)
+        except Exception:
+            pass
 
     def _ver_contraseña(self):
         pin = self.entry_ver.get().strip()

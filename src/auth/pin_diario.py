@@ -42,11 +42,13 @@ def generar_pin_diario(usuario_id: str) -> str | None:
     pin = str(secrets.randbelow(900000) + 100000)
     pin_hash = hashear_contraseña(pin)
 
+    ahora = datetime.now(timezone.utc)
     coleccion.insert_one({
         'usuario_id': usuario_oid,
         'fecha': hoy,
         'pin_hash': pin_hash,
         'intentos_fallidos': 0,
+        'ultimo_intento': ahora,
     })
 
     return pin  # Se devuelve UNA sola vez, después solo existe el hash
@@ -75,6 +77,27 @@ def eliminar_pin_diario(usuario_id: str) -> bool:
     })
     
     return resultado.deleted_count > 0
+
+
+def obtener_ultimo_pin(usuario_id: str) -> dict | None:
+    """
+    Obtiene el registro del último PIN generado hoy.
+    
+    Returns:
+        dict: Registro del PIN o None.
+    """
+    from bson import ObjectId
+    try:
+        usuario_oid = ObjectId(usuario_id)
+    except Exception:
+        usuario_oid = usuario_id
+
+    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    coleccion = conexion_global.obtener_coleccion('pines_diarios')
+    return coleccion.find_one({
+        'usuario_id': usuario_oid,
+        'fecha': hoy,
+    })
 
 
 def verificar_pin_diario(usuario_id: str, pin_introducido: str) -> bool:
