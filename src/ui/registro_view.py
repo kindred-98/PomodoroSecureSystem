@@ -513,6 +513,9 @@ class RegistroView(ctk.CTkFrame):
                 self._mostrar_paso_2()
             elif self.paso_actual == 3:
                 self._mostrar_paso_3()
+        else:
+            # Volver al login
+            self.on_ir_login()
 
     def limpiar(self):
         """Resetea la vista de registro."""

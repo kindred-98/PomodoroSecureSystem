@@ -52,6 +52,7 @@ class PomodoroSecureApp(ctk.CTk):
             on_login=self._on_login,
             on_ir_registro=self._mostrar_registro,
         )
+        vista.set_login_frase_callback(self._on_login_frase)
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista
 
@@ -132,6 +133,26 @@ class PomodoroSecureApp(ctk.CTk):
             self._vincular_a_equipo()
 
             # Verificar si necesita configurar descansos
+            self.after(500, self._verificar_config_descansos)
+        except Exception as e:
+            if hasattr(self.vista_actual, 'mostrar_error'):
+                self.vista_actual.mostrar_error(str(e))
+            raise
+
+    def _on_login_frase(self, email, usuario_data):
+        """Login con frase semilla - sin contraseña."""
+        try:
+            self.usuario_actual = usuario_data
+            self._mostrar_dashboard()
+
+            # Restaurar timer desde BD
+            from src.timer.servicio_timer import servicio_timer
+            servicio_timer.restaurar_desde_bd(str(self.usuario_actual['_id']))
+
+            # Vincular empleado a equipo
+            self._vincular_a_equipo()
+
+            # Verificar descansos
             self.after(500, self._verificar_config_descansos)
         except Exception as e:
             if hasattr(self.vista_actual, 'mostrar_error'):
