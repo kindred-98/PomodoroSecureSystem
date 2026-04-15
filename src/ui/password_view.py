@@ -425,6 +425,39 @@ class PasswordView(ctk.CTkFrame):
                 text="Mínimo 8 caracteres en la semilla", text_color=PELIGRO
             )
             return
+        
+        # Confirmar antes de cambiar
+        import customtkinter as ctk
+        dialogo = ctk.CTkToplevel(self)
+        dialogo.title("Confirmar")
+        dialogo.geometry("350x150")
+        dialogo.transient(self)
+        dialogo.grab_set()
+        
+        ctk.CTkLabel(
+            dialogo,
+            text="¿Generar nueva contraseña segura?\nEsto modificará tu contraseña actual.",
+            font=("JetBrains Mono", 12),
+        ).pack(pady=20)
+        
+        def confirmar():
+            self._guardar_contraseña_segura(semilla, dialogo)
+        
+        ctk.CTkButton(
+            dialogo, text="Sí, generar",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
+            command=confirmar,
+        ).pack(side="left", padx=20, pady=10)
+        
+        ctk.CTkButton(
+            dialogo, text="Cancelar",
+            font=("JetBrains Mono", 12),
+            command=dialogo.destroy,
+        ).pack(side="right", padx=20, pady=10)
+
+    def _guardar_contraseña_segura(self, semilla, dialogo=None):
+        """Guarda la contraseña segura generada."""
         try:
             from src.generador import generar_contraseña_personalizada
             from src.seguridad.encriptacion import hashear_contraseña, cifrar
@@ -437,7 +470,7 @@ class PasswordView(ctk.CTkFrame):
             coleccion = conexion_global.obtener_coleccion('usuarios')
             coleccion.update_one(
                 {'_id': self.usuario['_id']},
-                {'': {
+                {'$set': {
                     'contraseña_hash': nuevo_hash,
                     'contraseña_encriptada': nueva_enc,
                 }}
@@ -447,6 +480,8 @@ class PasswordView(ctk.CTkFrame):
                 text=f"Contraseña segura generada: {pw}", text_color=COMPLETADO,
             )
             self.entry_semilla_reg.delete(0, "end")
+            if dialogo:
+                dialogo.destroy()
         except Exception as e:
             self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
 
