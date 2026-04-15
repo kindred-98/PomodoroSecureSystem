@@ -32,7 +32,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="PomodoroSecure",
-            font=("JetBrains Mono", 32, "bold"),
+            font=("Comic Sans MS", 32, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack()
 
@@ -40,7 +40,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="Sistema de Gestión Segura de Tiempo",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(5, 30))
 
@@ -59,7 +59,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="v1.0.0",
-            font=("JetBrains Mono", 10),
+            font=("Comic Sans MS", 10),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(20, 0))
 
@@ -74,3 +74,4 @@ class SplashView(ctk.CTkFrame):
         else:
             self.progreso.set(1)
             self.after(300, self.on_complete)
+

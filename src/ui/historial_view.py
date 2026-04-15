@@ -25,7 +25,7 @@ class HistorialView(ctk.CTkFrame):
 
         ctk.CTkButton(
             header, text="← Volver",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=36, corner_radius=8,
             command=self.on_volver,
@@ -33,7 +33,7 @@ class HistorialView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="📋 Historial de Sesiones",
-            font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         # Contenido
@@ -46,19 +46,19 @@ class HistorialView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.card_resumen, text="📊 Resumen",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         self.label_resumen = ctk.CTkLabel(
             self.card_resumen, text="Cargando...",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_resumen.pack(anchor="w", padx=20, pady=(0, 15))
 
         # Lista de sesiones
         ctk.CTkLabel(
             contenido, text="Sesiones recientes",
-            font=("JetBrains Mono", 13, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 13, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", pady=(0, 5))
 
         self.frame_sesiones = ctk.CTkScrollableFrame(
@@ -100,7 +100,7 @@ class HistorialView(ctk.CTkFrame):
                 ctk.CTkLabel(
                     self.frame_sesiones,
                     text="No hay sesiones registradas",
-                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                    font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=30)
                 return
 
@@ -129,7 +129,7 @@ class HistorialView(ctk.CTkFrame):
                 ctk.CTkLabel(
                     info,
                     text=f"Ciclo {ciclo} — Pomodoro {pom} — {duracion_min} min",
-                    font=("JetBrains Mono", 11), text_color=TEXTO_PRINCIPAL,
+                    font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
                     anchor="w",
                 ).pack(fill="x")
 
@@ -140,9 +140,10 @@ class HistorialView(ctk.CTkFrame):
                     fecha = str(inicio)[:16]
                 ctk.CTkLabel(
                     info, text=fecha,
-                    font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+                    font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
                     anchor="w",
                 ).pack(fill="x")
 
         except Exception as e:
             self.label_resumen.configure(text=f"Error: {e}")
+

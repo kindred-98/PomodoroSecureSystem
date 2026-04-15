@@ -39,7 +39,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             card,
             text="PomodoroSecure",
-            font=("JetBrains Mono", 20, "bold"),
+            font=("Comic Sans MS", 20, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(0, 25))
 
@@ -47,7 +47,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             card,
             text="Email",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(fill="x", padx=40)
@@ -55,7 +55,7 @@ class LoginView(ctk.CTkFrame):
         self.entry_email = ctk.CTkEntry(
             card,
             placeholder_text="usuario@empresa.com",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
@@ -68,7 +68,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             card,
             text="Contraseña",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(fill="x", padx=40)
@@ -77,7 +77,7 @@ class LoginView(ctk.CTkFrame):
             card,
             placeholder_text="••••••••",
             show="•",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
@@ -93,7 +93,7 @@ class LoginView(ctk.CTkFrame):
             text="Mostrar contraseña",
             variable=self.mostrar_pw,
             command=self._toggle_contraseña,
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             text_color=TEXTO_SECUNDARIO,
             fg_color=FONDO_SECUNDARIO,
             checkmark_color=TEXTO_PRINCIPAL,
@@ -104,7 +104,7 @@ class LoginView(ctk.CTkFrame):
         self.label_error = ctk.CTkLabel(
             card,
             text="",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             text_color=PELIGRO,
         )
         self.label_error.pack(pady=(0, 10))
@@ -113,7 +113,7 @@ class LoginView(ctk.CTkFrame):
         self.boton_login = ctk.CTkButton(
             card,
             text="Iniciar Sesión",
-            font=("JetBrains Mono", 14, "bold"),
+            font=("Comic Sans MS", 14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -127,7 +127,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             card,
             text="¿Primera vez? Regístrate",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=INFORMACION,
@@ -140,7 +140,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             card,
             text="¿Olvidaste tu contraseña? Usa Frase Semilla",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             fg_color="transparent",
             text_color=TEXTO_SECUNDARIO,
             height=30,
@@ -152,7 +152,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             self,
             text="v1.0.0 — Dicampus",
-            font=("JetBrains Mono", 9),
+            font=("Comic Sans MS", 9),
             text_color=TEXTO_SECUNDARIO,
         ).place(relx=0.5, rely=0.95, anchor="center")
 
@@ -202,7 +202,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="🔑 Recuperar mi Cuenta",
-            font=("JetBrains Mono", 16, "bold"),
+            font=("Comic Sans MS", 16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
         
@@ -211,14 +211,15 @@ class LoginView(ctk.CTkFrame):
             text="Si perdiste tu contraseña, usa tu Frase Semilla.\n\n"
             "La generaste en: Cambiar contraseña → Frase Semilla.\n"
             "Guárdala en un lugar seguro.",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=10)
         
         ctk.CTkButton(
             dialogo,
             text="Cerrar",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             command=dialogo.destroy,
         ).pack(pady=15)
         self.boton_login.configure(state="normal", text="Iniciar Sesión")
+

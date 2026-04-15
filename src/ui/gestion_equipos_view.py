@@ -33,12 +33,12 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             header, text="👥 Gestión de Equipos",
-            font=("JetBrains Mono", 18, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 18, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20, pady=12)
 
         ctk.CTkButton(
             header, text="+ Crear Equipo",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=120, height=36, corner_radius=8,
             command=self._crear_equipo,
@@ -55,7 +55,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             lista_frame, text="Equipos",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 10))
 
         self.frame_equipos = ctk.CTkScrollableFrame(
@@ -71,7 +71,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         self.label_detalle_vacio = ctk.CTkLabel(
             self.panel_detalle,
             text="Selecciona un equipo para ver sus detalles",
-            font=("JetBrains Mono", 14),
+            font=("Comic Sans MS", 14),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_detalle_vacio.pack(pady=50)
@@ -91,7 +91,7 @@ class GestionEquiposView(ctk.CTkToplevel):
                 ctk.CTkLabel(
                     self.frame_equipos,
                     text="No hay equipos creados.\nUsa el botón 'Crear Equipo'",
-                    font=("JetBrains Mono", 11),
+                    font=("Comic Sans MS", 11),
                     text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 return
@@ -108,7 +108,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
                 btn = ctk.CTkButton(
                     frame, text=f"📁 {nombre}",
-                    font=("JetBrains Mono", 11),
+                    font=("Comic Sans MS", 11),
                     fg_color="transparent", hover_color=FONDO_CARD,
                     text_color=TEXTO_PRINCIPAL, height=36, corner_radius=6,
                     command=lambda e=equipo: self._seleccionar_equipo(e),
@@ -118,7 +118,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
                 info = ctk.CTkLabel(
                     frame, text=f"{len(miembros)} miembros" + (f" | Con encargado" if encargado else " | Sin encargado"),
-                    font=("JetBrains Mono", 9),
+                    font=("Comic Sans MS", 9),
                     text_color=TEXTO_SECUNDARIO,
                     anchor="w",
                 )
@@ -128,7 +128,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             ctk.CTkLabel(
                 self.frame_equipos,
                 text=f"Error: {e}",
-                font=("JetBrains Mono", 11),
+                font=("Comic Sans MS", 11),
                 text_color=PELIGRO,
             ).pack(pady=20)
 
@@ -150,13 +150,13 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             nombre_frame, text="Nombre:",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
             width=100,
         ).pack(side="left")
 
         self.entry_nombre = ctk.CTkEntry(
             nombre_frame,
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=36, corner_radius=8,
         )
@@ -165,7 +165,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             nombre_frame, text="Guardar",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=80, height=32, corner_radius=6,
             command=self._guardar_nombre,
@@ -177,7 +177,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             encargado_frame, text="Encargado:",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
             width=100,
         ).pack(side="left")
 
@@ -186,7 +186,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         # Miembros
         miembros_label = ctk.CTkLabel(
             detalle_card, text="Miembros del equipo:",
-            font=("JetBrains Mono", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 12, "bold"), text_color=TEXTO_PRINCIPAL,
         )
         miembros_label.pack(anchor="w", padx=20, pady=(15, 5))
 
@@ -204,7 +204,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         self.entry_agregar = ctk.CTkEntry(
             agregar_frame, placeholder_text="ID o email del usuario...",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=36, corner_radius=8,
         )
@@ -212,7 +212,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             agregar_frame, text="+ Agregar",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=36, corner_radius=8,
             command=self._agregar_miembro,
@@ -221,7 +221,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         # Botón eliminar equipo
         btn_eliminar = ctk.CTkButton(
             detalle_card, text="🗑 Eliminar Equipo",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=self._eliminar_equipo,
@@ -246,7 +246,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             self.combo_encargado = ctk.CTkComboBox(
                 parent,
                 values=valores,
-                font=("JetBrains Mono", 11),
+                font=("Comic Sans MS", 11),
                 fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
                 button_color=BORDE, width=200,
             )
@@ -262,7 +262,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
             ctk.CTkButton(
                 parent, text="Asignar",
-                font=("JetBrains Mono", 11),
+                font=("Comic Sans MS", 11),
                 fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
                 text_color=TEXTO_PRINCIPAL, width=80, height=32, corner_radius=6,
                 command=self._asignar_encargado,
@@ -271,7 +271,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         except Exception as e:
             ctk.CTkLabel(
                 parent, text=f"Error: {e}",
-                font=("JetBrains Mono", 10),
+                font=("Comic Sans MS", 10),
                 text_color=PELIGRO,
             ).pack(side="left")
 
@@ -284,7 +284,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             if not miembros:
                 ctk.CTkLabel(
                     parent, text="No hay miembros en este equipo",
-                    font=("JetBrains Mono", 11),
+                    font=("Comic Sans MS", 11),
                     text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=10)
                 return
@@ -299,19 +299,19 @@ class GestionEquiposView(ctk.CTkToplevel):
 
                 ctk.CTkLabel(
                     frame, text=f"👤 {nombre}",
-                    font=("JetBrains Mono", 11), text_color=TEXTO_PRINCIPAL,
+                    font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
                     anchor="w",
                 ).pack(side="left", padx=10, pady=8)
 
                 ctk.CTkLabel(
                     frame, text=rol,
-                    font=("JetBrains Mono", 9),
+                    font=("Comic Sans MS", 9),
                     text_color=AVISO,
                 ).pack(side="left", padx=5)
 
                 ctk.CTkButton(
                     frame, text="Quitar",
-                    font=("JetBrains Mono", 9),
+                    font=("Comic Sans MS", 9),
                     fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
                     text_color=TEXTO_PRINCIPAL, width=60, height=24, corner_radius=4,
                     command=lambda mm=m: self._quitar_miembro(mm),
@@ -320,7 +320,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         except Exception as e:
             ctk.CTkLabel(
                 parent, text=f"Error: {e}",
-                font=("JetBrains Mono", 10),
+                font=("Comic Sans MS", 10),
                 text_color=PELIGRO,
             ).pack(pady=10)
 
@@ -435,12 +435,12 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             dialogo, text="Nombre del nuevo equipo:",
-            font=("JetBrains Mono", 14), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 14), text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
 
         entry_nombre = ctk.CTkEntry(
             dialogo, placeholder_text="Ej: Equipo de Frontend",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=40, corner_radius=8,
         )
@@ -461,8 +461,9 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             dialogo, text="Crear",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=confirmar,
         ).pack(padx=40, fill="x")
+

@@ -37,7 +37,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_paso = ctk.CTkLabel(
             self.header,
             text="Paso 1 de 4 — Datos personales",
-            font=("JetBrains Mono", 16, "bold"),
+            font=("Comic Sans MS", 16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         )
         self.label_paso.pack()
@@ -60,7 +60,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_error = ctk.CTkLabel(
             self.card,
             text="",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             text_color=PELIGRO,
         )
         self.label_error.pack(pady=(0, 5))
@@ -72,7 +72,7 @@ class RegistroView(ctk.CTkFrame):
         self.boton_atras = ctk.CTkButton(
             botones,
             text="← Atrás",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -86,7 +86,7 @@ class RegistroView(ctk.CTkFrame):
         self.boton_siguiente = ctk.CTkButton(
             botones,
             text="Siguiente →",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -101,7 +101,7 @@ class RegistroView(ctk.CTkFrame):
         link = ctk.CTkLabel(
             self.card,
             text="¿Ya tienes cuenta? Inicia sesión",
-            font=("JetBrains Mono", 11, "underline"),
+            font=("Comic Sans MS", 11, "underline"),
             text_color=INFORMACION,
             cursor="hand2",
         )
@@ -133,31 +133,31 @@ class RegistroView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.contenido, text="Nombre completo",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 0))
 
         self.entry_nombre = ctk.CTkEntry(
             self.contenido, placeholder_text="Tu nombre",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_nombre.pack(fill="x", pady=(3, 10))
 
         ctk.CTkLabel(
             self.contenido, text="Email",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.entry_email = ctk.CTkEntry(
             self.contenido, placeholder_text="usuario@empresa.com",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_email.pack(fill="x", pady=(3, 10))
 
         ctk.CTkLabel(
             self.contenido, text="Rol",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         # Determinar opciones según si hay usuarios en BD
@@ -169,7 +169,7 @@ class RegistroView(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.contenido,
                 text="✅ Eres el primer usuario. Elige tu rol de administrador.",
-                font=("JetBrains Mono", 10), text_color=COMPLETADO,
+                font=("Comic Sans MS", 10), text_color=COMPLETADO,
             ).pack(anchor="w", pady=(3, 5))
         else:
             # Ya hay usuarios: solo empleado por defecto
@@ -178,13 +178,13 @@ class RegistroView(ctk.CTkFrame):
                 self.contenido,
                 text="Solo puedes registrarte como empleado.\n"
                      "Un supervisor puede cambiarte el rol después.",
-                font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+                font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
             ).pack(anchor="w", pady=(3, 5))
 
         self.combo_rol = ctk.CTkComboBox(
             self.contenido,
             values=roles_disponibles,
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             button_color=BOTON_PRIMARIO,
@@ -207,14 +207,14 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="Configuraremos tu contraseña segura",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 15))
 
         # Slider longitud
         ctk.CTkLabel(
             self.contenido, text="Longitud de la contraseña",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.slider_longitud = ctk.CTkSlider(
@@ -230,7 +230,7 @@ class RegistroView(ctk.CTkFrame):
 
         self.label_longitud = ctk.CTkLabel(
             self.contenido, text="20 caracteres",
-            font=("JetBrains Mono", 12), text_color=TRABAJO_ACTIVO,
+            font=("Comic Sans MS", 12), text_color=TRABAJO_ACTIVO,
         )
         self.label_longitud.pack(anchor="e")
 
@@ -252,7 +252,7 @@ class RegistroView(ctk.CTkFrame):
         ]:
             ctk.CTkCheckBox(
                 self.contenido, text=texto, variable=var,
-                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
                 fg_color=FONDO_SECUNDARIO, checkmark_color=TEXTO_PRINCIPAL,
             ).pack(anchor="w", pady=(8, 0))
 
@@ -264,7 +264,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkRadioButton(
             self.contenido, text="Generada por el sistema (recomendado)",
             variable=self.tipo_contraseña, value="sistema",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
             command=self._toggle_tipo_contraseña,
         ).pack(anchor="w")
@@ -272,7 +272,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkRadioButton(
             self.contenido, text="Personalizada (tu decides los caracteres)",
             variable=self.tipo_contraseña, value="personalizada",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
             command=self._toggle_tipo_contraseña,
         ).pack(anchor="w", pady=(2, 5))
@@ -282,13 +282,13 @@ class RegistroView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.frame_semilla, text="Tus caracteres:",
-            font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.entry_semilla = ctk.CTkEntry(
             self.frame_semilla,
             placeholder_text="Ej: ADEV1130$yasuo05",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
         )
         self.entry_semilla.pack(fill="x")
@@ -296,7 +296,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.frame_semilla,
             text="Min 8 caracteres. El sistema los mezclara para crear tu contrasena.",
-            font=("JetBrains Mono", 9), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 9), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(2, 0))
 
         self.frame_semilla.pack_forget()  # Oculto por defecto
@@ -305,7 +305,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_preview = ctk.CTkLabel(
             self.contenido,
             text="Fortaleza estimada: calculando...",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 11),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_preview.pack(anchor="w", pady=(15, 0))
@@ -320,7 +320,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="⚠️ Esta es la única vez que la verás así.\nGuárdala en un lugar seguro.",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=AVISO,
             justify="center",
         ).pack(pady=(20, 15))
@@ -329,7 +329,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_contraseña = ctk.CTkLabel(
             self.contenido,
             text=self.resultado_registro.get('contraseña_generada', ''),
-            font=("JetBrains Mono", 18, "bold"),
+            font=("Comic Sans MS", 18, "bold"),
             text_color=COMPLETADO,
         )
         self.label_contraseña.pack(pady=10)
@@ -338,7 +338,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="✅ Muy fuerte — 99%",
-            font=("JetBrains Mono", 14),
+            font=("Comic Sans MS", 14),
             text_color=COMPLETADO,
         ).pack()
 
@@ -346,7 +346,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkButton(
             self.contenido,
             text="📋 Copiar al portapapeles",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -372,14 +372,14 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="Registro completado",
-            font=("JetBrains Mono", 22, "bold"),
+            font=("Comic Sans MS", 22, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack()
 
         ctk.CTkLabel(
             self.contenido,
             text="Ya puedes iniciar sesión con tu email y contraseña",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=10)
 
@@ -389,7 +389,7 @@ class RegistroView(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.contenido,
                 text=f"Email: {usuario.get('email', '')}\nRol: {usuario.get('rol', '')}",
-                font=("JetBrains Mono", 12),
+                font=("Comic Sans MS", 12),
                 text_color=TEXTO_SECUNDARIO,
                 justify="center",
             ).pack(pady=10)
@@ -519,3 +519,4 @@ class RegistroView(ctk.CTkFrame):
         self.paso_actual = 1
         self.resultado_registro = None
         self._mostrar_paso_1()
+

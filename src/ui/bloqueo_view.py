@@ -51,14 +51,14 @@ class BloqueoView(ctk.CTkToplevel):
         ctk.CTkLabel(
             centro,
             text=f"DESCANSO {self.tipo_descanso.upper()}",
-            font=("JetBrains Mono", 28, "bold"),
+            font=("Comic Sans MS", 28, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(10, 5))
 
         self.label_countdown = ctk.CTkLabel(
             centro,
             text=self._formatear_tiempo(self.duracion_seg),
-            font=("JetBrains Mono", 72, "bold"),
+            font=("Comic Sans MS", 72, "bold"),
             text_color=TEXTO_PRINCIPAL,
         )
         self.label_countdown.pack(pady=10)
@@ -66,7 +66,7 @@ class BloqueoView(ctk.CTkToplevel):
         ctk.CTkLabel(
             centro,
             text="tiempo de descanso restante",
-            font=("JetBrains Mono", 14),
+            font=("Comic Sans MS", 14),
             text_color=TEXTO_SECUNDARIO,
         ).pack()
 
@@ -74,7 +74,7 @@ class BloqueoView(ctk.CTkToplevel):
         ctk.CTkLabel(
             centro,
             text="Aprovecha para estirarte,\nhidratarte y descansar la vista.",
-            font=("JetBrains Mono", 13),
+            font=("Comic Sans MS", 13),
             text_color=TEXTO_SECUNDARIO,
             justify="center",
         ).pack(pady=(25, 20))
@@ -86,14 +86,14 @@ class BloqueoView(ctk.CTkToplevel):
         ctk.CTkLabel(
             self.frame_otp,
             text="Introduce tu código de retorno:",
-            font=("JetBrains Mono", 14),
+            font=("Comic Sans MS", 14),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(0, 5))
 
         self.entry_otp = ctk.CTkEntry(
             self.frame_otp,
             placeholder_text="_ _ _ _ _ _",
-            font=("JetBrains Mono", 24),
+            font=("Comic Sans MS", 24),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
@@ -107,7 +107,7 @@ class BloqueoView(ctk.CTkToplevel):
         self.label_otp_estado = ctk.CTkLabel(
             self.frame_otp,
             text="",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             text_color=PELIGRO,
         )
         self.label_otp_estado.pack(pady=(5, 0))
@@ -115,7 +115,7 @@ class BloqueoView(ctk.CTkToplevel):
         self.boton_verificar = ctk.CTkButton(
             self.frame_otp,
             text="Confirmar",
-            font=("JetBrains Mono", 14, "bold"),
+            font=("Comic Sans MS", 14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -181,3 +181,4 @@ class BloqueoView(ctk.CTkToplevel):
         m = segundos // 60
         s = segundos % 60
         return f"{m:02d}:{s:02d}"
+

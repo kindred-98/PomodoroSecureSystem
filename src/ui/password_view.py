@@ -804,3 +804,4 @@ class PasswordView(ctk.CTkFrame):
             self.clipboard_clear()
             self.clipboard_append(pw)
             self.label_reg_resultado.configure(text="✓ Copiado!", text_color=COMPLETADO)
+

@@ -23,13 +23,13 @@ class ConfigDescansosView(ctk.CTkToplevel):
         # Header
         ctk.CTkLabel(
             self, text="☕ Descansos Fijos de Empresa",
-            font=("JetBrains Mono", 18, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 18, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(padx=20, pady=(20, 5))
 
         ctk.CTkLabel(
             self,
             text="Los descansos fijos son obligatorios y no pueden ser modificados por los empleados.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
             wraplength=550,
         ).pack(padx=20, pady=(0, 15))
 
@@ -46,45 +46,45 @@ class ConfigDescansosView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             form, text="➕ Nuevo descanso",
-            font=("JetBrains Mono", 13, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 13, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(10, 5))
 
         fila = ctk.CTkFrame(form, fg_color="transparent")
         fila.pack(fill="x", padx=15, pady=(0, 10))
 
         # Nombre
-        ctk.CTkLabel(fila, text="Nombre:", font=("JetBrains Mono", 11),
+        ctk.CTkLabel(fila, text="Nombre:", font=("Comic Sans MS", 11),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_nombre = ctk.CTkEntry(
             fila, placeholder_text="Ej: Café mañana",
-            font=("JetBrains Mono", 12), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 12), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, width=150, height=32, corner_radius=6,
         )
         self.entry_nombre.pack(side="left", padx=(5, 15))
 
         # Hora inicio
-        ctk.CTkLabel(fila, text="Hora:", font=("JetBrains Mono", 11),
+        ctk.CTkLabel(fila, text="Hora:", font=("Comic Sans MS", 11),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_hora = ctk.CTkEntry(
             fila, placeholder_text="10:30",
-            font=("JetBrains Mono", 12), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 12), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, width=70, height=32, corner_radius=6,
         )
         self.entry_hora.pack(side="left", padx=(5, 15))
 
         # Duración
-        ctk.CTkLabel(fila, text="Min:", font=("JetBrains Mono", 11),
+        ctk.CTkLabel(fila, text="Min:", font=("Comic Sans MS", 11),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_duracion = ctk.CTkEntry(
             fila, placeholder_text="15",
-            font=("JetBrains Mono", 12), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 12), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, width=50, height=32, corner_radius=6,
         )
         self.entry_duracion.pack(side="left", padx=(5, 10))
 
         ctk.CTkButton(
             fila, text="Añadir",
-            font=("JetBrains Mono", 11, "bold"),
+            font=("Comic Sans MS", 11, "bold"),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=70, height=32, corner_radius=6,
             command=self._añadir_descanso,
@@ -122,7 +122,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
                 ctk.CTkLabel(
                     self.frame_descansos,
                     text="No tienes un equipo asignado. Contacta a tu supervisor.",
-                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                    font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 self._equipo_actual = None
                 return
@@ -134,7 +134,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
                 ctk.CTkLabel(
                     self.frame_descansos,
                     text="No hay descansos fijos. Usa el formulario de abajo para agregar.",
-                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                    font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 return
 
@@ -145,14 +145,14 @@ class ConfigDescansosView(ctk.CTkToplevel):
                 ctk.CTkLabel(
                     frame,
                     text=f"{desc.get('nombre', '')}  |  {desc.get('hora_inicio', '')}  |  {desc.get('duracion_min', 0)} min",
-                    font=("JetBrains Mono", 12), text_color=TEXTO_PRINCIPAL,
+                    font=("Comic Sans MS", 12), text_color=TEXTO_PRINCIPAL,
                 ).pack(side="left", padx=10, pady=8)
 
         except Exception as e:
             ctk.CTkLabel(
                 self.frame_descansos,
                 text=f"Error: {e}",
-                font=("JetBrains Mono", 12), text_color=PELIGRO,
+                font=("Comic Sans MS", 12), text_color=PELIGRO,
             ).pack(pady=20)
 
     def _añadir_descanso(self):
@@ -198,3 +198,4 @@ class ConfigDescansosView(ctk.CTkToplevel):
         self.entry_duracion.delete(0, "end")
 
         self._cargar_descansos()
+
