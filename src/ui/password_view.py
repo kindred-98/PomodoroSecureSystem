@@ -626,16 +626,36 @@ class PasswordView(ctk.CTkFrame):
             self.label_manual_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _exportar(self):
+        from tkinter import filedialog
+        import os
+        
+        opciones = [
+            ("Texto plano", "*.txt"),
+            ("Encriptado", "*.enc"),
+        ]
+        ruta = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=opciones,
+            title="Guardar contraseña",
+        )
+        
+        if not ruta:
+            return
+            
         try:
-            from src.auth import exportar_contraseña
-            from tkinter import filedialog
-            ruta = filedialog.asksaveasfilename(
-                defaultextension=".enc",
-                filetypes=[("Encriptado", "*.enc")],
-                title="Guardar contraseña",
-            )
-            if ruta:
+            if ruta.endswith('.enc'):
+                from src.auth import exportar_contraseña
                 exportar_contraseña(str(self.usuario['_id']), ruta)
+                self.label_export_resultado.configure(
+                    text=f"Exportado: {ruta}", text_color=COMPLETADO
+                )
+            else:
+                from src.auth import obtener_contraseña
+                pw = obtener_contraseña(str(self.usuario['_id']))
+                with open(ruta, 'w', encoding='utf-8') as f:
+                    f.write(f"Usuario: {self.usuario.get('email', 'N/A')}\n")
+                    f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+                    f.write(f"Contraseña: {pw}\n")
                 self.label_export_resultado.configure(
                     text=f"Exportado: {ruta}", text_color=COMPLETADO
                 )

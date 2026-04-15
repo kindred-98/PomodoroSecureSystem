@@ -11,6 +11,29 @@ from src.auth.ver_contraseña import ver_contraseña
 from src.auth.regenerar_contraseña import regenerar_contraseña
 from src.auth.cambiar_contraseña import cambiar_contraseña
 from src.auth.exportar_contraseña import exportar_contraseña
+from src.auth.ver_contraseña import ver_contraseña
+
+def obtener_contraseña(usuario_id: str) -> str:
+    """
+    Obtiene la contraseña desencriptada del usuario.
+    Sin verificación (el usuario ya está autenticado).
+    """
+    from bson import ObjectId
+    from src.db.conexion import conexion_global
+    from src.seguridad.encriptacion import descifrar
+    
+    try:
+        oid = ObjectId(usuario_id)
+    except Exception:
+        raise ValueError("ID inválido")
+    
+    coleccion = conexion_global.obtener_coleccion('usuarios')
+    usuario = coleccion.find_one({'_id': oid})
+    
+    if not usuario:
+        raise Exception("Usuario no encontrado")
+    
+    return descifrar(usuario.get('contraseña_encriptada', ''))
 
 __all__ = [
     "registrar_usuario",
@@ -23,4 +46,5 @@ __all__ = [
     "regenerar_contraseña",
     "cambiar_contraseña",
     "exportar_contraseña",
+    "obtener_contraseña",
 ]
