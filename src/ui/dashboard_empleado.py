@@ -167,23 +167,6 @@ class DashboardEmpleado(ctk.CTkFrame):
         )
         self.boton_pausar.pack(side="left", padx=5)
 
-        # Info de descansos
-        descansos_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
-        descansos_card.pack(fill="x")
-
-        ctk.CTkLabel(
-            descansos_card, text="Proximos descansos",
-            font=("Comic Sans MS", 13, "bold"), text_color=TEXTO_PRINCIPAL,
-        ).pack(anchor="w", padx=20, pady=(15, 5))
-
-        self.label_descansos = ctk.CTkLabel(
-            descansos_card,
-            text="Corto 1: 5 min\nCorto 2: 5 min\nCorto 3: 5 min\nCorto 4: 5 min\nLargo: 30 min",
-            font=("Comic Sans MS", 11),
-            text_color=TEXTO_SECUNDARIO, justify="left",
-        )
-        self.label_descansos.pack(anchor="w", padx=20, pady=(0, 15))
-
     def _sincronizar_con_servicio(self):
         """Lee el estado del servicio y actualiza la UI."""
         from src.timer.servicio_timer import servicio_timer

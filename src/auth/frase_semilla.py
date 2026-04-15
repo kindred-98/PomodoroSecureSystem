@@ -13,7 +13,7 @@ from src.seguridad.encriptacion import hashear_contraseña
 PALABRAS = [
     "agua", "aire", "alto", "amar", "angel", "arbol", "arte", "ave", "azul",
     "bajo", "ballena", "banco", "barco", "bello", "bien", "blanco", "boca", "brazo",
-    "bueno", "buque", "caja", "calle", "calor", "cama", "campo", "campo", "canto",
+    "bueno", "buque", "caja", "calle", "calor", "cama", "campo", "canto",
     "carne", "carta", "casa", "caso", "cedro", "celeste", "centro", "cerca",
     "cielo", "cinco", "clase", "clima", "cobre", "coco", "colon", "color",
     "como", "copa", "corazon", "costa", "crema", "crudo", "cuarto", "cuatro",
@@ -75,7 +75,7 @@ PALABRAS = [
     "traves", "tren", "tres", "trigo", "triste", "trono", "tropa", "trueque",
     "tumba", "tumor", "tunar", "turbio", "tus", "ultimo", "unico", "unir",
     "usar", "util", "uva", "vaca", "vago", "valer", "valiente", "valor",
-    "vapor", "vario", "vaso", "vecino", "veinte", "vena", "venir", "venir",
+    "vapor", "vario", "vaso", "vecino", "veinte", "vena", "venir",
     "ventana", "ver", "verano", "verdad", "verde", "verso", "vestir", "vez",
     "viaje", "vida", "viejo", "viento", "vino", "violin", "virtud", "vista",
     "vivir", "volar", "volver", "voto", "voz", "yate", "yema", "yoga",

@@ -1,75 +1,125 @@
-# 🍅 PomodoroSecure System 🔐
+# 🍅 PomodoroSecureSystem 🔐
 
-> Aplicación de escritorio Windows para la gestión del tiempo laboral de equipos de programación.  
-> Combina la técnica Pomodoro con un sistema de autenticación segura, control de presencia real y trazabilidad de anomalías.
+> Aplicación de escritorio Windows para la gestión del tiempo laboral de equipos de programación.
+> Combina la técnica Pomodoro con un sistema de autenticación segura, control de presencia real y gestión de equipos.
 
 ---
 
 ## 📋 Descripción
 
-**PomodoroSecure** integra dos herramientas en un único sistema cohesionado:
+**PomodoroSecureSystem** es una aplicación empresarial para gestión del tiempo de trabajo que incluye:
 
-- **Generador de contraseñas seguras** — el sistema de autenticación genera las contraseñas a partir de parámetros del usuario. Nadie elige su propia contraseña.
-- **Pomodoro Timer profesional** — gestión del tiempo de trabajo con descansos forzados, bloqueo de pantalla y validación de presencia mediante OTP.
-
-Desarrollado como proyecto integrador del **Módulo 2 — Estrategias de Generación de Código con IA** de Dicampus.
-
----
-
-## 🎯 Funcionalidades principales
-
-- Autenticación segura con contraseñas generadas por el sistema (módulo `secrets`)
-- Encriptación de contraseñas almacenadas con Fernet (AES-128-CBC)
-- Hash de verificación de login con bcrypt
-- Timer Pomodoro con banco de tiempo configurable (50 min por ciclo)
-- Bloqueo total de pantalla Windows en descansos obligatorios
-- Validación de presencia mediante OTP de 6 dígitos (expira en 7 min)
-- Sistema de pausas manuales con límites y control de anomalías
-- Panel de supervisión diferenciado por rol (empleado / encargado / supervisor)
-- Registro de anomalías con trazabilidad completa en MongoDB Atlas
-- Cobertura de tests ≥ 80% con pytest-cov
+- **Timer Pomodoro** con descansos configurables y pausas manuales
+- **Gestión de equipos** con roles diferenciados (Supervisor, Encargado, Empleado)
+- **Autenticación segura** con PIN diario, frases semilla y contraseñas generadas por el sistema
+- **Historial y reportes** completo para supervisión
 
 ---
 
-## 👥 Roles del sistema
+## 🎯 Funcionalidades Principales
+
+### Autenticación y Seguridad
+- Login con email y contraseña
+- **PIN diario** de 6 dígitos para verificar identidad diariamente
+- **Frase Semilla** (12 palabras) para recuperación de cuenta (90 días de cooldown)
+- **Sesiones con expiración** (12 horas máximo)
+- Contraseñas generadas por el sistema con evaluación de fortaleza
+- Encriptación de contraseñas con Fernet (AES-128-CBC)
+- Hash de verificación con bcrypt
+
+### Timer Pomodoro
+- Ciclo estándar de 25 minutos de trabajo
+- **Descansos cortos** configurables (ej: [5, 5, 5, 5] minutos)
+- **Descanso largo** de 15-30 minutos (después de 4 pomodoros)
+- Banco de tiempo acumulado
+- **Pausas manuales**: máximo 2 por jornada, máximo 10 minutos cada una
+
+### Gestión de Equipos
+- Supervisor crea equipos y asigna encargado
+- Encargado lidera su equipo
+- Miembros distribuidos por el supervisor
+- Estados online/offline en tiempo real
+
+### Dashboard por Rol
+
+#### Supervisor
+- Vista global de equipos con miembros
+- Buscador de empleados
+- Historial completo (sesiones + pausas del equipo)
+- Gestión de equipos
+- Configuración de descansos de empresa
+
+#### Encargado
+- Timer personal
+- Panel de equipo con miembros
+- Estado online/offline de miembros
+
+#### Empleado
+- Timer Pomodoro con controles
+- Control de pausas (2 máximo)
+- Iniciar/Fin de jornada
+- Ver contraseña con PIN
+
+### Sistema de Contraseñas
+- Ver contraseña (requiere PIN diario)
+- Generar PIN (1 hora de lockout)
+- Frase Semilla (90 días de cooldown)
+- Contraseña Segura (generada automáticamente)
+- Contraseña Personalizada (con validación)
+- Cambio manual con repetición
+- Exportar a TXT/JSON
+
+---
+
+## 👥 Roles del Sistema
 
 | Rol | Descripción |
 |---|---|
-| Empleado | Acceso a su Pomodoro, historial propio y configuración de descansos flexibles |
-| Encargado | Vista de su equipo en tiempo real + anomalías de su equipo |
-| Supervisor | Panel global, configuración de empresa y gestión de usuarios |
+| **Supervisor** | Gestiona equipos, ve historial completo, configura descansos, gestiona usuarios |
+| **Encargado** | Lidera equipos, ve miembros, tiene timer propio |
+| **Empleado** | Usa el timer Pomodoro, inicia/pausa jornada, gestiona contraseñas |
 
 ---
 
-## 🗂️ Estructura del proyecto
+## 🗂️ Estructura del Proyecto
+
 ```
 PomodoroSecureSystem/
 ├── src/
-│   ├── auth/          ← Autenticación: login, registro, sesión
-│   ├── generador/     ← Generador de contraseñas y evaluador de fortaleza
-│   ├── timer/         ← Lógica del ciclo Pomodoro y banco de tiempo
-│   ├── pausas/        ← Control de pausas manuales
-│   ├── bloqueo/       ← Bloqueo de pantalla Windows
-│   ├── otp/           ← Generación y verificación de códigos OTP
-│   ├── anomalias/     ← Registro y notificación de anomalías
-│   ├── db/            ← Conexión y operaciones MongoDB Atlas
-│   ├── ui/            ← Interfaz gráfica CustomTkinter
-│   ├── config/        ← Configuración global y paleta de colores
-│   ├── seguridad/     ← Encriptación Fernet y hashing bcrypt
-│   └── notificaciones/ ← Alertas sonoras y visuales
-├── tests/             ← Tests unitarios (cobertura ≥ 80%)
-├── docs/              ← Documentación y registro de asistencia IA
-├── build/             ← Ejecutable .exe (generado con PyInstaller)
-├── .env.example       ← Plantilla de variables de entorno
-├── requirements.txt   ← Dependencias del proyecto
-└── README.md          ← Este archivo
+│   ├── ui/                    ← Interfaces CustomTkinter
+│   │   ├── dashboard_empleado.py
+│   │   ├── dashboard_encargado.py
+│   │   ├── dashboard_supervisor.py
+│   │   ├── gestion_equipos_view.py
+│   │   ├── historial_view.py
+│   │   └── password_view.py
+│   ├── auth/                  ← Autenticación
+│   │   ├── login.py
+│   │   ├── sesion.py
+│   │   ├── frase_semilla.py
+│   │   └── pin_diario.py
+│   ├── timer/                 ← Timer Pomodoro
+│   │   ├── servicio_timer.py
+│   │   ├── ciclo_pomodoro.py
+│   │   └── banco_tiempo.py
+│   ├── pausas/               ← Gestión de pausas
+│   │   └── gestor_pausas.py
+│   ├── db/                   ← MongoDB
+│   │   ├── equipos/
+│   │   ├── sesiones/
+│   │   ��── usuarios/
+│   └── generador/            ← Generador de contraseñas
+├── tests/                    ← Tests pytest (620 tests)
+├── docs/                     ← Documentación
+├── main.py                   ← Punto de entrada
+└── README.md
 ```
 
 ---
 
-## ⚙️ Instalación y configuración
+## ⚙️ Instalación y Configuración
 
-### Requisitos previos
+### Requisitos Previos
 - Windows 10/11
 - Python 3.12+
 - Cuenta en MongoDB Atlas (tier gratuito M0)
@@ -101,43 +151,65 @@ copy .env.example .env
 
 **5. Ejecutar la aplicación**
 ```powershell
-python src/main.py
+python main.py
 ```
 
 ---
 
-## 🧪 Ejecutar tests
+## 🧪 Ejecutar Tests
+
 ```powershell
 # Ejecutar todos los tests
 pytest
 
-# Con informe de cobertura
-pytest --cov=src --cov-report=term-missing
-
-# Cobertura mínima requerida: 80%
-pytest --cov=src --cov-fail-under=80
+# Tests específicos
+pytest tests/pausas/
+pytest tests/timer/
+pytest tests/db/
 ```
+
+**Cobertura actual**: 620 tests passing
 
 ---
 
 ## 🔐 Seguridad
 
 - Las contraseñas **nunca se almacenan en texto plano**
-- Verificación de login mediante hash bcrypt (no reversible)
-- Almacenamiento encriptado con Fernet para recuperación por el usuario
-- El archivo `.env` y las claves (`.key`) están en `.gitignore`
-- Conexión a MongoDB Atlas siempre por TLS/SSL
+- Verificación de login mediante hash bcrypt
+- Almacenamiento encriptado con Fernet
+- PIN diario expira cada día
+- Frase semilla con cooldown de 90 días
+- Conexión a MongoDB Atlas por TLS/SSL
 
 ---
 
-## 📁 Documentación
+## 📁 Colecciones MongoDB
 
-- [`docs/PLANIFICACION_COMPLETA.md`](docs/PLANIFICACION_COMPLETA.md) — Arquitectura y decisiones de diseño completas
-<!-- - [`docs/asistencia_ia.md`](docs/asistencia_ia.md) — Registro de prompts utilizados con IA -->
+| Colección | Descripción |
+|---|-------------|
+| `usuarios` | Usuarios del sistema |
+| `sesiones_auth` | Sesiones de login |
+| `sesiones` | Sesiones Pomodoro |
+| `ciclos_pomodoro` | Ciclos activos/completados |
+| `equipos` | Equipos de trabajo |
+| `config_descansos` | Configuración de descansos |
+| `pausas_manuales` | Pausas tomadas |
+| `anomalias` | Anomalías detectadas |
+| `reportes_jornada` | Reportes diarios |
+| `reportes_pausas` | Reportes de pausas |
+
+---
+
+## 📝 Notas de Uso
+
+1. **Primer login del día**: Requiere PIN de 6 dígitos
+2. **Configurar descansos**: Solo el supervisor puede hacerlo
+3. **Modificar descansos**: Solo después de completar un ciclo (4 cortos + 1 largo)
+4. **Recuperar cuenta**: Usa frase semilla después de 90 días
+5. **Ver contraseña**: Requiere PIN diario válido
 
 ---
 
 ## 👨‍💻 Autor
 
-**A.D.E.V.** · [kindred-98](https://github.com/kindred-98)  
-Módulo 2 · Estrategias de Generación de Código con IA · Dicampus
+**A.D.E.V.** · [kindred-98](https://github.com/kindred-98)

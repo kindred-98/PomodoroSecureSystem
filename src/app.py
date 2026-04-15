@@ -99,10 +99,12 @@ class PomodoroSecureApp(ctk.CTk):
 
     def _mostrar_historial(self):
         self._limpiar_vista()
+        es_supervisor = self.usuario_actual.get('rol') == 'supervisor'
         vista = HistorialView(
             self,
             usuario=self.usuario_actual,
             on_volver=self._mostrar_dashboard,
+            es_supervisor=es_supervisor,
         )
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista

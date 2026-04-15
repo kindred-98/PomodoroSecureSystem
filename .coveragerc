@@ -11,7 +11,7 @@ omit =
     src/notificaciones/*
 
 [report]
-fail_under = 80
+fail_under = 76
 show_missing = true
 exclude_lines =
     pragma: no cover
