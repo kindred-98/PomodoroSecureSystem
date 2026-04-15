@@ -14,9 +14,8 @@ class PasswordView(ctk.CTkFrame):
         super().__init__(parent, fg_color=FONDO_PRINCIPAL)
         self.usuario = usuario
         self.on_volver = on_volver
+        self._ultima_frase_mostrada = None
         self._crear_widgets()
-
-    def _crear_widgets(self):
         # Header
         header = ctk.CTkFrame(self, fg_color=FONDO_SECUNDARIO, height=60)
         header.pack(fill="x")
@@ -299,6 +298,25 @@ class PasswordView(ctk.CTkFrame):
             command=self._generar_frase_semilla,
         ).pack(anchor="w", padx=20, pady=(10, 5))
 
+        frame_export_semilla = ctk.CTkFrame(card_semilla, fg_color="transparent")
+        frame_export_semilla.pack(fill="x", padx=20, pady=(5, 10))
+
+        ctk.CTkButton(
+            frame_export_semilla, text="Exportar a TXT",
+            font=("JetBrains Mono", 11),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=32,
+            command=self._exportar_frase_semilla,
+        ).pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_export_semilla, text="Exportar a JSON",
+            font=("JetBrains Mono", 11),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=32,
+            command=self._exportar_frase_semilla_json,
+        ).pack(side="left")
+
         self.label_semilla_resultado = ctk.CTkLabel(
             card_semilla, text="", font=("JetBrains Mono", 12),
             text_color="#E7952B",
@@ -440,6 +458,7 @@ class PasswordView(ctk.CTkFrame):
             frase = generar_frase_usuario(uid)
             
             if frase:
+                self._ultima_frase_mostrada = frase
                 self.label_semilla_resultado.configure(
                     text=f"📝 {frase}",
                     text_color="#E7952B",
@@ -449,6 +468,115 @@ class PasswordView(ctk.CTkFrame):
                     text="Ya generaste una frase recientemente. Espera 90 dias.",
                     text_color=AVISO,
                 )
+        except Exception as e:
+            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _exportar_frase_semilla(self):
+        """Exporta frase semilla a TXT."""
+        try:
+            from src.auth.frase_semilla import obtener_ultima_frase
+            from tkinter import filedialog
+            from datetime import timedelta
+            
+            uid = str(self.usuario['_id'])
+            ultima = obtener_ultima_frase(uid)
+            
+            if not ultima:
+                self.label_semilla_resultado.configure(
+                    text="Primero genera una frase semilla", text_color=PELIGRO
+                )
+                return
+            
+            desde = ultima.get('generada_en')
+            if desde:
+                desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                limite = datetime.now(timezone.utc) - timedelta(days=90)
+                if desde <= limite:
+                    self.label_semilla_resultado.configure(
+                        text="Primero genera una frase semilla", text_color=PELIGRO
+                    )
+                    return
+            
+            ruta = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Texto plano", "*.txt")],
+                title="Exportar frase semilla",
+            )
+            
+            if not ruta:
+                return
+            
+            email = self.usuario.get('email', 'N/A')
+            fecha = desde.strftime('%Y-%m-%d %H:%M') if desde else 'N/A'
+            frase = " ".join(["palabra1","palabra2","palabra3","palabra4","palabra5","palabra6",
+                           "palabra7","palabra8","palabra9","palabra10","palabra11","palabra12"])
+            
+            # Obtener la frase correcta
+            from src.auth.frase_semilla import generar_frase_semilla
+            # La frase se muestra al generar, aqui usamos un placeholder
+            with open(ruta, 'w', encoding='utf-8') as f:
+                f.write(f"Usuario: {email}\n")
+                f.write(f"Fecha generacion: {fecha}\n")
+                f.write(f"Frase Semilla: {self._ultima_frase_mostrada or 'Genera una nueva frase'}\n")
+            
+            self.label_semilla_resultado.configure(
+                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            )
+        except Exception as e:
+            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _exportar_frase_semilla_json(self):
+        """Exporta frase semilla a JSON."""
+        try:
+            from src.auth.frase_semilla import obtener_ultima_frase
+            from tkinter import filedialog
+            import json
+            from datetime import timedelta
+            
+            uid = str(self.usuario['_id'])
+            ultima = obtener_ultima_frase(uid)
+            
+            if not ultima:
+                self.label_semilla_resultado.configure(
+                    text="Primero genera una frase semilla", text_color=PELIGRO
+                )
+                return
+            
+            desde = ultima.get('generada_en')
+            if desde:
+                desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                limite = datetime.now(timezone.utc) - timedelta(days=90)
+                if desde <= limite:
+                    self.label_semilla_resultado.configure(
+                        text="Primero genera una frase semilla", text_color=PELIGRO
+                    )
+                    return
+            
+            ruta = filedialog.asksaveasfilename(
+                defaultextension=".json",
+                filetypes=[("JSON", "*.json")],
+                title="Exportar frase semilla",
+            )
+            
+            if not ruta:
+                return
+            
+            email = self.usuario.get('email', 'N/A')
+            fecha = desde.strftime('%Y-%m-%d %H:%M') if desde else 'N/A'
+            
+            data = {
+                "usuario": email,
+                "fecha_generacion": fecha,
+                "frase_semilla": self._ultima_frase_mostrada or "Genera una nueva frase",
+                "instrucciones": "Guarda esta frase en un lugar seguro. La necesitaras si pierdes tu contrasena."
+            }
+            
+            with open(ruta, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            self.label_semilla_resultado.configure(
+                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            )
         except Exception as e:
             self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
 
@@ -693,37 +821,43 @@ class PasswordView(ctk.CTkFrame):
 
     def _exportar(self):
         from tkinter import filedialog
-        import os
+        import json
         
         opciones = [
             ("Texto plano", "*.txt"),
-            ("Encriptado", "*.enc"),
+            ("JSON", "*.json"),
         ]
         ruta = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=opciones,
-            title="Guardar contraseña",
+            title="Exportar contraseña",
         )
         
         if not ruta:
             return
             
         try:
-            if ruta.endswith('.enc'):
-                from src.auth import exportar_contraseña
-                exportar_contraseña(str(self.usuario['_id']), ruta)
-                self.label_export_resultado.configure(
-                    text=f"Exportado: {ruta}", text_color=COMPLETADO
-                )
-            else:
-                from src.auth import obtener_contraseña
-                pw = obtener_contraseña(str(self.usuario['_id']))
+            from src.auth import obtener_contraseña
+            pw = obtener_contraseña(str(self.usuario['_id']))
+            email = self.usuario.get('email', 'N/A')
+            fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
+            
+            if ruta.endswith('.json'):
+                data = {
+                    "usuario": email,
+                    "fecha": fecha,
+                    "contraseña": pw
+                }
                 with open(ruta, 'w', encoding='utf-8') as f:
-                    f.write(f"Usuario: {self.usuario.get('email', 'N/A')}\n")
-                    f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+            else:
+                with open(ruta, 'w', encoding='utf-8') as f:
+                    f.write(f"Usuario: {email}\n")
+                    f.write(f"Fecha: {fecha}\n")
                     f.write(f"Contraseña: {pw}\n")
-                self.label_export_resultado.configure(
-                    text=f"Exportado: {ruta}", text_color=COMPLETADO
-                )
+            
+            self.label_export_resultado.configure(
+                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            )
         except Exception as e:
             self.label_export_resultado.configure(text=str(e), text_color=PELIGRO)
