@@ -119,6 +119,8 @@ def generar_frase_usuario(usuario_id: str) -> str | None:
         str: La frase (UNA sola vez) o None si ya existe reciente.
     """
     from bson import ObjectId
+    from src.db.conexion import conexion_global
+    
     try:
         usuario_oid = ObjectId(usuario_id)
     except Exception:
@@ -140,6 +142,7 @@ def generar_frase_usuario(usuario_id: str) -> str | None:
     frase = generar_frase_semilla()
     frase_hash = hashear_contraseña(frase)
     
+    # Guardar hash (para verificación)
     coleccion.insert_one({
         'usuario_id': usuario_oid,
         'frase_hash': frase_hash,
@@ -147,8 +150,21 @@ def generar_frase_usuario(usuario_id: str) -> str | None:
         'usada': False,
     })
     
+    # Guardar frase encriptada en usuario para recuperación
+    from src.seguridad.encriptacion import cifrar
+    from src.db.conexion import conexion_global
+    usuarios = conexion_global.obtener_coleccion('usuarios')
+    usuarios.update_one(
+        {'_id': usuario_oid},
+        {'$set': {'frase_semilla_encriptada': cifrar(frase)}}
+    )
+    
     return frase
 
+
+def conexion():
+    from src.db.conexion import conexion_global
+    return conexion_global
 
 def verificar_frase_semilla(usuario_id: str, frase: str) -> bool:
     """

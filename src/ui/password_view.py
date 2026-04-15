@@ -24,7 +24,7 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkButton(
             header, text="← Volver",
-            font=("JetBrains Mono", 12),
+            font=("Comic Sans MS", 12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=36, corner_radius=8,
             command=self.on_volver,
@@ -32,7 +32,7 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="🔑 Gestión de Contraseña",
-            font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         # Contenido con scroll
@@ -44,14 +44,14 @@ class PasswordView(ctk.CTkFrame):
         card_ver.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_ver, text="Ver contrasena actual",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            card_ver, text="👁️ Ver contraseña actual",
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_ver,
             text="Introduce tu PIN de 6 digitos (generado al iniciar sesion).",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_ver = ctk.CTkFrame(card_ver, fg_color="transparent")
@@ -59,21 +59,21 @@ class PasswordView(ctk.CTkFrame):
 
         self.entry_ver = ctk.CTkEntry(
             frame_ver, placeholder_text="PIN de 6 digitos",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_ver.pack(side="left", fill="x", expand=True, padx=(0, 10))
 
         ctk.CTkButton(
-            frame_ver, text="Ver",
-            font=("JetBrains Mono", 12, "bold"),
+            frame_ver, text="🔍 Ver",
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, width=80, height=38, corner_radius=8,
+            text_color=TEXTO_PRINCIPAL, width=80, height=40, corner_radius=8,
             command=self._ver_contraseña,
         ).pack(side="right")
 
         self.label_ver_resultado = ctk.CTkLabel(
-            card_ver, text="", font=("JetBrains Mono", 12),
+            card_ver, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_ver_resultado.pack(anchor="w", padx=20, pady=(0, 15))
@@ -84,51 +84,48 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card_pin, text="🔐 Generar PIN de 6 dígitos",
-            font=("JetBrains Mono", 14, "bold"), text_color="#9B59B6",
+            font=("Comic Sans MS", 14, "bold"), text_color="#9B59B6",
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_pin,
             text="PIN para ver contraseña. Solo 1 cada hora por seguridad.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
         frame_pin.pack(fill="x", padx=20, pady=(10, 5))
 
         self.boton_generar_pin = ctk.CTkButton(
-            frame_pin, text="Generar PIN",
-            font=("JetBrains Mono", 12, "bold"),
+            frame_pin, text="🔑 Generar PIN",
+            font=("Comic Sans MS", 12, "bold"),
             fg_color="#9B59B6", hover_color="#8E44AD",
-            text_color=TEXTO_PRINCIPAL, width=120, height=38, corner_radius=8,
+            text_color=TEXTO_PRINCIPAL, width=130, height=40, corner_radius=8,
             command=self._generar_pin,
         )
-        self.boton_generar_pin.pack(side="left")
+        self.boton_generar_pin.pack(side="left", padx=(0, 10))
         
         self._verificar_bloqueo_pin()
 
-        # Resultado del PIN
-        frame_pin_resultado = ctk.CTkFrame(card_pin, fg_color="transparent")
-        frame_pin_resultado.pack(fill="x", padx=20, pady=(8, 2))
-        
+        # Resultado + Copiar juntos
         self.label_pin_resultado = ctk.CTkLabel(
-            frame_pin_resultado, text="",
-            font=("JetBrains Mono", 22, "bold"),
+            frame_pin, text="",
+            font=("Comic Sans MS", 22, "bold"),
             text_color="#9B59B6",
         )
-        self.label_pin_resultado.pack(side="left")
+        self.label_pin_resultado.pack(side="left", padx=(10, 0))
         
         ctk.CTkButton(
-            frame_pin_resultado, text="📋 Copiar",
-            font=("JetBrains Mono", 10),
+            frame_pin, text="📋 Copiar",
+            font=("Comic Sans MS", 10),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, width=70, height=28,
+            text_color=TEXTO_PRINCIPAL, width=70, height=40,
             command=self._copiar_pin,
-        ).pack(side="right", padx=(10, 0))
+        ).pack(side="left")
 
         self.label_pin_aviso = ctk.CTkLabel(
             card_pin, text="",
-            font=("JetBrains Mono", 10),
+            font=("Comic Sans MS", 10),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_pin_aviso.pack(anchor="w", padx=20, pady=(0, 15))
@@ -141,65 +138,76 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card_semilla, text="🔑 Frase Semilla de Recuperación",
-            font=("JetBrains Mono", 14, "bold"), text_color="#E7952B",
+            font=("Comic Sans MS", 14, "bold"), text_color="#E7952B",
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_semilla,
             text="12 palabras para recuperar tu cuenta. Solo se genera cada 90 dias.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_semilla = ctk.CTkFrame(card_semilla, fg_color="transparent")
         frame_semilla.pack(fill="x", padx=20, pady=(10, 5))
 
         ctk.CTkButton(
-            frame_semilla, text="Generar Frase",
-            font=("JetBrains Mono", 12, "bold"),
+            frame_semilla, text="🔑 Generar Frase",
+            font=("Comic Sans MS", 12, "bold"),
             fg_color="#E7952B", hover_color="#D7841B",
-            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            text_color=TEXTO_PRINCIPAL, width=150, height=40, corner_radius=8,
             command=self._generar_frase_semilla,
         ).pack(side="left", padx=(0, 10))
 
         ctk.CTkButton(
             frame_semilla, text="📋 Copiar",
-            font=("JetBrains Mono", 11),
+            font=("Comic Sans MS", 10),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=38,
+            text_color=TEXTO_PRINCIPAL, width=70, height=40,
             command=self._copiar_frase,
         ).pack(side="left")
 
         self.label_semilla_resultado = ctk.CTkLabel(
-            card_semilla, text="", font=("JetBrains Mono", 12),
+            card_semilla, text="", font=("Comic Sans MS", 12),
             text_color="#E7952B",
         )
         self.label_semilla_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN B: Regenerar contraseña ──
+        # ── CONTRASEÑA SEGURA ──
         card_reg = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_reg.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_reg, text="🔄 Regenerar contraseña",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            card_reg, text="🔐 Contraseña Segura",
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_reg,
             text="Genera una nueva contraseña con parámetros diferentes.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
+        frame_reg = ctk.CTkFrame(card_reg, fg_color="transparent")
+        frame_reg.pack(fill="x", padx=20, pady=(10, 5))
+
         ctk.CTkButton(
-            card_reg, text="Regenerar",
-            font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            frame_reg, text="🔄 Generar",
+            font=("Comic Sans MS", 12, "bold"),
+            fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, width=150, height=40, corner_radius=8,
             command=self._regenerar,
-        ).pack(anchor="w", padx=20, pady=(10, 15))
+        ).pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_reg, text="📋 Copiar",
+            font=("Comic Sans MS", 10),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, width=70, height=40,
+            command=self._copiar_segura,
+        ).pack(side="left")
 
         self.label_reg_resultado = ctk.CTkLabel(
-            card_reg, text="", font=("JetBrains Mono", 12),
+            card_reg, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_reg_resultado.pack(anchor="w", padx=20, pady=(0, 15))
@@ -209,14 +217,14 @@ class PasswordView(ctk.CTkFrame):
         card_custom.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_custom, text="Contraseña personalizada",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            card_custom, text="🔧 Contraseña personalizada",
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_custom,
             text="El sistema mezcla tus caracteres para crear una contrasena fuerte.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_custom = ctk.CTkFrame(card_custom, fg_color="transparent")
@@ -224,21 +232,21 @@ class PasswordView(ctk.CTkFrame):
 
         self.entry_semilla_pw = ctk.CTkEntry(
             frame_custom, placeholder_text="Ej: ADEV1130$yasuo05 (min 8 chars)",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_semilla_pw.pack(side="left", fill="x", expand=True, padx=(0, 10))
 
         ctk.CTkButton(
             frame_custom, text="Generar",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=90, height=38, corner_radius=8,
             command=self._generar_personalizada,
         ).pack(side="right")
 
         self.label_custom_resultado = ctk.CTkLabel(
-            card_custom, text="", font=("JetBrains Mono", 12),
+            card_custom, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_custom_resultado.pack(anchor="w", padx=20, pady=(0, 15))
@@ -248,25 +256,25 @@ class PasswordView(ctk.CTkFrame):
         card_manual.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_manual, text="✏ Cambio manual",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            card_manual, text="✏️ Cambio manual",
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_manual,
             text="La contrasena debe ser nivel 'Muy Fuerte' (>=80 pts). Se pedira la actual para confirmar.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         # Contraseña actual
         frame_manual_actual = ctk.CTkFrame(card_manual, fg_color="transparent")
         frame_manual_actual.pack(fill="x", padx=20, pady=(10, 2))
 
-        ctk.CTkLabel(frame_manual_actual, text="Actual:", font=("JetBrains Mono", 10),
+        ctk.CTkLabel(frame_manual_actual, text="Actual:", font=("Comic Sans MS", 10),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_manual_actual = ctk.CTkEntry(
             frame_manual_actual, placeholder_text="Contrasena actual",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8, show="•",
         )
         self.entry_manual_actual.pack(side="left", fill="x", expand=True, padx=(5, 0))
@@ -275,27 +283,41 @@ class PasswordView(ctk.CTkFrame):
         frame_manual = ctk.CTkFrame(card_manual, fg_color="transparent")
         frame_manual.pack(fill="x", padx=20, pady=(2, 5))
 
-        ctk.CTkLabel(frame_manual, text="Nueva:", font=("JetBrains Mono", 10),
+        ctk.CTkLabel(frame_manual, text="Nueva:", font=("Comic Sans MS", 10),
                      text_color=TEXTO_SECUNDARIO).pack(side="left")
         self.entry_manual = ctk.CTkEntry(
             frame_manual, placeholder_text="Nueva contrasena",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
         )
-        self.entry_manual.pack(side="left", fill="x", expand=True, padx=(5, 10))
+        self.entry_manual.pack(side="left", fill="x", expand=True, padx=(5, 0))
 
+        # Repetir nueva contraseña  
+        frame_repetir = ctk.CTkFrame(card_manual, fg_color="transparent")
+        frame_repetir.pack(fill="x", padx=20, pady=(2, 5))
+
+        ctk.CTkLabel(frame_repetir, text="Repetir:", font=("Comic Sans MS", 10),
+                     text_color=TEXTO_SECUNDARIO).pack(side="left")
+        self.entry_manual_repetir = ctk.CTkEntry(
+            frame_repetir, placeholder_text="Repetir nueva contrasena",
+            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
+        )
+        self.entry_manual_repetir.pack(side="left", fill="x", expand=True, padx=(5, 0))
+
+        # Botón cambiar debajo
         ctk.CTkButton(
-            frame_manual, text="Cambiar",
-            font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
-            text_color=TEXTO_PRINCIPAL, width=100, height=38, corner_radius=8,
+            card_manual, text="✓ Cambiar Contraseña",
+            font=("Comic Sans MS", 12, "bold"),
+            fg_color="#10B981", hover_color="#059669",
+            text_color=TEXTO_PRINCIPAL, width=180, height=40, corner_radius=8,
             command=self._cambiar_manual,
-        ).pack(side="right")
+        ).pack(anchor="w", padx=20, pady=(10, 5))
 
         # Indicador de fortaleza en tiempo real
         self.label_fortaleza_tiempo = ctk.CTkLabel(
             card_manual, text="Escribe tu contrasena...",
-            font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
         )
         self.label_fortaleza_tiempo.pack(anchor="w", padx=20)
 
@@ -311,7 +333,7 @@ class PasswordView(ctk.CTkFrame):
         self.entry_manual.bind("<KeyRelease>", self._actualizar_fortaleza_tiempo)
 
         self.label_manual_resultado = ctk.CTkLabel(
-            card_manual, text="", font=("JetBrains Mono", 12),
+            card_manual, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_manual_resultado.pack(anchor="w", padx=20, pady=(0, 15))
@@ -322,13 +344,13 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card_export, text="💾 Exportar (sin encriptar)",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_export,
             text="Archivo legible con tu email, contraseña y frase semilla.",
-            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_export = ctk.CTkFrame(card_export, fg_color="transparent")
@@ -336,7 +358,7 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkButton(
             frame_export, text="Exportar TXT",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
             command=self._exportar_txt,
@@ -344,28 +366,28 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkButton(
             frame_export, text="Exportar JSON",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
             command=self._exportar_json,
         ).pack(side="left")
 
         self.label_export_resultado = ctk.CTkLabel(
-            card_export, text="", font=("JetBrains Mono", 12),
+            card_export, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
         ctk.CTkButton(
             card_export, text="Exportar",
-            font=("JetBrains Mono", 12, "bold"),
+            font=("Comic Sans MS", 12, "bold"),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
             command=self._exportar,
         ).pack(anchor="w", padx=20, pady=(10, 15))
 
         self.label_export_resultado = ctk.CTkLabel(
-            card_export, text="", font=("JetBrains Mono", 12),
+            card_export, text="", font=("Comic Sans MS", 12),
             text_color=COMPLETADO,
         )
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
@@ -491,10 +513,17 @@ class PasswordView(ctk.CTkFrame):
     def _cambiar_manual(self):
         pw_actual = self.entry_manual_actual.get()
         pw_nueva = self.entry_manual.get()
+        pw_repetir = self.entry_manual_repetir.get()
 
-        if not pw_actual or not pw_nueva:
+        if not pw_actual or not pw_nueva or not pw_repetir:
             self.label_manual_resultado.configure(
-                text="Ambos campos son obligatorios", text_color=PELIGRO
+                text="Todos los campos son obligatorios", text_color=PELIGRO
+            )
+            return
+
+        if pw_nueva != pw_repetir:
+            self.label_manual_resultado.configure(
+                text="Las contraseñas no coinciden", text_color=PELIGRO
             )
             return
 
@@ -559,23 +588,42 @@ class PasswordView(ctk.CTkFrame):
             email = self.usuario.get('email', 'N/A')
             fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
             
-            # Frase semilla si existe
-            frase = ""
+# Frase semilla - siempre mostrar si existe
+            frase_info = ""
             try:
+                from src.auth.frase_semilla import obtener_ultima_frase
+                from src.seguridad.encriptacion import descifrar
+                from src.db.conexion import conexion_global
+                
+                # Fecha de la frase
                 ult = obtener_ultima_frase(str(self.usuario['_id']))
                 if ult:
                     desde = ult.get('generada_en')
                     if desde:
-                        frase = f"Generada: {desde.strftime('%Y-%m-%d %H:%M')}"
-            except:
-                pass
+                        fecha_frase = desde.strftime('%Y-%m-%d %H:%M')
+                        
+                        # Palabras (si están guardadas)
+                        usuarios = conexion_global.obtener_coleccion('usuarios')
+                        usuario = usuarios.find_one({'_id': self.usuario['_id']})
+                        enc = usuario.get('frase_semilla_encriptada', '')
+                        palabras = descifrar(enc) if enc else ""
+                        
+                        # Si hay palabras o la frase reciente
+                        if palabras:
+                            frase_info = f"Generada: {fecha_frase}\n{palabras}"
+                        elif hasattr(self, '_ultima_frase_mostrada') and self._ultima_frase_mostrada:
+                            frase_info = f"Generada: {fecha_frase}\n{self._ultima_frase_mostrada}"
+                        else:
+                            frase_info = f"Generada: {fecha_frase}"
+            except Exception as e:
+                frase_info = ""
             
             with open(ruta, 'w', encoding='utf-8') as f:
                 f.write(f"Usuario: {email}\n")
                 f.write(f"Fecha exportacion: {fecha}\n")
                 f.write(f"Contrasena: {pw}\n")
-                if frase:
-                    f.write(f"Frase Semilla: {frase}\n")
+                if frase_info:
+                    f.write(f"Frase Semilla: {frase_info}\n")
             
             self.label_export_resultado.configure(
                 text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
@@ -609,13 +657,30 @@ class PasswordView(ctk.CTkFrame):
                 "contrasena": pw,
             }
             
+            # Frase semilla - siempre mostrar si existe
             try:
+                from src.auth.frase_semilla import obtener_ultima_frase
+                from src.seguridad.encriptacion import descifrar
+                from src.db.conexion import conexion_global
+                
                 ult = obtener_ultima_frase(str(self.usuario['_id']))
                 if ult:
                     desde = ult.get('generada_en')
                     if desde:
-                        data["frase_semilla"] = desde.strftime('%Y-%m-%d %H:%M')
-            except:
+                        fecha_frase = desde.strftime('%Y-%m-%d %H:%M')
+                        
+                        usuarios = conexion_global.obtener_coleccion('usuarios')
+                        usuario = usuarios.find_one({'_id': self.usuario['_id']})
+                        enc = usuario.get('frase_semilla_encriptada', '')
+                        palabras = descifrar(enc) if enc else ""
+                        
+                        if palabras:
+                            data["frase_semilla"] = {"generada": fecha_frase, "palabras": palabras}
+                        elif hasattr(self, '_ultima_frase_mostrada') and self._ultima_frase_mostrada:
+                            data["frase_semilla"] = {"generada": fecha_frase, "palabras": self._ultima_frase_mostrada}
+                        else:
+                            data["frase_semilla"] = {"generada": fecha_frase}
+            except Exception as e:
                 pass
             
             with open(ruta, 'w', encoding='utf-8') as f:
@@ -730,3 +795,12 @@ class PasswordView(ctk.CTkFrame):
             self.clipboard_clear()
             self.clipboard_append(texto)
             self.label_pin_aviso.configure(text="✓ Copiado!", text_color=COMPLETADO)
+
+    def _copiar_segura(self):
+        """Copia la contraseña segura generada."""
+        texto = self.label_reg_resultado.cget("text")
+        if texto and "contraseña:" in texto.lower():
+            pw = texto.split("contraseña:")[-1].strip()
+            self.clipboard_clear()
+            self.clipboard_append(pw)
+            self.label_reg_resultado.configure(text="✓ Copiado!", text_color=COMPLETADO)
