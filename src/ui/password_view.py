@@ -15,7 +15,8 @@ class PasswordView(ctk.CTkFrame):
         self.usuario = usuario
         self.on_volver = on_volver
         self._ultima_frase_mostrada = None
-        self._crear_widgets()
+
+    def _crear_widgets(self):
         # Header
         header = ctk.CTkFrame(self, fg_color=FONDO_SECUNDARIO, height=60)
         header.pack(fill="x")
