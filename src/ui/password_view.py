@@ -35,8 +35,8 @@ class PasswordView(ctk.CTkFrame):
             font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
-        # Contenido
-        contenido = ctk.CTkFrame(self, fg_color="transparent")
+        # Contenido con scroll para que todas las secciones sean accesibles
+        contenido = ctk.CTkScrollableFrame(self, fg_color="transparent")
         contenido.pack(fill="both", expand=True, padx=30, pady=20)
 
         # ── OPCIÓN A: Ver contraseña ──
@@ -78,28 +78,38 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_ver_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN B: Regenerar contraseña ──
+        # ── OPCIÓN B: Contraseñas Seguras ──
         card_reg = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_reg.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_reg, text="🔄 Regenerar contraseña",
+            card_reg, text="🔄 Contraseñas Seguras",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_reg,
-            text="Genera una nueva contraseña con parámetros diferentes.",
+            text="Introduce una semilla para generar una contraseña segura con tus datos.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
+        frame_reg = ctk.CTkFrame(card_reg, fg_color="transparent")
+        frame_reg.pack(fill="x", padx=20, pady=(10, 15))
+
+        self.entry_semilla_reg = ctk.CTkEntry(
+            frame_reg, placeholder_text="Ej: MiClaveSegura2024! (min 8 chars)",
+            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+        )
+        self.entry_semilla_reg.pack(side="left", fill="x", expand=True, padx=(0, 10))
+
         ctk.CTkButton(
-            card_reg, text="Regenerar",
+            frame_reg, text="Generar",
             font=("JetBrains Mono", 12, "bold"),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            text_color=TEXTO_PRINCIPAL, width=90, height=38, corner_radius=8,
             command=self._regenerar,
-        ).pack(anchor="w", padx=20, pady=(10, 15))
+        ).pack(side="right")
 
         self.label_reg_resultado = ctk.CTkLabel(
             card_reg, text="", font=("JetBrains Mono", 12),
@@ -118,12 +128,12 @@ class PasswordView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card_pin,
-            text="Genera un PIN para ver tu contraseña actual (válido solo para hoy).",
+            text="Genera un PIN para ver tu contraseña actual (válido solo para hoy). Solo se muestra una vez.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
-        frame_pin.pack(fill="x", padx=20, pady=(10, 15))
+        frame_pin.pack(fill="x", padx=20, pady=(10, 5))
 
         ctk.CTkButton(
             frame_pin, text="Generar PIN",
@@ -133,11 +143,20 @@ class PasswordView(ctk.CTkFrame):
             command=self._generar_pin,
         ).pack(side="left")
 
+        # Caja que muestra el PIN generado (grande y visible)
         self.label_pin_resultado = ctk.CTkLabel(
-            card_pin, text="", font=("JetBrains Mono", 14, "bold"),
+            card_pin, text="",
+            font=("JetBrains Mono", 22, "bold"),
             text_color="#9B59B6",
         )
-        self.label_pin_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+        self.label_pin_resultado.pack(anchor="w", padx=20, pady=(8, 2))
+
+        self.label_pin_aviso = ctk.CTkLabel(
+            card_pin, text="",
+            font=("JetBrains Mono", 10),
+            text_color=TEXTO_SECUNDARIO,
+        )
+        self.label_pin_aviso.pack(anchor="w", padx=20, pady=(0, 15))
 
         # ── OPCIÓN D: Contraseña personalizada ──
         card_custom = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
@@ -294,36 +313,39 @@ class PasswordView(ctk.CTkFrame):
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
     def _generar_pin(self):
-        """Genera un nuevo PIN de 6 dígitos para hoy."""
+        """Genera un nuevo PIN de 6 dígitos para hoy y lo muestra UNA sola vez."""
         try:
-            from src.auth.pin_diario import generar_pin_diario
+            from src.auth.pin_diario import generar_pin_diario, eliminar_pin_diario
             uid = str(self.usuario['_id'])
-            generar_pin_diario(uid)
             
-            # Obtener el PIN generado (solo para mostrar, en producción sería secreto)
-            from src.db.conexion import conexion_global
-            coleccion = conexion_global.obtener_coleccion('pines_diarios')
-            from datetime import datetime
-            hoy = datetime.now().strftime("%Y-%m-%d")
-            pin_doc = coleccion.find_one({
-                'usuario_id': self.usuario['_id'],
-                'fecha': hoy
-            })
+            # Primero eliminar cualquier PIN existente para poder generar uno nuevo
+            eliminar_pin_diario(uid)
             
-            if pin_doc:
-                # El PIN real debería mostrarse solo una vez y luego ocultarse
-                # Por ahora mostramos que se generó
+            pin = generar_pin_diario(uid)
+
+            if pin is not None:
+                # PIN recién generado: mostrarlo en grande
                 self.label_pin_resultado.configure(
-                    text="PIN generado para hoy (úsalo en 'Ver contraseña')",
-                    text_color=COMPLETADO
+                    text=pin,
+                    text_color="#9B59B6",
+                )
+                self.label_pin_aviso.configure(
+                    text="⚠ Guárdalo ahora — no se volverá a mostrar. Úsalo en 'Ver contraseña'.",
+                    text_color=AVISO,
                 )
             else:
+                # Ya existe PIN para hoy, no recuperable
                 self.label_pin_resultado.configure(
-                    text="PIN ya existe para hoy",
-                    text_color=AVISO
+                    text="Ya tienes un PIN para hoy",
+                    text_color=AVISO,
+                )
+                self.label_pin_aviso.configure(
+                    text="El PIN se generó al iniciar sesión. Solo hay uno por día.",
+                    text_color=TEXTO_SECUNDARIO,
                 )
         except Exception as e:
             self.label_pin_resultado.configure(text=str(e), text_color=PELIGRO)
+            self.label_pin_aviso.configure(text="", text_color=TEXTO_SECUNDARIO)
 
     def _ver_contraseña(self):
         pin = self.entry_ver.get().strip()
@@ -396,18 +418,35 @@ class PasswordView(ctk.CTkFrame):
             return PELIGRO
 
     def _regenerar(self):
-        try:
-            from src.auth import regenerar_contraseña
-            params = self.usuario.get('parametros_contraseña', {
-                "longitud": 20, "usar_mayusculas": True,
-                "usar_numeros": True, "usar_simbolos": True,
-                "excluir_ambiguos": False,
-            })
-            resultado = regenerar_contraseña(str(self.usuario['_id']), params)
+        """Genera contraseña segura usando la semilla introducida por el usuario."""
+        semilla = self.entry_semilla_reg.get().strip()
+        if len(semilla) < 8:
             self.label_reg_resultado.configure(
-                text=f"Nueva contraseña: {resultado['nueva_contraseña']}",
-                text_color=COMPLETADO,
+                text="Mínimo 8 caracteres en la semilla", text_color=PELIGRO
             )
+            return
+        try:
+            from src.generador import generar_contraseña_personalizada
+            from src.seguridad.encriptacion import hashear_contraseña, cifrar
+            from src.db.conexion import conexion_global
+
+            pw = generar_contraseña_personalizada(semilla)
+            nuevo_hash = hashear_contraseña(pw)
+            nueva_enc = cifrar(pw)
+
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            coleccion.update_one(
+                {'_id': self.usuario['_id']},
+                {'': {
+                    'contraseña_hash': nuevo_hash,
+                    'contraseña_encriptada': nueva_enc,
+                }}
+            )
+
+            self.label_reg_resultado.configure(
+                text=f"Contraseña segura generada: {pw}", text_color=COMPLETADO,
+            )
+            self.entry_semilla_reg.delete(0, "end")
         except Exception as e:
             self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
 

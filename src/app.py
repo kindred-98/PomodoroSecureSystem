@@ -124,10 +124,6 @@ class PomodoroSecureApp(ctk.CTk):
             self.usuario_actual = resultado['usuario']
             self._mostrar_dashboard()
 
-            # Generar PIN diario
-            from src.auth.pin_diario import generar_pin_diario
-            generar_pin_diario(str(self.usuario_actual['_id']))
-
             # Restaurar timer desde BD (si había ciclo activo)
             from src.timer.servicio_timer import servicio_timer
             servicio_timer.restaurar_desde_bd(str(self.usuario_actual['_id']))

@@ -1,7 +1,8 @@
 """
 Módulo: pin_diario.py
 Responsabilidad: Generar y verificar PIN diario de 6 dígitos.
-Se genera al login, se hashea con bcrypt, nunca se muestra de nuevo.
+Se genera al login o desde gestión de contraseña.
+Se hashea con bcrypt. Solo se devuelve en texto plano en el momento de creación.
 """
 
 import secrets
@@ -10,11 +11,15 @@ from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseñ
 from src.db.conexion import conexion_global
 
 
-def generar_pin_diario(usuario_id: str) -> None:
+def generar_pin_diario(usuario_id: str) -> str | None:
     """
     Genera un PIN de 6 dígitos para el día de hoy.
-    Se llama al hacer login. El PIN nunca se muestra al usuario.
+    Se llama al hacer login o desde la pantalla de gestión de contraseña.
     Solo se guarda su hash en BD.
+
+    Returns:
+        str: El PIN en texto plano si se generó ahora (solo esta vez).
+        None: Si ya existía un PIN para hoy (ya no recuperable).
     """
     from bson import ObjectId
     try:
@@ -31,7 +36,7 @@ def generar_pin_diario(usuario_id: str) -> None:
     })
 
     if existente is not None:
-        return  # Ya tiene PIN para hoy
+        return None  # Ya tiene PIN para hoy, no recuperable
 
     # Generar PIN de 6 dígitos
     pin = str(secrets.randbelow(900000) + 100000)
@@ -44,11 +49,38 @@ def generar_pin_diario(usuario_id: str) -> None:
         'intentos_fallidos': 0,
     })
 
+    return pin  # Se devuelve UNA sola vez, después solo existe el hash
+
+
+def eliminar_pin_diario(usuario_id: str) -> bool:
+    """
+    Elimina el PIN del día para permitir generar uno nuevo.
+    Útil si el usuario perdió el PIN y necesita uno nuevo.
+    
+    Returns:
+        bool: True si se eliminó, False si no había PIN.
+    """
+    from bson import ObjectId
+    try:
+        usuario_oid = ObjectId(usuario_id)
+    except Exception:
+        usuario_oid = usuario_id
+
+    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    coleccion = conexion_global.obtener_coleccion('pines_diarios')
+    
+    resultado = coleccion.delete_one({
+        'usuario_id': usuario_oid,
+        'fecha': hoy,
+    })
+    
+    return resultado.deleted_count > 0
+
 
 def verificar_pin_diario(usuario_id: str, pin_introducido: str) -> bool:
     """
     Verifica si el PIN introducido coincide con el del día.
-    
+
     Returns:
         bool: True si es correcto
     """
