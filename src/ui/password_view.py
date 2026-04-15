@@ -83,39 +83,29 @@ class PasswordView(ctk.CTkFrame):
         card_reg.pack(fill="x", pady=(0, 15))
 
         ctk.CTkLabel(
-            card_reg, text="🔄 Contraseñas Seguras",
+            card_reg, text="🔄 Contraseña Segura Automática",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_reg,
-            text="Introduce una semilla para generar una contraseña segura con tus datos.",
+            text="Genera una contraseña segura y aleatoria automáticamente.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
-        frame_reg = ctk.CTkFrame(card_reg, fg_color="transparent")
-        frame_reg.pack(fill="x", padx=20, pady=(10, 15))
-
-        self.entry_semilla_reg = ctk.CTkEntry(
-            frame_reg, placeholder_text="Ej: MiClaveSegura2024! (min 8 chars)",
-            font=("JetBrains Mono", 13), fg_color=FONDO_SECUNDARIO,
-            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
-        )
-        self.entry_semilla_reg.pack(side="left", fill="x", expand=True, padx=(0, 10))
-
         ctk.CTkButton(
-            frame_reg, text="Generar",
+            card_reg, text="🔄 Generar Contraseña Segura",
             font=("JetBrains Mono", 12, "bold"),
-            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
-            text_color=TEXTO_PRINCIPAL, width=90, height=38, corner_radius=8,
-            command=self._regenerar,
-        ).pack(side="right")
+            fg_color=BOTON_PRINCIPAL, hover_color=BOTON_PRINCIPAL_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
+            command=self._generar_segura_automatica,
+        ).pack(anchor="w", padx=20, pady=(10, 5))
 
         self.label_reg_resultado = ctk.CTkLabel(
-            card_reg, text="", font=("JetBrains Mono", 12),
+            card_reg, text="", font=("JetBrains Mono", 14, "bold"),
             text_color=COMPLETADO,
         )
-        self.label_reg_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+        self.label_reg_resultado.pack(anchor="w", padx=20, pady=(5, 15))
 
         # ── OPCIÓN C: Generar PIN de 6 dígitos ──
         card_pin = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
@@ -455,6 +445,32 @@ class PasswordView(ctk.CTkFrame):
             font=("JetBrains Mono", 12),
             command=dialogo.destroy,
         ).pack(side="right", padx=20, pady=10)
+
+    def _generar_segura_automatica(self):
+        """Genera una contraseña segura automáticamente (sin semilla)."""
+        try:
+            from src.generador import generar_contraseña_segura
+            from src.seguridad.encriptacion import hashear_contraseña, cifrar
+            from src.db.conexion import conexion_global
+
+            pw = generar_contraseña_segura()
+            nuevo_hash = hashear_contraseña(pw)
+            nueva_enc = cifrar(pw)
+
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            coleccion.update_one(
+                {'_id': self.usuario['_id']},
+                {'$set': {
+                    'contraseña_hash': nuevo_hash,
+                    'contraseña_encriptada': nueva_enc,
+                }}
+            )
+
+            self.label_reg_resultado.configure(
+                text=f"✓ Generada: {pw}", text_color=COMPLETADO,
+            )
+        except Exception as e:
+            self.label_reg_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _guardar_contraseña_segura(self, semilla, dialogo=None):
         """Guarda la contraseña segura generada."""

@@ -69,6 +69,26 @@ def generar_contraseña(parametros: dict) -> str:
     return "".join(contraseña)
 
 
+def generar_contraseña_segura(longitud: int = 16) -> str:
+    """
+    Genera una contraseña segura automáticamente.
+    
+    Args:
+        longitud (int): Entre 8 y 32. Por defecto 16.
+    
+    Returns:
+        str: Contraseña segura aleatoria.
+    """
+    parametros = {
+        'longitud': longitud,
+        'usar_mayusculas': True,
+        'usar_numeros': True,
+        'usar_simbolos': True,
+        'excluir_ambiguos': True,
+    }
+    return generar_contraseña(parametros)
+
+
 def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
     """
     Genera una contraseña fuerte usando SOLO los caracteres de la semilla.
