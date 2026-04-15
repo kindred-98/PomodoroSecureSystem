@@ -37,8 +37,10 @@ jobs:
 
       - name: Fail on high/medium issues
         run: |
-          if grep -E "^\s+(High|Medium):\s+[1-9]" bandit_report.txt 2>/dev/null; then
-            echo "Security issues found! Please review the report."
+          HIGH=$(grep "High:" bandit_report.txt | awk '{print $2}')
+          MEDIUM=$(grep "Medium:" bandit_report.txt | awk '{print $2}')
+          if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ]; then
+            echo "Security issues found! High: $HIGH, Medium: $MEDIUM"
             exit 1
           else
             echo "No high/medium security issues found"
