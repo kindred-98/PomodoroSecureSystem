@@ -136,6 +136,18 @@ class LoginView(ctk.CTkFrame):
             command=self.on_ir_registro,
         ).pack(fill="x", padx=40, pady=(0, 5))
 
+        # Olvidé mi contraseña
+        ctk.CTkButton(
+            card,
+            text="¿Olvidaste tu contraseña? Usa Frase Semilla",
+            font=("JetBrains Mono", 11),
+            fg_color="transparent",
+            text_color=TEXTO_SECUNDARIO,
+            height=30,
+            corner_radius=8,
+            command=self._recuperar_contraseña,
+        ).pack(pady=(5, 0))
+
         # Footer
         ctk.CTkLabel(
             self,
@@ -176,4 +188,37 @@ class LoginView(ctk.CTkFrame):
         self.entry_email.delete(0, "end")
         self.entry_contraseña.delete(0, "end")
         self.label_error.configure(text="")
+
+    def _recuperar_contraseña(self):
+        """Muestra info sobre recuperacion con frase semilla."""
+        import customtkinter as ctk
+        
+        dialogo = ctk.CTkToplevel(self)
+        dialogo.title("Recuperar Cuenta")
+        dialogo.geometry("450x250")
+        dialogo.transient(self)
+        dialogo.grab_set()
+        
+        ctk.CTkLabel(
+            dialogo,
+            text="🔑 Recuperar mi Cuenta",
+            font=("JetBrains Mono", 16, "bold"),
+            text_color=TEXTO_PRINCIPAL,
+        ).pack(pady=20)
+        
+        ctk.CTkLabel(
+            dialogo,
+            text="Si perdiste tu contraseña, usa tu Frase Semilla.\n\n"
+            "La generaste en: Cambiar contraseña → Frase Semilla.\n"
+            "Guárdala en un lugar seguro.",
+            font=("JetBrains Mono", 12),
+            text_color=TEXTO_SECUNDARIO,
+        ).pack(pady=10)
+        
+        ctk.CTkButton(
+            dialogo,
+            text="Cerrar",
+            font=("JetBrains Mono", 12),
+            command=dialogo.destroy,
+        ).pack(pady=15)
         self.boton_login.configure(state="normal", text="Iniciar Sesión")

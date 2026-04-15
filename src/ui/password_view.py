@@ -136,12 +136,23 @@ class PasswordView(ctk.CTkFrame):
         self._verificar_bloqueo_pin()
 
         # Caja que muestra el PIN generado (grande y visible)
+        frame_pin_resultado = ctk.CTkFrame(card_pin, fg_color="transparent")
+        frame_pin_resultado.pack(fill="x", padx=20, pady=(8, 2))
+        
         self.label_pin_resultado = ctk.CTkLabel(
-            card_pin, text="",
+            frame_pin_resultado, text="",
             font=("JetBrains Mono", 22, "bold"),
             text_color="#9B59B6",
         )
-        self.label_pin_resultado.pack(anchor="w", padx=20, pady=(8, 2))
+        self.label_pin_resultado.pack(side="left")
+        
+        ctk.CTkButton(
+            frame_pin_resultado, text="📋 Copiar",
+            font=("JetBrains Mono", 10),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, width=70, height=28,
+            command=self._copiar_pin,
+        ).pack(side="right", padx=(10, 0))
 
         self.label_pin_aviso = ctk.CTkLabel(
             card_pin, text="",
@@ -149,6 +160,23 @@ class PasswordView(ctk.CTkFrame):
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_pin_aviso.pack(anchor="w", padx=20, pady=(0, 15))
+
+    def _copiar_pin(self):
+        """Copia el PIN al portapapeles."""
+        from tkinter import Tk
+        texto = self.label_pin_resultado.cget("text")
+        if texto:
+            self.clipboard_clear()
+            self.clipboard_append(texto)
+            self.label_pin_aviso.configure(text="✓ Copiado!", text_color=COMPLETADO)
+
+    def _copiar_frase_semilla(self):
+        """Copia la frase semilla al portapapeles."""
+        texto = self._ultima_frase_mostrada
+        if texto:
+            self.clipboard_clear()
+            self.clipboard_append(texto)
+            self.label_semilla_resultado.configure(text="✓ Copiado!", text_color=COMPLETADO)
 
         # ── OPCIÓN D: Contraseña personalizada ──
         card_custom = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
@@ -298,11 +326,19 @@ class PasswordView(ctk.CTkFrame):
             command=self._generar_frase_semilla,
         ).pack(anchor="w", padx=20, pady=(10, 5))
 
-        frame_export_semilla = ctk.CTkFrame(card_semilla, fg_color="transparent")
-        frame_export_semilla.pack(fill="x", padx=20, pady=(5, 10))
+        frame_semilla_botones = ctk.CTkFrame(card_semilla, fg_color="transparent")
+        frame_semilla_botones.pack(fill="x", padx=20, pady=(5, 10))
 
         ctk.CTkButton(
-            frame_export_semilla, text="Exportar a TXT",
+            frame_semilla_botones, text="📋 Copiar",
+            font=("JetBrains Mono", 11),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=32,
+            command=self._copiar_frase_semilla,
+        ).pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_semilla_botones, text="Exportar a TXT",
             font=("JetBrains Mono", 11),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=32,
@@ -310,7 +346,7 @@ class PasswordView(ctk.CTkFrame):
         ).pack(side="left", padx=(0, 10))
 
         ctk.CTkButton(
-            frame_export_semilla, text="Exportar a JSON",
+            frame_semilla_botones, text="Exportar a JSON",
             font=("JetBrains Mono", 11),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=32,
@@ -508,16 +544,12 @@ class PasswordView(ctk.CTkFrame):
             
             email = self.usuario.get('email', 'N/A')
             fecha = desde.strftime('%Y-%m-%d %H:%M') if desde else 'N/A'
-            frase = " ".join(["palabra1","palabra2","palabra3","palabra4","palabra5","palabra6",
-                           "palabra7","palabra8","palabra9","palabra10","palabra11","palabra12"])
+            frase = self._ultima_frase_mostrada or "Genera una nueva frase"
             
-            # Obtener la frase correcta
-            from src.auth.frase_semilla import generar_frase_semilla
-            # La frase se muestra al generar, aqui usamos un placeholder
             with open(ruta, 'w', encoding='utf-8') as f:
                 f.write(f"Usuario: {email}\n")
                 f.write(f"Fecha generacion: {fecha}\n")
-                f.write(f"Frase Semilla: {self._ultima_frase_mostrada or 'Genera una nueva frase'}\n")
+                f.write(f"Frase Semilla: {frase}\n")
             
             self.label_semilla_resultado.configure(
                 text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
@@ -837,7 +869,7 @@ class PasswordView(ctk.CTkFrame):
             return
             
         try:
-            from src.auth import obtener_contraseña
+from src.auth import obtener_contraseña
             pw = obtener_contraseña(str(self.usuario['_id']))
             email = self.usuario.get('email', 'N/A')
             fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
