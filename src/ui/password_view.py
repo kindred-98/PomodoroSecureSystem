@@ -35,8 +35,8 @@ class PasswordView(ctk.CTkFrame):
             font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
-        # Contenido
-        contenido = ctk.CTkFrame(self, fg_color="transparent")
+        # Contenido con scroll
+        contenido = ctk.CTkScrollableFrame(self, fg_color="transparent")
         contenido.pack(fill="both", expand=True, padx=30, pady=20)
 
         # ── OPCIÓN A: Ver contraseña ──
@@ -77,6 +77,103 @@ class PasswordView(ctk.CTkFrame):
             text_color=COMPLETADO,
         )
         self.label_ver_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+
+        # ── GENERAR PIN DE 6 DÍGITOS ──
+        card_pin = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
+        card_pin.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            card_pin, text="🔐 Generar PIN de 6 dígitos",
+            font=("JetBrains Mono", 14, "bold"), text_color="#9B59B6",
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        ctk.CTkLabel(
+            card_pin,
+            text="PIN para ver contraseña. Solo 1 cada hora por seguridad.",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", padx=20)
+
+        frame_pin = ctk.CTkFrame(card_pin, fg_color="transparent")
+        frame_pin.pack(fill="x", padx=20, pady=(10, 5))
+
+        self.boton_generar_pin = ctk.CTkButton(
+            frame_pin, text="Generar PIN",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color="#9B59B6", hover_color="#8E44AD",
+            text_color=TEXTO_PRINCIPAL, width=120, height=38, corner_radius=8,
+            command=self._generar_pin,
+        )
+        self.boton_generar_pin.pack(side="left")
+        
+        self._verificar_bloqueo_pin()
+
+        # Resultado del PIN
+        frame_pin_resultado = ctk.CTkFrame(card_pin, fg_color="transparent")
+        frame_pin_resultado.pack(fill="x", padx=20, pady=(8, 2))
+        
+        self.label_pin_resultado = ctk.CTkLabel(
+            frame_pin_resultado, text="",
+            font=("JetBrains Mono", 22, "bold"),
+            text_color="#9B59B6",
+        )
+        self.label_pin_resultado.pack(side="left")
+        
+        ctk.CTkButton(
+            frame_pin_resultado, text="📋 Copiar",
+            font=("JetBrains Mono", 10),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, width=70, height=28,
+            command=self._copiar_pin,
+        ).pack(side="right", padx=(10, 0))
+
+        self.label_pin_aviso = ctk.CTkLabel(
+            card_pin, text="",
+            font=("JetBrains Mono", 10),
+            text_color=TEXTO_SECUNDARIO,
+        )
+        self.label_pin_aviso.pack(anchor="w", padx=20, pady=(0, 15))
+
+        # ── FRASE SEMILLA (RECUPERACIÓN) ──
+        self._ultima_frase_mostrada = None
+        
+        card_semilla = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
+        card_semilla.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            card_semilla, text="🔑 Frase Semilla de Recuperación",
+            font=("JetBrains Mono", 14, "bold"), text_color="#E7952B",
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        ctk.CTkLabel(
+            card_semilla,
+            text="12 palabras para recuperar tu cuenta. Solo se genera cada 90 dias.",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", padx=20)
+
+        frame_semilla = ctk.CTkFrame(card_semilla, fg_color="transparent")
+        frame_semilla.pack(fill="x", padx=20, pady=(10, 5))
+
+        ctk.CTkButton(
+            frame_semilla, text="Generar Frase",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color="#E7952B", hover_color="#D7841B",
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            command=self._generar_frase_semilla,
+        ).pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_semilla, text="📋 Copiar",
+            font=("JetBrains Mono", 11),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=38,
+            command=self._copiar_frase,
+        ).pack(side="left")
+
+        self.label_semilla_resultado = ctk.CTkLabel(
+            card_semilla, text="", font=("JetBrains Mono", 12),
+            text_color="#E7952B",
+        )
+        self.label_semilla_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
         # ── OPCIÓN B: Regenerar contraseña ──
         card_reg = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
@@ -219,20 +316,45 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_manual_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN D: Exportar JSON ──
+        # ── EXPORTAR A TXT/JSON (SIN ENCRIPTAR) ──
         card_export = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_export.pack(fill="x")
 
         ctk.CTkLabel(
-            card_export, text="💾 Exportar a JSON encriptado",
+            card_export, text="💾 Exportar (sin encriptar)",
             font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         ctk.CTkLabel(
             card_export,
-            text="Genera un archivo .enc con tu contraseña (solo legible por la app).",
+            text="Archivo legible con tu email, contraseña y frase semilla.",
             font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
+
+        frame_export = ctk.CTkFrame(card_export, fg_color="transparent")
+        frame_export.pack(fill="x", padx=20, pady=(10, 5))
+
+        ctk.CTkButton(
+            frame_export, text="Exportar TXT",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            command=self._exportar_txt,
+        ).pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(
+            frame_export, text="Exportar JSON",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
+            command=self._exportar_json,
+        ).pack(side="left")
+
+        self.label_export_resultado = ctk.CTkLabel(
+            card_export, text="", font=("JetBrains Mono", 12),
+            text_color=COMPLETADO,
+        )
+        self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
         ctk.CTkButton(
             card_export, text="Exportar",
@@ -417,3 +539,194 @@ class PasswordView(ctk.CTkFrame):
                 )
         except Exception as e:
             self.label_export_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _exportar_txt(self):
+        try:
+            from src.auth import obtener_contraseña
+            from tkinter import filedialog
+            from datetime import datetime
+            from src.auth.frase_semilla import obtener_ultima_frase
+            
+            ruta = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Texto plano", "*.txt")],
+                title="Exportar datos",
+            )
+            if not ruta:
+                return
+            
+            pw = obtener_contraseña(str(self.usuario['_id']))
+            email = self.usuario.get('email', 'N/A')
+            fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
+            
+            # Frase semilla si existe
+            frase = ""
+            try:
+                ult = obtener_ultima_frase(str(self.usuario['_id']))
+                if ult:
+                    desde = ult.get('generada_en')
+                    if desde:
+                        frase = f"Generada: {desde.strftime('%Y-%m-%d %H:%M')}"
+            except:
+                pass
+            
+            with open(ruta, 'w', encoding='utf-8') as f:
+                f.write(f"Usuario: {email}\n")
+                f.write(f"Fecha exportacion: {fecha}\n")
+                f.write(f"Contrasena: {pw}\n")
+                if frase:
+                    f.write(f"Frase Semilla: {frase}\n")
+            
+            self.label_export_resultado.configure(
+                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            )
+        except Exception as e:
+            self.label_export_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _exportar_json(self):
+        try:
+            from src.auth import obtener_contraseña
+            from tkinter import filedialog
+            from datetime import datetime
+            import json
+            from src.auth.frase_semilla import obtener_ultima_frase
+            
+            ruta = filedialog.asksaveasfilename(
+                defaultextension=".json",
+                filetypes=[("JSON", "*.json")],
+                title="Exportar datos",
+            )
+            if not ruta:
+                return
+            
+            pw = obtener_contraseña(str(self.usuario['_id']))
+            email = self.usuario.get('email', 'N/A')
+            fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
+            
+            data = {
+                "usuario": email,
+                "fecha_exportacion": fecha,
+                "contrasena": pw,
+            }
+            
+            try:
+                ult = obtener_ultima_frase(str(self.usuario['_id']))
+                if ult:
+                    desde = ult.get('generada_en')
+                    if desde:
+                        data["frase_semilla"] = desde.strftime('%Y-%m-%d %H:%M')
+            except:
+                pass
+            
+            with open(ruta, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            self.label_export_resultado.configure(
+                text=f"✓ Exportado: {ruta}", text_color=COMPLETADO
+            )
+        except Exception as e:
+            self.label_export_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _generar_pin(self):
+        """Genera nuevo PIN de 6 dígitos (1 cada hora)."""
+        try:
+            from src.auth.pin_diario import generar_pin_diario, eliminar_pin_diario, obtener_ultimo_pin
+            from datetime import datetime, timezone, timedelta
+            uid = str(self.usuario['_id'])
+            
+            ultimo = obtener_ultimo_pin(uid)
+            if ultimo:
+                desde = ultimo.get('ultimo_intento')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
+                    if desde > limite:
+                        minutos = int((datetime.now(timezone.utc) - desde).total_seconds() // 60)
+                        self.label_pin_resultado.configure(
+                            text=f"⚠ Espera {60-minutos} min", text_color=PELIGRO
+                        )
+                        self.label_pin_aviso.configure(text="Debes esperar 1 hora")
+                        return
+            
+            eliminar_pin_diario(uid)
+            pin = generar_pin_diario(uid)
+
+            if pin:
+                self.boton_generar_pin.configure(state="disabled")
+                self.after(3600000, self._desbloquear_pin)
+                
+                self.label_pin_resultado.configure(text=pin, text_color="#9B59B6")
+                self.label_pin_aviso.configure(
+                    text="✓ Copialo ahora. Nuevo en 1 hora.", text_color=COMPLETADO
+                )
+            else:
+                self.label_pin_resultado.configure(text="Error", text_color=PELIGRO)
+        except Exception as e:
+            self.label_pin_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _generar_frase_semilla(self):
+        """Genera frase semilla de recuperación (cada 90 dias)."""
+        try:
+            from src.auth.frase_semilla import generar_frase_usuario, obtener_ultima_frase
+            from datetime import datetime, timezone, timedelta
+            uid = str(self.usuario['_id'])
+            
+            ultima = obtener_ultima_frase(uid)
+            if ultima:
+                desde = ultima.get('generada_en')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(days=90)
+                    if desde > limite:
+                        dias = 90 - int((datetime.now(timezone.utc) - desde).days)
+                        self.label_semilla_resultado.configure(
+                            text=f"⚠ Espera {dias} dias", text_color=PELIGRO
+                        )
+                        return
+            
+            frase = generar_frase_usuario(uid)
+            if frase:
+                self._ultima_frase_mostrada = frase
+                self.label_semilla_resultado.configure(
+                    text=f"📝 {frase}", text_color="#E7952B"
+                )
+            else:
+                self.label_semilla_resultado.configure(
+                    text="Error al generar", text_color=PELIGRO
+                )
+        except Exception as e:
+            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
+
+    def _copiar_frase(self):
+        if self._ultima_frase_mostrada:
+            self.clipboard_clear()
+            self.clipboard_append(self._ultima_frase_mostrada)
+            self.label_semilla_resultado.configure(text="✓ Copiado!", text_color=COMPLETADO)
+
+    def _desbloquear_pin(self):
+        if hasattr(self, 'boton_generar_pin'):
+            self.boton_generar_pin.configure(state="normal")
+    
+    def _verificar_bloqueo_pin(self):
+        try:
+            from src.auth.pin_diario import obtener_ultimo_pin
+            from datetime import datetime, timezone, timedelta
+            uid = str(self.usuario['_id'])
+            ultimo = obtener_ultimo_pin(uid)
+            if ultimo:
+                desde = ultimo.get('ultimo_intento')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(hours=1)
+                    if desde > limite:
+                        self.boton_generar_pin.configure(state="disabled")
+                        self.after(3600000, self._desbloquear_pin)
+        except Exception:
+            pass
+
+    def _copiar_pin(self):
+        texto = self.label_pin_resultado.cget("text")
+        if texto and texto != "⚠ Espera" and texto != "Error":
+            self.clipboard_clear()
+            self.clipboard_append(texto)
+            self.label_pin_aviso.configure(text="✓ Copiado!", text_color=COMPLETADO)
