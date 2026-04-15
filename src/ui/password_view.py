@@ -869,7 +869,7 @@ class PasswordView(ctk.CTkFrame):
             return
             
         try:
-from src.auth import obtener_contraseña
+            from src.auth import obtener_contraseña
             pw = obtener_contraseña(str(self.usuario['_id']))
             email = self.usuario.get('email', 'N/A')
             fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
