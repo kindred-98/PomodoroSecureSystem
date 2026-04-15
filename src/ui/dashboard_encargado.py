@@ -17,6 +17,9 @@ class DashboardEncargado(ctk.CTkFrame):
         self.on_ver_contraseña = on_ver_contraseña
         self.on_ver_historial = on_ver_historial
         self._job_refresh = None
+        self._equipos_cache = []          # lista de equipos del encargado
+        self._miembros_cache = []         # miembros del equipo activo (legacy, mantener)
+        self._equipo_id = None            # equipo activo (legacy, mantener)
         self._crear_widgets()
         self._sincronizar_con_servicio()
         self._iniciar_refresh()
@@ -29,13 +32,13 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="🍅 PomodoroSecure",
-            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         nombre = self.usuario.get('nombre', 'Encargado')
         ctk.CTkLabel(
             header, text=f"{nombre} | Encargado",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="right", padx=20)
 
         # BODY
@@ -49,18 +52,18 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Hoy",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 5))
 
         self.label_ciclos = ctk.CTkLabel(
             lateral, text="Ciclos: 0/inf",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_ciclos.pack(anchor="w", padx=15)
 
         self.label_trabajado = ctk.CTkLabel(
             lateral, text="Trabajado: 0h 0m",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_trabajado.pack(anchor="w", padx=15, pady=(3, 0))
 
@@ -68,12 +71,12 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Pausas",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15)
 
         self.label_pausas = ctk.CTkLabel(
             lateral, text="O O  (0 usadas)",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_pausas.pack(anchor="w", padx=15, pady=(5, 0))
 
@@ -90,7 +93,7 @@ class DashboardEncargado(ctk.CTkFrame):
             hover = BOTON_PELIGRO_HOVER if "Sesión" in texto else ("#D35400" if "Jornada" in texto else BOTON_SECUNDARIO_HOVER)
             ctk.CTkButton(
                 lateral, text=texto,
-                font=("Comic Sans MS", 12),
+                font=("JetBrains Mono", 12),
                 fg_color=color, hover_color=hover,
                 text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
                 command=cmd,
@@ -106,13 +109,13 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.label_estado = ctk.CTkLabel(
             timer_card, text="INACTIVO",
-            font=("Comic Sans MS", 18, "bold"), text_color=TEXTO_SECUNDARIO,
+            font=("JetBrains Mono", 18, "bold"), text_color=TEXTO_SECUNDARIO,
         )
         self.label_estado.pack(pady=(25, 5))
 
         self.label_countdown = ctk.CTkLabel(
             timer_card, text="25:00",
-            font=("Comic Sans MS", 56, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=("JetBrains Mono", 56, "bold"), text_color=TEXTO_PRINCIPAL,
         )
         self.label_countdown.pack()
 
@@ -130,7 +133,7 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.boton_iniciar = ctk.CTkButton(
             botones_control, text="Iniciar Jornada",
-            font=("Comic Sans MS", 14, "bold"),
+            font=("JetBrains Mono", 14, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=180, corner_radius=10,
             command=self._iniciar_ciclo,
@@ -139,7 +142,7 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.boton_pausar = ctk.CTkButton(
             botones_control, text="Pausar",
-            font=("Comic Sans MS", 13),
+            font=("JetBrains Mono", 13),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=130, corner_radius=10,
             command=self._pausar_reanudar,
@@ -147,7 +150,7 @@ class DashboardEncargado(ctk.CTkFrame):
         )
         self.boton_pausar.pack(side="left", padx=5)
 
-        # ── Mi Equipo ──
+        # ── Mis Equipos ──
         equipo_card = ctk.CTkFrame(central, fg_color=FONDO_CARD, corner_radius=12)
         equipo_card.pack(fill="both", expand=True)
 
@@ -155,34 +158,35 @@ class DashboardEncargado(ctk.CTkFrame):
         header_equipo.pack(fill="x", padx=20, pady=(15, 10))
 
         ctk.CTkLabel(
-            header_equipo, text="👥 Mi Equipo",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            header_equipo, text="👥 Mis Equipos",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left")
 
         self.badge_anomalias = ctk.CTkLabel(
             header_equipo, text="",
-            font=("Comic Sans MS", 12, "bold"), text_color=PELIGRO,
+            font=("JetBrains Mono", 12, "bold"), text_color=PELIGRO,
         )
         self.badge_anomalias.pack(side="right")
 
-        self.frame_miembros = ctk.CTkScrollableFrame(
+        # Lista de equipos con scroll (se reconstruye al detectar cambios del supervisor)
+        self.frame_equipos_lista = ctk.CTkScrollableFrame(
             equipo_card,
             fg_color="transparent",
             scrollbar_button_color=BORDE,
             scrollbar_button_hover_color=BORDE_ACTIVO,
         )
-        self.frame_miembros.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+        self.frame_equipos_lista.pack(fill="both", expand=True, padx=20, pady=(0, 15))
 
         self.label_vacio = ctk.CTkLabel(
-            self.frame_miembros,
-            text="Cargando equipo...",
-            font=("Comic Sans MS", 12),
+            self.frame_equipos_lista,
+            text="Cargando equipos...",
+            font=("JetBrains Mono", 12),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_vacio.pack(pady=20)
 
-        # Cargar equipo
-        self._cargar_equipo()
+        # Cargar equipos inicialmente
+        self._cargar_equipos()
 
     def _sincronizar_con_servicio(self):
         """Lee el estado del servicio y actualiza la UI."""
@@ -201,10 +205,11 @@ class DashboardEncargado(ctk.CTkFrame):
             resultado = servicio_timer.tick()
             estado = resultado
             self._actualizar_labels(estado)
-            self._actualizar_miembros()
+            # Recargar equipos desde BD para detectar cambios del supervisor
+            self._cargar_equipos()
         except Exception:  # nosec
             pass
-        self._job_refresh = self.after(1000, self._refrescar)
+        self._job_refresh = self.after(5000, self._refrescar)
 
     def _actualizar_labels(self, estado):
         """Actualiza todos los labels con el estado del servicio."""
@@ -306,14 +311,14 @@ class DashboardEncargado(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="¿Finalizar jornada laboral?",
-            font=("Comic Sans MS", 16, "bold"),
+            font=("JetBrains Mono", 16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
         
         ctk.CTkLabel(
             dialogo,
             text="Se generará un reporte con tu actividad\ny se reiniciarán todos los contadores.",
-            font=("Comic Sans MS", 12),
+            font=("JetBrains Mono", 12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=10)
         
@@ -335,7 +340,7 @@ class DashboardEncargado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=mensaje,
-                    font=("Comic Sans MS", 12),
+                    font=("JetBrains Mono", 12),
                     text_color="#2ECC71",
                 ).pack(pady=20)
                 
@@ -345,13 +350,13 @@ class DashboardEncargado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=f"Error: {resultado.get('error', 'Desconocido')}",
-                    font=("Comic Sans MS", 12),
+                    font=("JetBrains Mono", 12),
                     text_color=PELIGRO,
                 ).pack(pady=20)
         
         ctk.CTkButton(
             botones, text="Confirmar",
-            font=("Comic Sans MS", 12),
+            font=("JetBrains Mono", 12),
             fg_color="#27AE60", hover_color="#219A52",
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=confirmar,
@@ -360,87 +365,71 @@ class DashboardEncargado(ctk.CTkFrame):
         
         ctk.CTkButton(
             botones, text="Cancelar",
-            font=("Comic Sans MS", 12),
+            font=("JetBrains Mono", 12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=dialogo.destroy,
             width=120,
         ).pack(side="left", padx=10)
 
-    def _cargar_equipo(self):
-        """Carga los miembros del equipo del encargado."""
-        self._miembros_cache = []
-        self._equipo_id = None
+    def _cargar_equipos(self):
+        """Carga todos los equipos asignados al encargado desde BD y reconstruye la lista."""
         try:
-            from src.db.equipos import obtener_por_encargado, obtener_miembros, listar_todos
-            from src.db.conexion import conexion_global
-            from bson import ObjectId
+            from src.db.equipos import obtener_por_encargado
+            nuevos_equipos = obtener_por_encargado(str(self.usuario['_id']))
 
-            usuario_id = str(self.usuario['_id'])
-            usuario_oid = self.usuario['_id']
-            
-            # Buscar equipos donde es encargado_id
-            equipos = obtener_por_encargado(usuario_id)
-            
-            # Si no hay equipos como encargado, buscar donde es miembro
-            if not equipos:
-                todos = listar_todos()
-                for eq in todos:
-                    miembros = eq.get('miembros', [])
-                    # Comparar ObjectIds
-                    if usuario_oid in miembros:
-                        equipos = [eq]
-                        break
-            
-            if equipos:
-                equipo = equipos[0]
-                self._equipo_id = equipo['_id']
-                miembros = obtener_miembros(str(equipo['_id']))
-                self._miembros_cache = miembros
-                self._actualizar_miembros()
-                self._contar_anomalias_equipo(equipo['_id'])
-            else:
-                self.label_vacio.configure(text="No tienes un equipo asignado.")
+            # Solo reconstruir si hubo cambios (añadido o eliminado por el supervisor)
+            ids_nuevos = [str(e['_id']) for e in nuevos_equipos]
+            ids_actuales = [str(e['_id']) for e in self._equipos_cache]
+            if ids_nuevos == ids_actuales:
+                return  # Sin cambios, no reconstruir
+
+            self._equipos_cache = nuevos_equipos
+            self._reconstruir_lista_equipos()
         except Exception as e:
-            self.label_vacio.configure(text=f"Error al cargar equipo: {e}")
+            self.label_vacio.configure(text=f"Error: {e}")
 
-    def _actualizar_miembros(self):
-        """Reconstruye la lista de miembros con estado real."""
-        for widget in self.frame_miembros.winfo_children():
+    def _reconstruir_lista_equipos(self):
+        """Limpia y redibuja la lista de equipos en el frame."""
+        for widget in self.frame_equipos_lista.winfo_children():
             widget.destroy()
 
-        from src.db.conexion import conexion_global
-        coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
-
-        if not self._miembros_cache:
-            self.label_vacio.configure(text="No tienes un equipo asignado.")
+        if not self._equipos_cache:
+            ctk.CTkLabel(
+                self.frame_equipos_lista,
+                text="No tienes equipos asignados.",
+                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            ).pack(pady=20)
             return
 
-        for miembro in self._miembros_cache:
-            estado, color, texto = self._obtener_estado_miembro(miembro, coleccion_ciclos)
+        for equipo in self._equipos_cache:
+            nombre = equipo.get('nombre', 'Sin nombre')
+            n_miembros = len(equipo.get('miembros', []))
 
-            frame = ctk.CTkFrame(self.frame_miembros, fg_color=FONDO_SECUNDARIO, corner_radius=8)
-            frame.pack(fill="x", pady=3)
-
-            ctk.CTkLabel(
-                frame, text=estado,
-                font=("Segoe UI Emoji", 18), text_color=color,
-            ).pack(side="left", padx=(10, 5), pady=8)
-
-            info = ctk.CTkFrame(frame, fg_color="transparent")
-            info.pack(side="left", fill="x", expand=True, pady=8)
+            fila = ctk.CTkFrame(self.frame_equipos_lista, fg_color=FONDO_SECUNDARIO, corner_radius=8)
+            fila.pack(fill="x", pady=3)
 
             ctk.CTkLabel(
-                info, text=miembro.get('nombre', 'Sin nombre'),
-                font=("Comic Sans MS", 12, "bold"), text_color=TEXTO_PRINCIPAL,
-                anchor="w",
-            ).pack(fill="x")
+                fila, text=f"📁 {nombre}",
+                font=("JetBrains Mono", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+            ).pack(side="left", padx=12, pady=10)
 
             ctk.CTkLabel(
-                info, text=f"{miembro.get('rol', 'empleado').title()} — {texto}",
-                font=("Comic Sans MS", 10), text_color=color,
-                anchor="w",
-            ).pack(fill="x")
+                fila, text=f"{n_miembros} miembro{'s' if n_miembros != 1 else ''}",
+                font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+            ).pack(side="left", padx=(0, 10))
+
+            ctk.CTkButton(
+                fila, text="👁  Ver",
+                font=("JetBrains Mono", 11, "bold"),
+                fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
+                text_color=TEXTO_PRINCIPAL, width=70, height=30, corner_radius=8,
+                command=lambda e=equipo: self._ver_miembros_equipo(e),
+            ).pack(side="right", padx=10)
+
+        # Anomalías (suma de todos los equipos)
+        self._contar_anomalias_todos()
+
 
     @staticmethod
     def _obtener_estado_miembro(miembro, coleccion_ciclos):
@@ -479,14 +468,171 @@ class DashboardEncargado(ctk.CTkFrame):
         except Exception:
             return "⚫", TEXTO_SECUNDARIO, "Sin conexion"
 
-    def _contar_anomalias_equipo(self, equipo_id):
-        """Cuenta anomalías pendientes del equipo."""
+
+
+    def _ver_miembros_equipo(self, equipo):
+        """Abre un Toplevel de solo lectura con los miembros del equipo y su estado."""
+        try:
+            from src.db.equipos import obtener_miembros
+            from src.db.conexion import conexion_global
+
+            nombre_equipo = equipo.get('nombre', 'Equipo')
+            miembros = obtener_miembros(str(equipo['_id']))
+
+            ventana = ctk.CTkToplevel(self)
+            ventana.title(f"👥 {nombre_equipo}")
+            ventana.geometry("520x480")
+            ventana.configure(fg_color=FONDO_PRINCIPAL)
+            ventana.transient(self)
+            ventana.grab_set()
+            x = (ventana.winfo_screenwidth() // 2) - 260
+            y = (ventana.winfo_screenheight() // 2) - 240
+            ventana.geometry(f"520x480+{x}+{y}")
+
+            # Header
+            header = ctk.CTkFrame(ventana, fg_color=FONDO_SECUNDARIO, height=55)
+            header.pack(fill="x")
+            header.pack_propagate(False)
+            ctk.CTkLabel(
+                header, text=f"📁 {nombre_equipo}",
+                font=("JetBrains Mono", 15, "bold"), text_color=TEXTO_PRINCIPAL,
+            ).pack(side="left", padx=20, pady=12)
+            ctk.CTkLabel(
+                header, text=f"{len(miembros)} miembro{'s' if len(miembros) != 1 else ''}",
+                font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+            ).pack(side="right", padx=20)
+
+            # Lista de miembros
+            coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
+            lista = ctk.CTkScrollableFrame(
+                ventana, fg_color="transparent",
+                scrollbar_button_color=BORDE,
+            )
+            lista.pack(fill="both", expand=True, padx=15, pady=15)
+
+            if not miembros:
+                ctk.CTkLabel(
+                    lista, text="Este equipo no tiene miembros aún.",
+                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                ).pack(pady=30)
+            else:
+                for miembro in miembros:
+                    estado_icono, color, texto_estado = self._obtener_estado_miembro(
+                        miembro, coleccion_ciclos
+                    )
+                    fila = ctk.CTkFrame(lista, fg_color=FONDO_CARD, corner_radius=8)
+                    fila.pack(fill="x", pady=3)
+
+                    ctk.CTkLabel(
+                        fila, text=estado_icono,
+                        font=("Segoe UI Emoji", 18), text_color=color,
+                    ).pack(side="left", padx=(12, 6), pady=10)
+
+                    info = ctk.CTkFrame(fila, fg_color="transparent")
+                    info.pack(side="left", fill="x", expand=True, pady=10)
+
+                    ctk.CTkLabel(
+                        info, text=miembro.get('nombre', 'Sin nombre'),
+                        font=("JetBrains Mono", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+                        anchor="w",
+                    ).pack(fill="x")
+                    ctk.CTkLabel(
+                        info,
+                        text=f"{miembro.get('rol', 'empleado').title()} — {texto_estado}",
+                        font=("JetBrains Mono", 10), text_color=color,
+                        anchor="w",
+                    ).pack(fill="x")
+
+            # Botón cerrar
+            ctk.CTkButton(
+                ventana, text="Cerrar",
+                font=("JetBrains Mono", 12),
+                fg_color=FONDO_SECUNDARIO, hover_color=BORDE_ACTIVO,
+                text_color=TEXTO_PRINCIPAL, width=100, height=34, corner_radius=8,
+                command=ventana.destroy,
+            ).pack(pady=(0, 15))
+
+        except Exception as e:  # nosec
+            pass
+
+    def _contar_anomalias_todos(self):
+        """Suma anomalías pendientes de todos los equipos del encargado."""
         try:
             from src.db.anomalias import obtener_por_equipo
-            anomalias = obtener_por_equipo(str(equipo_id))
-            pendientes = [a for a in anomalias if not a.get('resuelto', False)]
-            if pendientes:
-                self.badge_anomalias.configure(text=f"🚨 {len(pendientes)} anomalía(s)")
+            total_pendientes = 0
+            for equipo in self._equipos_cache:
+                anomalias = obtener_por_equipo(str(equipo['_id']))
+                total_pendientes += len([a for a in anomalias if not a.get('resuelto', False)])
+            if total_pendientes:
+                self.badge_anomalias.configure(text=f"🚨 {total_pendientes} anomalía(s)")
+            else:
+                self.badge_anomalias.configure(text="")
+        except Exception:  # nosec
+            pass
+
+    def _ver_detalle_miembro(self, miembro):
+        """Muestra un panel flotante con el detalle del miembro."""
+        try:
+            import customtkinter as ctk
+            from src.config.colores import (
+                FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
+                TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, COMPLETADO, AVISO, PELIGRO,
+            )
+            from src.db.conexion import conexion_global
+
+            ventana = ctk.CTkToplevel(self)
+            ventana.title(f"Detalle — {miembro.get('nombre', '')}")
+            ventana.geometry("420x320")
+            ventana.configure(fg_color=FONDO_PRINCIPAL)
+            ventana.transient(self)
+            ventana.grab_set()
+            x = (ventana.winfo_screenwidth() // 2) - 210
+            y = (ventana.winfo_screenheight() // 2) - 160
+            ventana.geometry(f"420x320+{x}+{y}")
+
+            card = ctk.CTkFrame(ventana, fg_color=FONDO_CARD, corner_radius=12)
+            card.pack(fill="both", expand=True, padx=20, pady=20)
+
+            ctk.CTkLabel(
+                card, text=miembro.get('nombre', 'Sin nombre'),
+                font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            ).pack(pady=(20, 5))
+
+            ctk.CTkLabel(
+                card, text=f"Rol: {miembro.get('rol', 'empleado').title()}",
+                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            ).pack()
+
+            ctk.CTkLabel(
+                card, text=f"Email: {miembro.get('email', 'Sin email')}",
+                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            ).pack(pady=(5, 0))
+
+            # Ciclos hoy
+            try:
+                from bson import ObjectId
+                from datetime import datetime
+                hoy = datetime.now().strftime("%Y-%m-%d")
+                coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
+                ciclos_hoy = coleccion.count_documents({
+                    'usuario_id': miembro['_id'],
+                    'fecha': hoy,
+                })
+                ctk.CTkLabel(
+                    card, text=f"Ciclos hoy: {ciclos_hoy}",
+                    font=("JetBrains Mono", 12), text_color=COMPLETADO,
+                ).pack(pady=(10, 0))
+            except Exception:  # nosec
+                pass
+
+            ctk.CTkButton(
+                card, text="Cerrar",
+                font=("JetBrains Mono", 12),
+                fg_color=FONDO_SECUNDARIO, hover_color=BORDE_ACTIVO,
+                text_color=TEXTO_PRINCIPAL, width=100, height=34, corner_radius=8,
+                command=ventana.destroy,
+            ).pack(pady=20)
+
         except Exception:  # nosec
             pass
 
@@ -501,4 +647,3 @@ class DashboardEncargado(ctk.CTkFrame):
         if self._job_refresh:
             self.after_cancel(self._job_refresh)
         super().destroy()
-
