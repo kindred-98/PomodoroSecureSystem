@@ -8,7 +8,7 @@ from bson import ObjectId
 from src.db.conexion import conexion_global
 
 
-def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "") -> dict:
+def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "", supervisor_id: str = None) -> dict:
     """
     Crea un nuevo equipo en la base de datos.
     
@@ -16,12 +16,14 @@ def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "") -> dict:
         nombre (str): Nombre del equipo
         encargado_id (str): ID del usuario encargado (debe ser rol 'encargado' o 'supervisor')
         descripcion (str): Descripción del equipo (opcional)
+        supervisor_id (str): ID del supervisor que crea el equipo (opcional, para notificación)
     
     Returns:
         dict: Documento del equipo creado
             {
                 '_id': ObjectId,
                 'nombre': str,
+                'supervisor_id': ObjectId,
                 'encargado_id': ObjectId,
                 'descripcion': str,
                 'miembros': [],
@@ -58,9 +60,18 @@ def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "") -> dict:
     if encargado is None:
         raise Exception(f"Encargado con ID '{encargado_id}' no existe")
     
+    # Agregar supervisor_id si se proporciona
+    supervisor_oid = None
+    if supervisor_id:
+        try:
+            supervisor_oid = ObjectId(supervisor_id)
+        except Exception:
+            pass
+    
     # Crear equipo
     equipo = {
         'nombre': nombre,
+        'supervisor_id': supervisor_oid,
         'encargado_id': encargado_objeto_id,
         'descripcion': descripcion,
         'miembros': [encargado_objeto_id],  # El encargado es el primer miembro

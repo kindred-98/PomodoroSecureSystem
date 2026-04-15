@@ -10,22 +10,23 @@ from src.db.conexion import conexion_global
 def obtener_estado_todos_los_usuarios() -> list:
     """
     Obtiene el estado de conexión de todos los usuarios activos.
+    Se considera conectado si tiene un ciclo Pomodoro activo (no completado).
     
     Returns:
         list: Lista de dicts con {usuario_id, nombre, email, rol, conectado, ultima_conexion}
     """
-    coleccion_sesiones = conexion_global.obtener_coleccion('sesiones')
+    coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     
-    # Obtener sesiones activas (no cerradas)
-    sesiones_activas = list(coleccion_sesiones.find({
-        'fin': None
+    # Obtener ciclos activos (no completados)
+    ciclos_activos = list(coleccion_ciclos.find({
+        'completado': False
     }))
     
     # Crear set de usuarios conectados
     usuarios_conectados = set()
-    for sesion in sesiones_activas:
-        uid = sesion.get('usuario_id')
+    for ciclo in ciclos_activos:
+        uid = ciclo.get('usuario_id')
         if uid:
             usuarios_conectados.add(str(uid))
     
@@ -52,6 +53,7 @@ def obtener_estado_todos_los_usuarios() -> list:
 def esta_conectado(usuario_id: str) -> bool:
     """
     Verifica si un usuario está actualmente conectado.
+    Se considera conectado si tiene un ciclo Pomodoro activo.
     
     Args:
         usuario_id (str): ID del usuario
@@ -61,14 +63,14 @@ def esta_conectado(usuario_id: str) -> bool:
     """
     try:
         from bson import ObjectId
-        coleccion = conexion_global.obtener_coleccion('sesiones')
+        coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
         
-        sesion_activa = coleccion.find_one({
+        ciclo_activo = coleccion.find_one({
             'usuario_id': ObjectId(usuario_id),
-            'fin': None,
+            'completado': False,
         })
         
-        return sesion_activa is not None
+        return ciclo_activo is not None
     except Exception:
         return False
 
@@ -84,26 +86,31 @@ def obtener_tiempo_desconectado(usuario_id: str) -> str:
         str: Texto con el tiempo desconectado o "Conectado"
     """
     try:
-        coleccion = conexion_global.obtener_coleccion('sesiones')
         from bson import ObjectId
         
-        sesion = coleccion.find_one({
+        # Verificar si tiene ciclo activo
+        coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
+        ciclo_activo = coleccion_ciclos.find_one({
             'usuario_id': ObjectId(usuario_id),
-            'fin': None,
+            'completado': False,
         })
         
-        if sesion:
-            return "Conectado"
+        if ciclo_activo:
+            estado = ciclo_activo.get('estado_actual', 'TRABAJANDO')
+            if estado == 'DESCANSO_CORTO' or estado == 'DESCANSO_LARGO':
+                return "En descanso"
+            return "Trabajando"
         
-        # Buscar última sesión cerrada
-        ultima = coleccion.find_one(
-            {'usuario_id': ObjectId(usuario_id), 'fin': {'$ne': None}},
-            sort=[('fin', -1)]
+        # Buscar último ciclo completado
+        coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
+        ultimo = coleccion.find_one(
+            {'usuario_id': ObjectId(usuario_id), 'completado': True},
+            sort=[('fin_ciclo', -1)]
         )
         
-        if ultima and 'fin' in ultima:
+        if ultimo and 'fin_ciclo' in ultimo:
             ahora = datetime.now(timezone.utc)
-            fin = ultima['fin']
+            fin = ultimo['fin_ciclo']
             
             if hasattr(fin, 'tzinfo') and fin.tzinfo is None:
                 fin = fin.replace(tzinfo=timezone.utc)

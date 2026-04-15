@@ -52,14 +52,15 @@ class TestIniciarPausa:
             iniciar_pausa(str(usuario_en_db['_id']))
     
     def test_pausa_activa_existente_falla(self, mock_conexion_global, usuario_en_db):
-        """No debe permitir pausa si ya hay una activa"""
+        """Si hay pausa activa, se limpia automáticamente (pausa huérfana)"""
         uid = str(usuario_en_db['_id'])
         iniciar_ciclo(uid)
         
         iniciar_pausa(uid)
         
-        with pytest.raises(Exception, match="pausa activa"):
-            iniciar_pausa(uid)
+        # Ahora limpia automáticamente la pausa huérfana
+        resultado = iniciar_pausa(uid)
+        assert resultado is not None
     
     def test_usuario_id_no_string(self, mock_conexion_global):
         with pytest.raises(TypeError, match="usuario_id debe ser string"):

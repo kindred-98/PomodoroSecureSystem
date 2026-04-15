@@ -7,6 +7,8 @@ from src.db.equipos.crear_equipo import crear_equipo
 from src.db.equipos.buscar_por_id import buscar_por_id
 from src.db.equipos.obtener_miembros import obtener_miembros
 from src.db.equipos.obtener_por_encargado import obtener_por_encargado
+from src.db.equipos.obtener_para_encargado import obtener_para_encargado
+from src.db.equipos.obtener_por_supervisor import obtener_por_supervisor
 from src.db.equipos.añadir_miembro import añadir_miembro
 from src.db.equipos.listar_todos import listar_todos
 from src.db.equipos.editar_equipo import (
@@ -21,6 +23,8 @@ __all__ = [
     'buscar_por_id',
     'obtener_miembros',
     'obtener_por_encargado',
+    'obtener_para_encargado',
+    'obtener_por_supervisor',
     'añadir_miembro',
     'listar_todos',
     'editar_nombre',

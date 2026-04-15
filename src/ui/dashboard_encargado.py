@@ -372,11 +372,28 @@ class DashboardEncargado(ctk.CTkFrame):
         self._miembros_cache = []
         self._equipo_id = None
         try:
-            from src.db.equipos import obtener_por_encargado
-            from src.db.equipos import obtener_miembros
+            from src.db.equipos import obtener_por_encargado, obtener_miembros, listar_todos
+            from src.db.conexion import conexion_global
+            from bson import ObjectId
 
-            equipo = obtener_por_encargado(str(self.usuario['_id']))
-            if equipo:
+            usuario_id = str(self.usuario['_id'])
+            usuario_oid = self.usuario['_id']
+            
+            # Buscar equipos donde es encargado_id
+            equipos = obtener_por_encargado(usuario_id)
+            
+            # Si no hay equipos como encargado, buscar donde es miembro
+            if not equipos:
+                todos = listar_todos()
+                for eq in todos:
+                    miembros = eq.get('miembros', [])
+                    # Comparar ObjectIds
+                    if usuario_oid in miembros:
+                        equipos = [eq]
+                        break
+            
+            if equipos:
+                equipo = equipos[0]
                 self._equipo_id = equipo['_id']
                 miembros = obtener_miembros(str(equipo['_id']))
                 self._miembros_cache = miembros

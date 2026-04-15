@@ -84,7 +84,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             widget.destroy()
 
         try:
-            from src.db.equipos import listar_todos
+            from src.db.equipos.listar_todos import listar_todos
             equipos = listar_todos()
 
             if not equipos:
@@ -452,7 +452,7 @@ class GestionEquiposView(ctk.CTkToplevel):
                 return
 
             try:
-                from src.db.equipos import crear_equipo
+                from src.db.equipos.crear_equipo import crear_equipo
                 crear_equipo(nombre, str(self.usuario['_id']))
                 dialogo.destroy()
                 self._cargar_equipos()

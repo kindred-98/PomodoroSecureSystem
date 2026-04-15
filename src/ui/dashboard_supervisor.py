@@ -220,12 +220,10 @@ class DashboardSupervisor(ctk.CTkFrame):
     def _cargar_equipos(self):
         """Carga todos los equipos."""
         try:
-            from src.db.equipos import obtener_por_encargado
+            from src.db.equipos import listar_todos
             from src.db.usuarios.estado_conexion import obtener_estado_todos_los_usuarios
-            from src.db.conexion import conexion_global
 
-            coleccion = conexion_global.obtener_coleccion('equipos')
-            equipos = list(coleccion.find())
+            equipos = listar_todos()
             
             usuarios_estado = obtener_estado_todos_los_usuarios()
             conectados = len([u for u in usuarios_estado if u.get('conectado', False)])

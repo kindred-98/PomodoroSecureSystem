@@ -544,6 +544,13 @@ class ServicioTimer:
             # Limpiar timer_estado
             coleccion.delete_one({'usuario_id': self._parsear_oid(usuario_id)})
             
+            # Resetear pausas de hoy
+            try:
+                from src.pausas.gestor_pausas import resetear_pausas_jornada
+                resetear_pausas_jornada(usuario_id)
+            except Exception:  # nosec
+                pass
+            
             # Resetear el servicio
             self._inicializar()
             

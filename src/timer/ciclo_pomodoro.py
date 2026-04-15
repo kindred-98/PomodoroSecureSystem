@@ -271,6 +271,13 @@ def manejar_evento_timer(usuario_id: str, evento: str) -> dict:
             'pomodoro_numero': pomodoros_completados,
         })
         
+        # Cerrar pausa manual si existe (el descanso automático reemplaza la pausa)
+        try:
+            from src.pausas.gestor_pausas import limpiar_pausa_huerfana
+            limpiar_pausa_huerfana(usuario_id)
+        except Exception:
+            pass
+        
         # ¿Es el último pomodoro del ciclo?
         if pomodoro_actual >= pomodoros_totales:
             # Descanso largo
