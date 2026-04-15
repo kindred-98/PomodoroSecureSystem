@@ -276,7 +276,36 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_manual_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-        # ── OPCIÓN D: Exportar JSON ──
+        # ── OPCIÓN E: Frase Semilla (recuperación) ──
+        card_semilla = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
+        card_semilla.pack(fill="x", pady=(0, 15))
+
+        ctk.CTkLabel(
+            card_semilla, text="🔑 Frase Semilla de Recuperación",
+            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
+        ctk.CTkLabel(
+            card_semilla,
+            text="12 palabras para recuperar tu cuenta. Solo se muestra UNA vez cada 90 dias.",
+            font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+        ).pack(anchor="w", padx=20)
+
+        ctk.CTkButton(
+            card_semilla, text="Generar Frase Semilla",
+            font=("JetBrains Mono", 12, "bold"),
+            fg_color="#E7952B", hover_color="#D7841B",
+            text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
+            command=self._generar_frase_semilla,
+        ).pack(anchor="w", padx=20, pady=(10, 5))
+
+        self.label_semilla_resultado = ctk.CTkLabel(
+            card_semilla, text="", font=("JetBrains Mono", 12),
+            text_color="#E7952B",
+        )
+        self.label_semilla_resultado.pack(anchor="w", padx=20, pady=(0, 15))
+
+        # ── OPCIÓN F: Exportar JSON ──
         card_export = ctk.CTkFrame(contenido, fg_color=FONDO_CARD, corner_radius=12)
         card_export.pack(fill="x")
 
@@ -385,6 +414,43 @@ class PasswordView(ctk.CTkFrame):
                         self.after(3600000, self._desbloquear_pin)
         except Exception:
             pass
+
+    def _generar_frase_semilla(self):
+        """Genera frase semilla de recuperacion."""
+        try:
+            from src.auth.frase_semilla import generar_frase_usuario, obtener_ultima_frase
+            from datetime import timedelta
+            uid = str(self.usuario['_id'])
+            
+            # Verificar si puede generar (90 dias)
+            ultima = obtener_ultima_frase(uid)
+            if ultima:
+                desde = ultima.get('generada_en')
+                if desde:
+                    desde = desde.replace(tzinfo=timezone.utc) if desde.tzinfo is None else desde
+                    limite = datetime.now(timezone.utc) - timedelta(days=90)
+                    if desde > limite:
+                        dias = 90 - int((datetime.now(timezone.utc) - desde).days)
+                        self.label_semilla_resultado.configure(
+                            text=f"⚠ Espera {dias} dias para nueva frase",
+                            text_color=AVISO,
+                        )
+                        return
+            
+            frase = generar_frase_usuario(uid)
+            
+            if frase:
+                self.label_semilla_resultado.configure(
+                    text=f"📝 {frase}",
+                    text_color="#E7952B",
+                )
+            else:
+                self.label_semilla_resultado.configure(
+                    text="Ya generaste una frase recientemente. Espera 90 dias.",
+                    text_color=AVISO,
+                )
+        except Exception as e:
+            self.label_semilla_resultado.configure(text=str(e), text_color=PELIGRO)
 
     def _ver_contraseña(self):
         pin = self.entry_ver.get().strip()
