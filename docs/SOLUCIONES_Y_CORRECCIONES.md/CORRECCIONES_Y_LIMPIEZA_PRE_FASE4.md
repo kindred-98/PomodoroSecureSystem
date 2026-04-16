@@ -108,10 +108,10 @@ Se reemplazó el nombre real del cluster por un placeholder:
 
 ```markdown
 <!-- ANTES -->
-MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.nroyjcn.mongodb.net/?appName=Cluster0
+MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@tucluster.nroyjcn.mongodb.net/?appName=tuCluster
 
 <!-- DESPUÉS -->
-MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.xxxxx.mongodb.net/?appName=Cluster0
+MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@tucluster.xxxxx.mongodb.net/?appName=tuCluster
 ```
 
 ---
