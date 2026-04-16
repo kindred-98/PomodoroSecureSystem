@@ -34,7 +34,7 @@ El riesgo: Si estas credenciales quedan expuestas en GitHub, atacantes pueden ac
 
 **`.env`** (protegido en `.gitignore` — NUNCA a GitHub):
 ```env
-MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.xxxxx.mongodb.net/?appName=Cluster0
+MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.xxxxx.mongodb.net/?appName=tucloste
 ```
 
 **Nota:** La contraseña real se guarda SOLO en `.env` local (no se versiona en Git).
