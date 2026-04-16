@@ -34,7 +34,7 @@ El riesgo: Si estas credenciales quedan expuestas en GitHub, atacantes pueden ac
 
 **`.env`** (protegido en `.gitignore` — NUNCA a GitHub):
 ```env
-MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.xxxxx.mongodb.net/?appName=cluster0
+MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@tucluster.xxxxx.mongodb.net/?appName=tucluster
 ```
 
 **Nota:** La contraseña real se guarda SOLO en `.env` local (no se versiona en Git).
@@ -42,8 +42,8 @@ MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_MONGODB_PASSWORD@cluster0.xx
 **`.env.example`** (público — para otros devs):
 ```env
 # Obtener la URI desde MongoDB Atlas y pegarla aquí
-# Formato: mongodb+srv://usuario:contraseña@cluster.mongodb.net/?appName=Cluster0
-MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_PASSWORD_HERE@placerhost/?appName=Cluster0
+# Formato: mongodb+srv://usuario:contraseña@tucluster.mongodb.net/?appName=tuCluster
+MONGODB_URI=mongodb+srv://PomodoroSecureSystem:YOUR_PASSWORD_HERE@placerhost/?appName=tuCluster
 ```
 
 ### 2️⃣ Lectura de Credenciales en `src/config/config.py`
@@ -57,7 +57,7 @@ load_dotenv()
 
 MONGODB_URI = os.getenv(
     "MONGODB_URI",
-    "mongodb+srv://user:pass@cluster0.mongodb.net/?appName=Cluster0"
+    "mongodb+srv://user:pass@tucluster.mongodb.net/?appName=tuCluster"
 )
 
 # ✅ Validación correcta — no rechaza URIs válidas
