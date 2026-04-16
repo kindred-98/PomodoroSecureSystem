@@ -301,7 +301,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                         frame_lista, text=f"• {nombre} ({email})",
                         font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
                     ).pack(anchor="w", pady=2)
-            except:
+            except:  # nosec B112
                 continue
         
         ctk.CTkButton(

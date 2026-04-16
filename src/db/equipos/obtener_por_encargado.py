@@ -26,7 +26,7 @@ def obtener_por_encargado(encargado_id: str) -> list:
     
     try:
         objeto_id = ObjectId(encargado_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError(f"ID inválido: '{encargado_id}'")
     
     coleccion = conexion_global.obtener_coleccion('equipos')

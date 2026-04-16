@@ -26,7 +26,7 @@ def obtener_por_supervisor(supervisor_id: str) -> list:
     
     try:
         objeto_id = ObjectId(supervisor_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError(f"ID inválido: '{supervisor_id}'")
     
     coleccion = conexion_global.obtener_coleccion('equipos')

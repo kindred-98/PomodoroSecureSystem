@@ -26,7 +26,7 @@ def editar_nombre(equipo_id: str, nuevo_nombre: str) -> dict:
     
     try:
         oid = ObjectId(equipo_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError(f"ID inválido: '{equipo_id}'")
     
     coleccion = conexion_global.obtener_coleccion('equipos')
@@ -56,7 +56,7 @@ def asignar_encargado(equipo_id: str, encargado_id: str) -> dict:
     try:
         oid_equipo = ObjectId(equipo_id)
         oid_encargado = ObjectId(encargado_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError("ID inválido")
     
     coleccion = conexion_global.obtener_coleccion('equipos')
@@ -86,7 +86,7 @@ def quitar_miembro(equipo_id: str, miembro_id: str) -> dict:
     try:
         oid_equipo = ObjectId(equipo_id)
         oid_miembro = ObjectId(miembro_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError("ID inválido")
     
     coleccion = conexion_global.obtener_coleccion('equipos')

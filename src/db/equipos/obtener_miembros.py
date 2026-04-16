@@ -27,7 +27,7 @@ def obtener_miembros(equipo_id: str) -> list:
     
     try:
         objeto_id = ObjectId(equipo_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError(f"ID inválido: '{equipo_id}'")
     
     coleccion_equipos = conexion_global.obtener_coleccion('equipos')

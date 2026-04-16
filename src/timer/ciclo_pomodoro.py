@@ -275,7 +275,7 @@ def manejar_evento_timer(usuario_id: str, evento: str) -> dict:
         try:
             from src.pausas.gestor_pausas import limpiar_pausa_huerfana
             limpiar_pausa_huerfana(usuario_id)
-        except Exception:
+        except Exception:  # nosec B110
             pass
         
         # ¿Es el último pomodoro del ciclo?

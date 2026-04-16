@@ -1,22 +1,108 @@
-Run started:2026-04-05 23:59:24.533206+00:00
+Run started:2026-04-16 22:02:51.750125+00:00
 
 Test results:
-	No issues identified.
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\pausas\gestor_pausas.py:305:4
+304	            }
+305	    except Exception:
+306	        pass
+307	    return {}
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\pausas\gestor_pausas.py:328:4
+327	            return (str(equipo.get('supervisor_id', '')), str(equipo.get('encargado_id', '')))
+328	    except Exception:
+329	        pass
+330	    return (None, None)
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\pausas\gestor_pausas.py:366:4
+365	        coleccion.insert_one(reporte)
+366	    except Exception:
+367	        pass
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\timer\ciclo_pomodoro.py:278:8
+277	            limpiar_pausa_huerfana(usuario_id)
+278	        except Exception:
+279	            pass
+280	        
+
+--------------------------------------------------
+>> Issue: [B112:try_except_continue] Try, Except, Continue detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html
+   Location: src\ui\dashboard_supervisor.py:304:12
+303	                    ).pack(anchor="w", pady=2)
+304	            except:
+305	                continue
+306	        
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\ui\password_view.py:450:8
+449	            self.barra_fortaleza.configure(progress_color=self._color_fortaleza(puntuacion))
+450	        except Exception:
+451	            pass
+452	
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\ui\password_view.py:683:12
+682	                            data["frase_semilla"] = {"generada": fecha_frase}
+683	            except Exception as e:
+684	                pass
+685	            
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: src\ui\password_view.py:789:8
+788	                        self.after(3600000, self._desbloquear_pin)
+789	        except Exception:
+790	            pass
+791	
+
+--------------------------------------------------
 
 Code scanned:
-	Total lines of code: 7682
-	Total lines skipped (#nosec): 24
-	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+	Total lines of code: 8803
+	Total lines skipped (#nosec): 27
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 1
 
 Run metrics:
 	Total issues (by severity):
 		Undefined: 0
-		Low: 0
+		Low: 8
 		Medium: 0
 		High: 0
 	Total issues (by confidence):
 		Undefined: 0
 		Low: 0
 		Medium: 0
-		High: 0
+		High: 8
 Files skipped (0):

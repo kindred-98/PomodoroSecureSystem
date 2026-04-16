@@ -52,7 +52,7 @@ def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "", supervis
     # Verificar que encargado existe
     try:
         encargado_objeto_id = ObjectId(encargado_id)
-    except Exception:
+    except Exception:  # nosec B110
         raise ValueError(f"encargado_id inválido: '{encargado_id}'")
     
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
@@ -66,7 +66,7 @@ def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "", supervis
         try:
             supervisor_oid = ObjectId(supervisor_id)
         except Exception:
-            pass
+            raise ValueError(f"ID de supervisor inválido: '{supervisor_id}'")
     
     # Crear equipo
     equipo = {

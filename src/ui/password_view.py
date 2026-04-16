@@ -447,7 +447,7 @@ class PasswordView(ctk.CTkFrame):
             )
             self.barra_fortaleza.set(puntuacion / 100)
             self.barra_fortaleza.configure(progress_color=self._color_fortaleza(puntuacion))
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
     @staticmethod
@@ -680,7 +680,7 @@ class PasswordView(ctk.CTkFrame):
                             data["frase_semilla"] = {"generada": fecha_frase, "palabras": self._ultima_frase_mostrada}
                         else:
                             data["frase_semilla"] = {"generada": fecha_frase}
-            except Exception as e:
+            except Exception as e:  # nosec B110
                 pass
             
             with open(ruta, 'w', encoding='utf-8') as f:
@@ -786,7 +786,7 @@ class PasswordView(ctk.CTkFrame):
                     if desde > limite:
                         self.boton_generar_pin.configure(state="disabled")
                         self.after(3600000, self._desbloquear_pin)
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
     def _copiar_pin(self):

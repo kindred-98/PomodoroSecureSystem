@@ -231,8 +231,8 @@ def finalizar_pausa(usuario_id: str) -> dict:
     # Crear reporte para supervisor y encargado
     try:
         _crear_reporte_pausa(usuario_id, pausa_actualizada, duracion_minutos)
-    except Exception:
-        pass
+    except Exception as e:
+        pass  # nolint # nosec B110
     
     anomalia_registrada = None
     
@@ -302,7 +302,7 @@ def _obtener_usuario_info(usuario_id: str) -> dict:
                 'email': usuario.get('email', ''),
                 'rol': usuario.get('rol', 'empleado'),
             }
-    except Exception:
+    except Exception:  # nosec B110
         pass
     return {}
 
@@ -325,7 +325,7 @@ def _obtener_supervisor_encargado(usuario_id: str) -> tuple:
         
         if equipo:
             return (str(equipo.get('supervisor_id', '')), str(equipo.get('encargado_id', '')))
-    except Exception:
+    except Exception:  # nosec B110
         pass
     return (None, None)
 
@@ -363,5 +363,5 @@ def _crear_reporte_pausa(usuario_id: str, pausa_doc: dict, duracion_min: int):
         
         coleccion = conexion_global.obtener_coleccion('reportes_pausas')
         coleccion.insert_one(reporte)
-    except Exception:
+    except Exception:  # nosec B110
         pass

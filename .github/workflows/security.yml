@@ -39,11 +39,12 @@ jobs:
         run: |
           HIGH=$(grep "High:" bandit_report.txt | awk '{print $2}')
           MEDIUM=$(grep "Medium:" bandit_report.txt | awk '{print $2}')
+          # Solo falla en High o Medium (Low se ignora)
           if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ]; then
             echo "Security issues found! High: $HIGH, Medium: $MEDIUM"
             exit 1
           else
-            echo "No high/medium security issues found"
+            echo "No high/medium security issues found (Low issues OK)"
           fi
 
   dependency-check:
