@@ -13,10 +13,12 @@ load_dotenv(Path(__file__).parent / '.env')
 
 
 def main():
+    modo_offline = os.getenv('MODO_OFFLINE', '').lower() == 'true'
     errores = []
 
-    if not os.getenv('MONGODB_URI'):
-        errores.append("MONGODB_URI no configurada en .env")
+    if not modo_offline:
+        if not os.getenv('MONGODB_URI'):
+            errores.append("MONGODB_URI no configurada en .env")
 
     if not os.getenv('FERNET_KEY'):
         errores.append("FERNET_KEY no configurada en .env")
@@ -42,8 +44,14 @@ def main():
         print("Conectado a MongoDB Atlas")
     except Exception as e:
         print(f"Error al conectar a MongoDB: {e}")
-        print("Verifica tu MONGODB_URI en .env")
-        return
+        print("Intentando modo offline...")
+        try:
+            conexion_global.conectar(modo_offline=True)
+            print("Conectado a MongoDB (modo offline)")
+        except Exception as e2:
+            print(f"No se pudo conectar en modo offline: {e2}")
+            print("Verifica tu MONGODB_URI en .env")
+            return
 
     from src.app import PomodoroSecureApp
 

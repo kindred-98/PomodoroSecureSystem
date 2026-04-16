@@ -10,6 +10,12 @@ import os
 
 logger = logging.getLogger(__name__)
 
+try:
+    from mongomock import MongoClient as MockMongoClient
+    MONGOMOCK_DISPONIBLE = True
+except ImportError:
+    MONGOMOCK_DISPONIBLE = False
+
 
 class ConexionMongoDB:
     """Gestor de conexión a MongoDB Atlas."""
@@ -24,13 +30,14 @@ class ConexionMongoDB:
             cls._instancia = super().__new__(cls)
         return cls._instancia
     
-    def conectar(self, uri: str = None):
+    def conectar(self, uri: str = None, modo_offline: bool = False):
         """
         Establece conexión a MongoDB Atlas.
         
         Args:
             uri (str, optional): URI de conexión. Si no se proporciona,
                                  intenta usar variable de entorno MONGODB_URI
+            modo_offline (bool): Si True, usa base de datos simulada (mongomock)
         
         Raises:
             ConnectionFailure: Si no se puede conectar a MongoDB
@@ -38,6 +45,16 @@ class ConexionMongoDB:
         """
         if self._cliente is not None:
             return  # Ya conectado
+        
+        if modo_offline or os.getenv('MODO_OFFLINE', '').lower() == 'true':
+            if not MONGOMOCK_DISPONIBLE:
+                raise ConnectionFailure(
+                    "mongomock no está instalado. Ejecuta: pip install mongomock"
+                )
+            self._cliente = MockMongoClient()
+            self._base_datos = self._cliente['pomodoro_secure']
+            logger.info("Conectado a MongoDB (modo offline/simulado)")
+            return
         
         if uri is None:
             # Intentar obtener de variable de entorno
