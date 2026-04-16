@@ -140,6 +140,11 @@ def generar_frase_usuario(usuario_id: str) -> str | None:
         return None
     
     frase = generar_frase_semilla()
+    # Truncar a 72 bytes para bcrypt
+    frase_bytes = frase.encode('utf-8')
+    if len(frase_bytes) > 72:
+        frase_bytes = frase_bytes[:72]
+        frase = frase_bytes.decode('utf-8', errors='ignore')
     frase_hash = hashear_contraseña(frase)
     
     # Guardar hash (para verificación)

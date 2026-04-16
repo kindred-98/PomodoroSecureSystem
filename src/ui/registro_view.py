@@ -25,7 +25,7 @@ class RegistroView(ctk.CTkFrame):
             fg_color=FONDO_CARD,
             corner_radius=16,
             width=500,
-            height=550,
+            height=620,
         )
         self.card.place(relx=0.5, rely=0.5, anchor="center")
         self.card.pack_propagate(False)
@@ -52,8 +52,13 @@ class RegistroView(ctk.CTkFrame):
         self.progreso.pack(fill="x", pady=(10, 0))
         self.progreso.set(0.25)
 
-        # Contenedor del paso
-        self.contenido = ctk.CTkFrame(self.card, fg_color="transparent")
+        # Contenedor del paso (scrollable)
+        self.contenido = ctk.CTkScrollableFrame(
+            self.card, 
+            fg_color="transparent",
+            scrollbar_button_color=FONDO_SECUNDARIO,
+            scrollbar_button_hover_color=BOTON_PRIMARIO,
+        )
         self.contenido.pack(fill="both", expand=True, padx=30, pady=10)
 
         # Label de error
@@ -121,7 +126,10 @@ class RegistroView(ctk.CTkFrame):
 
     def _limpiar_contenido(self):
         for widget in self.contenido.winfo_children():
-            widget.destroy()
+            try:
+                widget.destroy()
+            except:
+                pass
 
     def _mostrar_paso_1(self):
         """Paso 1: Datos personales."""
