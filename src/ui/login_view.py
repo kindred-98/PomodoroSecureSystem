@@ -29,8 +29,8 @@ class LoginView(ctk.CTkFrame):
             self,
             fg_color=FONDO_CARD,
             corner_radius=16,
-            width=420,
-            height=580,
+            width=520,
+            height=640,
         )
         card.place(relx=0.5, rely=0.5, anchor="center")
         card.pack_propagate(False)
@@ -39,59 +39,59 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             card,
             text="🍅🔐",
-            font=("Segoe UI Emoji", 40),
+            font=("Segoe UI Emoji", 56),
             text_color=TEXTO_PRINCIPAL,
-        ).pack(pady=(30, 5))
+        ).pack(pady=(35, 5))
 
         ctk.CTkLabel(
             card,
             text="PomodoroSecure",
-            font=("Comic Sans MS", 20, "bold"),
+            font=("Comic Sans MS", 26, "bold"),
             text_color=TEXTO_PRINCIPAL,
-        ).pack(pady=(0, 25))
+        ).pack(pady=(0, 30))
 
         # Campo Email
         ctk.CTkLabel(
             card,
             text="Email",
-            font=("Comic Sans MS", 12),
+            font=("Comic Sans MS", 14),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
-        ).pack(fill="x", padx=40)
+        ).pack(fill="x", padx=45)
 
         self.entry_email = ctk.CTkEntry(
             card,
             placeholder_text="usuario@empresa.com",
-            font=("Comic Sans MS", 13),
+            font=("Comic Sans MS", 15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
-            height=40,
+            height=48,
             corner_radius=8,
         )
-        self.entry_email.pack(fill="x", padx=40, pady=(5, 15))
+        self.entry_email.pack(fill="x", padx=45, pady=(5, 15))
 
         # Campo Contraseña
         ctk.CTkLabel(
             card,
             text="Contraseña",
-            font=("Comic Sans MS", 12),
+            font=("Comic Sans MS", 14),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
-        ).pack(fill="x", padx=40)
+        ).pack(fill="x", padx=45)
 
         self.entry_contraseña = ctk.CTkEntry(
             card,
             placeholder_text="••••••••",
             show="•",
-            font=("Comic Sans MS", 13),
+            font=("Comic Sans MS", 15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
-            height=40,
+            height=48,
             corner_radius=8,
         )
-        self.entry_contraseña.pack(fill="x", padx=40, pady=(5, 5))
+        self.entry_contraseña.pack(fill="x", padx=45, pady=(5, 5))
 
         # Toggle mostrar contraseña
         self.mostrar_pw = ctk.BooleanVar(value=False)
@@ -100,18 +100,18 @@ class LoginView(ctk.CTkFrame):
             text="Mostrar contraseña",
             variable=self.mostrar_pw,
             command=self._toggle_contraseña,
-            font=("Comic Sans MS", 11),
+            font=("Comic Sans MS", 13),
             text_color=TEXTO_SECUNDARIO,
             fg_color=FONDO_SECUNDARIO,
             checkmark_color=TEXTO_PRINCIPAL,
             hover_color=BOTON_PRIMARIO_HOVER,
-        ).pack(anchor="w", padx=40, pady=(0, 15))
+        ).pack(anchor="w", padx=45, pady=(0, 15))
 
         # Label de error
         self.label_error = ctk.CTkLabel(
             card,
             text="",
-            font=("Comic Sans MS", 11),
+            font=("Comic Sans MS", 14),
             text_color=PELIGRO,
         )
         self.label_error.pack(pady=(0, 10))
@@ -120,47 +120,47 @@ class LoginView(ctk.CTkFrame):
         self.boton_login = ctk.CTkButton(
             card,
             text="Iniciar Sesión",
-            font=("Comic Sans MS", 14, "bold"),
+            font=("Comic Sans MS", 16, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
-            height=45,
+            height=52,
             corner_radius=10,
             command=self._on_login_click,
         )
-        self.boton_login.pack(fill="x", padx=40, pady=(0, 15))
+        self.boton_login.pack(fill="x", padx=45, pady=(0, 15))
 
         # Botón Registro
         ctk.CTkButton(
             card,
             text="¿Primera vez? Regístrate",
-            font=("Comic Sans MS", 12),
+            font=("Comic Sans MS", 14),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=INFORMACION,
-            height=36,
+            height=45,
             corner_radius=8,
             command=self.on_ir_registro,
-        ).pack(fill="x", padx=40, pady=(0, 5))
+        ).pack(fill="x", padx=45, pady=(0, 5))
 
         # Olvidé mi contraseña
         ctk.CTkButton(
             card,
             text="¿Olvidaste tu contraseña? Usa Frase Semilla",
-            font=("Comic Sans MS", 12, "bold"),
+            font=("Comic Sans MS", 14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
-            height=38,
+            height=45,
             corner_radius=8,
             command=self._recuperar_contraseña,
-        ).pack(fill="x", padx=40, pady=(5, 0))
+        ).pack(fill="x", padx=45, pady=(5, 0))
 
         # Footer
         ctk.CTkLabel(
             self,
             text="v1.0.0 — Dicampus",
-            font=("Comic Sans MS", 9),
+            font=("Comic Sans MS", 11),
             text_color=TEXTO_SECUNDARIO,
         ).place(relx=0.5, rely=0.95, anchor="center")
 
