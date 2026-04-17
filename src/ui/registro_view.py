@@ -128,7 +128,7 @@ class RegistroView(ctk.CTkFrame):
         self._limpiar_contenido()
         self.label_paso.configure(text="Paso 1 de 4 — Datos personales")
         self.progreso.set(0.25)
-        self.boton_atras.configure(state="disabled")
+        self.boton_atras.configure(state="normal")
         self.boton_siguiente.configure(text="Siguiente →")
 
         ctk.CTkLabel(
@@ -142,6 +142,7 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_nombre.pack(fill="x", pady=(3, 10))
+        self.entry_nombre.bind("<KeyRelease>", self._validate_nombre)
 
         ctk.CTkLabel(
             self.contenido, text="Email",
@@ -154,6 +155,7 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_email.pack(fill="x", pady=(3, 10))
+        self.entry_email.bind("<KeyRelease>", self._validate_email)
 
         ctk.CTkLabel(
             self.contenido, text="Rol",
@@ -403,6 +405,25 @@ class RegistroView(ctk.CTkFrame):
             self.clipboard_clear()
             self.clipboard_append(self.resultado_registro['contraseña_generada'])
 
+    def _validate_nombre(self, event=None):
+        texto = self.entry_nombre.get()
+        texto_filtrado = ""
+        for c in texto:
+            if c.isalpha() or c in "áéíóúüÁÉÍÓÚÜñÑ ":
+                texto_filtrado += c
+        if len(texto_filtrado) > 50:
+            texto_filtrado = texto_filtrado[:50]
+        if texto != texto_filtrado:
+            self.entry_nombre.delete(0, "end")
+            self.entry_nombre.insert(0, texto_filtrado)
+
+    def _validate_email(self, event=None):
+        texto = self.entry_email.get()
+        if len(texto) > 50:
+            texto = texto[:50]
+            self.entry_email.delete(0, "end")
+            self.entry_email.insert(0, texto)
+
     def _toggle_tipo_contraseña(self):
         """Muestra/oculta el campo de semilla personalizada."""
         if self.tipo_contraseña.get() == "personalizada":
@@ -411,14 +432,62 @@ class RegistroView(ctk.CTkFrame):
             self.frame_semilla.pack_forget()
 
     def _validar_paso_1(self):
+        import re
         nombre = self.entry_nombre.get().strip()
         email = self.entry_email.get().strip()
+
         if not nombre:
             self.label_error.configure(text="El nombre es obligatorio")
             return False
+
+        if len(nombre) > 50:
+            self.label_error.configure(text="El nombre debe tener máximo 50 caracteres")
+            return False
+
+        if not re.match(r"^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]+$", nombre):
+            self.label_error.configure(text="El nombre solo puede contener letras")
+            return False
+
         if not email:
             self.label_error.configure(text="El email es obligatorio")
             return False
+
+        if "@" not in email:
+            self.label_error.configure(text="El email debe contener @")
+            return False
+
+        partes = email.split("@")
+        if len(partes) != 2 or not partes[0] or not partes[1]:
+            self.label_error.configure(text="El formato del email es inválido debe contener @ y punto")
+            return False
+
+        dominio = partes[1]
+        if "." not in dominio:
+            self.label_error.configure(text="El dominio debe tener un punto (.)")
+            return False
+
+        dominio_partes = dominio.rsplit(".", 1)
+        if len(dominio_partes) != 2:
+            self.label_error.configure(text="El dominio debe tener un TLD válido")
+            return False
+
+        tld = dominio_partes[1]
+        if len(tld) < 2:
+            self.label_error.configure(text="El TLD debe tener mínimo 2 caracteres")
+            return False
+
+        if len(tld) > 10:
+            self.label_error.configure(text="El dominio debe tener máximo 10 caracteres")
+            return False
+
+        if not tld.isalpha():
+            self.label_error.configure(text="El TLD solo puede contener letras")
+            return False
+
+        if len(email) > 50:
+            self.label_error.configure(text="El email debe tener máximo 50 caracteres")
+            return False
+
         self.label_error.configure(text="")
         return True
 
