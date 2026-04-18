@@ -68,12 +68,27 @@ def registrar_usuario(
     if not nombre:
         raise ValueError("nombre no puede estar vacío")
     
-    roles_validos = {"empleado", "encargado", "supervisor"}
-    if rol not in roles_validos:
-        raise ValueError(f"rol debe ser uno de {roles_validos}, recibido: {rol}")
+    # Verificar si es el primer usuario para forzar supervisor
+    from src.db.conexion import conexion_global
+    coleccion = conexion_global.obtener_coleccion('usuarios')
+    es_primer_usuario = coleccion.count_documents({}) == 0
     
-    # Generar contraseña con los parámetros del usuario
-    contraseña_generada = generar_contraseña(parametros_contraseña)
+    if es_primer_usuario:
+        rol = "supervisor"
+    else:
+        roles_validos = {"empleado"}
+        if rol not in roles_validos:
+            rol = "empleado"
+    
+    # Determinar tipo de contraseña: personalizada vs generada por sistema
+    tipo = parametros_contraseña.get("tipo", "sistema")
+    
+    if tipo == "personalizada":
+        contraseña_generada = parametros_contraseña.get("contraseña", "")
+        if not contraseña_generada:
+            raise ValueError("Contraseña personalizada no proporcionada")
+    else:
+        contraseña_generada = generar_contraseña(parametros_contraseña)
     
     # Crear hash para verificación de login (no reversible)
     contraseña_hash = hashear_contraseña(contraseña_generada)

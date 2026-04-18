@@ -4,7 +4,12 @@ Responsabilidad: Pantalla de login con email y contraseña.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.ui.templates import (
+    FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
+    TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, PELIGRO, INFORMACION,
+    BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER,
+    crear_fuente, NORMAL, NORMAL_NEGRITA, PEQUENO, MINIMO
+)
 
 
 class LoginView(ctk.CTkFrame):
@@ -25,44 +30,44 @@ class LoginView(ctk.CTkFrame):
 
     def _crear_widgets(self):
         # Contenedor central (card)
-        card = ctk.CTkFrame(
+        self.card = ctk.CTkFrame(
             self,
             fg_color=FONDO_CARD,
             corner_radius=16,
             width=660,
             height=760,
         )
-        card.place(relx=0.5, rely=0.5, anchor="center")
-        card.pack_propagate(False)
+        self.card.place(relx=0.5, rely=0.5, anchor="center")
+        self.card.pack_propagate(False)
 
         # Logo
         ctk.CTkLabel(
-            card,
+            self.card,
             text="🍅🔐",
             font=("Segoe UI Emoji", 56),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(35, 5))
 
         ctk.CTkLabel(
-            card,
+            self.card,
             text="PomodoroSecure",
-            font=("Comic Sans MS", 26, "bold"),
+            font=crear_fuente(26, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(0, 30))
 
         # Campo Email
         ctk.CTkLabel(
-            card,
+            self.card,
             text="Email",
-            font=("Comic Sans MS", 14),
+            font=PEQUENO,
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(fill="x", padx=45)
 
         self.entry_email = ctk.CTkEntry(
-            card,
+            self.card,
             placeholder_text="TuCorreo@empresa.com",
-            font=("Comic Sans MS", 15),
+            font=crear_fuente(15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
@@ -73,18 +78,18 @@ class LoginView(ctk.CTkFrame):
 
         # Campo Contraseña
         ctk.CTkLabel(
-            card,
+            self.card,
             text="Contraseña",
-            font=("Comic Sans MS", 14),
+            font=PEQUENO,
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(fill="x", padx=45)
 
         self.entry_contraseña = ctk.CTkEntry(
-            card,
+            self.card,
             placeholder_text="••••••••",
             show="•",
-            font=("Comic Sans MS", 15),
+            font=crear_fuente(15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             placeholder_text_color=TEXTO_SECUNDARIO,
@@ -96,11 +101,11 @@ class LoginView(ctk.CTkFrame):
         # Toggle mostrar contraseña
         self.mostrar_pw = ctk.BooleanVar(value=False)
         ctk.CTkCheckBox(
-            card,
+            self.card,
             text="Mostrar contraseña",
             variable=self.mostrar_pw,
             command=self._toggle_contraseña,
-            font=("Comic Sans MS", 13),
+            font=PEQUENO,
             text_color=TEXTO_SECUNDARIO,
             fg_color=FONDO_SECUNDARIO,
             checkmark_color=TEXTO_PRINCIPAL,
@@ -109,22 +114,22 @@ class LoginView(ctk.CTkFrame):
 
         # Label de error
         self.label_error = ctk.CTkLabel(
-            card,
+            self.card,
             text="",
-            font=("Comic Sans MS", 14),
+            font=PEQUENO,
             text_color=PELIGRO,
         )
         self.label_error.pack(pady=(0, 10))
 
         # Footer con botones en la parte inferior
-        footer = ctk.CTkFrame(card, fg_color="transparent")
+        footer = ctk.CTkFrame(self.card, fg_color="transparent")
         footer.pack(side="bottom", fill="x", padx=45, pady=(0, 25))
 
         # Botón Iniciar Sesión
         self.boton_login = ctk.CTkButton(
             footer,
             text="Iniciar Sesión",
-            font=("Comic Sans MS", 16, "bold"),
+            font=NORMAL_NEGRITA,
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -138,7 +143,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             footer,
             text="¿Primera vez? Regístrate",
-            font=("Comic Sans MS", 14),
+            font=PEQUENO,
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=INFORMACION,
@@ -151,7 +156,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             footer,
             text="¿Olvidaste tu contraseña? Usa Frase Semilla",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -164,7 +169,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             self,
             text="v1.0.0 — Dicampus",
-            font=("Comic Sans MS", 11),
+            font=MINIMO,
             text_color=TEXTO_SECUNDARIO,
         ).place(relx=0.5, rely=0.95, anchor="center")
 
@@ -174,7 +179,6 @@ class LoginView(ctk.CTkFrame):
         )
 
     def _on_login_click(self):
-        import re
         email = self.entry_email.get().strip()
         contraseña = self.entry_contraseña.get()
 
@@ -220,8 +224,6 @@ class LoginView(ctk.CTkFrame):
 
     def _recuperar_contraseña(self):
         """Recuperar cuenta con frase semilla."""
-        import customtkinter as ctk
-        
         dialogo = ctk.CTkToplevel(self)
         dialogo.title("🔑 Recuperar Cuenta")
         dialogo.geometry("480x400")
@@ -231,7 +233,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="🔑 Recuperar con Frase Semilla",
-            font=("Comic Sans MS", 16, "bold"),
+            font=crear_fuente(16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
         
@@ -239,14 +241,14 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="Tu Email:",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(anchor="w", padx=40)
         
         entry_email = ctk.CTkEntry(
             dialogo, placeholder_text="tu@email.com",
-            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=40,
         )
         entry_email.pack(fill="x", padx=40, pady=(5, 15))
@@ -255,20 +257,20 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="Tu Frase Semilla (12 palabras):",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             text_color=TEXTO_SECUNDARIO,
             anchor="w",
         ).pack(anchor="w", padx=40)
         
         entry_frase = ctk.CTkEntry(
             dialogo, placeholder_text="palabra1 palabra2 palabra3 ...",
-            font=("Comic Sans MS", 13), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(13), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=40,
         )
         entry_frase.pack(fill="x", padx=40, pady=(5, 20))
         
         label_error = ctk.CTkLabel(
-            dialogo, text="", font=("Comic Sans MS", 11),
+            dialogo, text="", font=crear_fuente(11),
             text_color=PELIGRO,
         )
         label_error.pack(pady=5)
@@ -285,7 +287,6 @@ class LoginView(ctk.CTkFrame):
             try:
                 from src.db.conexion import conexion_global
                 from src.auth.frase_semilla import verificar_frase_semilla
-                from src.seguridad.encriptacion import verificar_contraseña
                 
                 usuarios = conexion_global.obtener_coleccion('usuarios')
                 usuario = usuarios.find_one({'email': email})
@@ -313,7 +314,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             dialogo,
             text="✓ Entrar",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45,
             command=intentar_login,
@@ -322,8 +323,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             dialogo,
             text="Cancelar",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             command=dialogo.destroy,
         ).pack(pady=10)
         self.boton_login.configure(state="normal", text="Iniciar Sesión")
-
