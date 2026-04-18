@@ -232,6 +232,9 @@ def mock_conexion_global(conexion_mongodb_mock):
         'src.auth.exportar_contraseña',
         'src.auth.registro',
     ]
+    modulos_conexion = [
+        'src.db.conexion',
+    ]
     modulos_timer = [
         'src.timer.ciclo_pomodoro',
         'src.timer.servicio_sesiones',
@@ -247,7 +250,7 @@ def mock_conexion_global(conexion_mongodb_mock):
     ]
     
     with ExitStack() as stack:
-        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra:
+        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra + modulos_conexion:
             stack.enter_context(
                 patch(f'{modulo}.conexion_global', conexion_mongodb_mock)
             )

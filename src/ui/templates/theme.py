@@ -18,13 +18,13 @@ TRABAJO_ACTIVO = "#7C3AED"      # violeta — pomodoro corriendo
 COMPLETADO = "#10B981"           # verde esmeralda
 AVISO = "#F59E0B"                # naranja ámbar
 PELIGRO = "#EF4444"              # rojo
-INFORMACION = "#3B82F6"          # azul
+INFORMACION = "#fbe600"          # azul
 
 # ============================================
 # TEXTO
 # ============================================
-TEXTO_PRINCIPAL = "#F8F8F2"
-TEXTO_SECUNDARIO = "#94A3B8"
+TEXTO_PRINCIPAL = "#fff8f8"
+TEXTO_SECUNDARIO = "#fffffe"
 
 # ============================================
 # PANTALLA DE BLOQUEO
@@ -42,10 +42,10 @@ BORDE_ACTIVO = "#7C3AED"
 # ============================================
 # BOTONES
 # ============================================
-BOTON_PRIMARIO = "#7C3AED"
-BOTON_PRIMARIO_HOVER = "#6D28D9"
-BOTON_SECUNDARIO = "#313145"
-BOTON_SECUNDARIO_HOVER = "#3E3E5E"
+BOTON_PRIMARIO = "#59339b"
+BOTON_PRIMARIO_HOVER = "#7C3AED"
+BOTON_SECUNDARIO = "#595968"
+BOTON_SECUNDARIO_HOVER = "#4242c9"
 BOTON_PELIGRO = "#EF4444"
 BOTON_PELIGRO_HOVER = "#DC2626"
 BOTON_EXITO = "#10B981"
