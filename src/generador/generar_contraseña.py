@@ -91,34 +91,43 @@ def generar_contraseña_segura(longitud: int = 16) -> str:
 
 def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
     """
-    Genera una contraseña fuerte usando SOLO los caracteres de la semilla.
+    Genera una contraseña fuerte usando 4 letras y 4 números de la semilla.
     
-    La semilla proporcionada por el usuario se usa como pool de caracteres.
-    Se mezcla con Fisher-Yates y se asegura diversidad.
+    La semilla debe tener al menos 4 letras distintas y 4 números distintos.
+    Se usan exactamente 4 letras y 4 números (mezclados) para crear la contraseña.
     
     Args:
-        semilla (str): Caracteres que el usuario quiere usar (mín 8 chars únicos)
-        longitud (int): Longitud deseada. Si 0, usa el largo de la semilla.
+        semilla (str): Caracteres que el usuario quiere usar (mín 8 chars)
+        longitud (int): Longitud deseada. Si 0, usa 16 por defecto.
     
     Returns:
-        str: Contraseña generada solo con caracteres de la semilla
+        str: Contraseña generada con 4 letras + 4 números mezclados
     
     Raises:
         TypeError: Si semilla no es string
-        ValueError: Si semilla tiene menos de 8 caracteres o muy pocos únicos
+        ValueError: Si semilla no cumple requisitos
     """
     if not isinstance(semilla, str):
         raise TypeError(f"semilla debe ser string, recibido: {type(semilla).__name__}")
     if not semilla:
         raise ValueError("semilla no puede estar vacía")
     
-    # Caracteres únicos
-    unicos = list(set(semilla))
+    letras = [c for c in semilla.lower() if c.isalpha()]
+    numeros = [c for c in semilla if c.isdigit()]
     
-    if len(unicos) < 4:
+    letras_unicas = list(dict.fromkeys(letras))
+    numeros_unicos = list(dict.fromkeys(numeros))
+    
+    if len(letras_unicas) < 4:
         raise ValueError(
-            f"La semilla debe tener al menos 4 caracteres unicos. "
-            f"Tienes {len(unicos)}: {''.join(unicos)}"
+            f"La semilla debe tener al menos 4 letras distintas. "
+            f"Tienes {len(letras_unicas)}: {''.join(letras_unicos)}"
+        )
+    
+    if len(numeros_unicos) < 4:
+        raise ValueError(
+            f"La semilla debe tener al menos 4 números distintos. "
+            f"Tienes {len(numeros_unicos)}: {''.join(numeros_unicos)}"
         )
     
     if len(semilla) < 8:
@@ -127,17 +136,15 @@ def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
             f"Tienes {len(semilla)}"
         )
     
-    # Longitud de la contraseña
-    if longitud <= 0:
-        longitud = len(semilla)
+    letras_seleccionadas = letras_unicas[:4]
+    numeros_seleccionados = numeros_unicos[:4]
     
-    # Pool: repetir caracteres únicos hasta cubrir la longitud
-    pool = list(semilla)
-    while len(pool) < longitud:
-        pool.extend(unicos)
+    pool = letras_seleccionadas + numeros_seleccionados
     
-    # Mezclar con Fisher-Yates (secrets)
-    pool = pool[:longitud]
+    if longitud > 8:
+        pool_extendido = pool * ((longitud // 8) + 1)
+        pool = pool_extendido[:longitud]
+    
     for i in range(len(pool) - 1, 0, -1):
         j = secrets.randbelow(i + 1)
         pool[i], pool[j] = pool[j], pool[i]

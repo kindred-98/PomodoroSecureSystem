@@ -16,6 +16,16 @@ class RegistroView(ctk.CTkFrame):
         self.on_ir_login = on_ir_login
         self.paso_actual = 1
         self.resultado_registro = None
+        self.datos_paso_1 = {"nombre": "", "email": "", "rol": "empleado"}
+        self.datos_paso_2 = {
+            "longitud": 20,
+            "usar_mayusculas": True,
+            "usar_numeros": True,
+            "usar_simbolos": True,
+            "excluir_ambiguos": False,
+            "tipo": "sistema",
+            "semilla": ""
+        }
         self._crear_widgets()
 
     def _crear_widgets(self):
@@ -36,7 +46,7 @@ class RegistroView(ctk.CTkFrame):
 
         self.label_paso = ctk.CTkLabel(
             self.header,
-            text="Paso 1 de 4 — Datos personales",
+            text="Paso 1 de 3 — Datos personales",
             font=("Comic Sans MS", 20, "bold"),
             text_color=TEXTO_PRINCIPAL,
         )
@@ -106,7 +116,7 @@ class RegistroView(ctk.CTkFrame):
             cursor="hand2",
         )
         self.link_login.pack(pady=(0, 20))
-        self.link_login.bind("<Button-1>", lambda e: self.on_ir_login())
+        self.link_login.bind("<Button-1>", lambda e: self._ir_a_login())
 
         self._mostrar_paso_1()
 
@@ -125,17 +135,28 @@ class RegistroView(ctk.CTkFrame):
 
     def _mostrar_paso_1(self):
         """Paso 1: Datos personales."""
+        print(f"DEBUG: _mostrar_paso_1 iniciado, datos_paso_1={self.datos_paso_1}")
         self._limpiar_contenido()
         self.label_paso.configure(text="Paso 1 de 4 — Datos personales")
         self.progreso.set(0.25)
         self.boton_atras.configure(state="normal")
         self.boton_atras.pack(side="left")
         self.link_login.pack()
-        self.boton_siguiente.configure(text="Siguiente →")
+        
+        tiene_datos_validos = bool(
+            self.datos_paso_1.get("nombre") and 
+            self.datos_paso_1.get("email") and
+            len(self.datos_paso_1.get("nombre", "")) >= 2
+        )
+        
+        if tiene_datos_validos:
+            self.boton_siguiente.configure(text="Siguiente →", state="normal", fg_color=BOTON_PRIMARIO)
+        else:
+            self.boton_siguiente.configure(text="Siguiente →", state="disabled", fg_color=BOTON_SECUNDARIO)
         self.boton_siguiente.pack(side="right")
 
         ctk.CTkLabel(
-            self.contenido, text="Nombre completo",
+            self.contenido, text="Nombre completo (puede contener números, min 1 letra)",
             font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 0))
 
@@ -145,7 +166,8 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8,
         )
         self.entry_nombre.pack(fill="x", pady=(3, 10))
-        self.entry_nombre.bind("<KeyRelease>", self._validate_nombre)
+        self.entry_nombre.insert(0, self.datos_paso_1["nombre"])
+        self.entry_nombre.bind("<KeyRelease>", self._on_nombre_change)
 
         ctk.CTkLabel(
             self.contenido, text="Email",
@@ -158,18 +180,17 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8,
         )
         self.entry_email.pack(fill="x", pady=(3, 10))
-        self.entry_email.bind("<KeyRelease>", self._validate_email)
+        self.entry_email.insert(0, self.datos_paso_1["email"])
+        self.entry_email.bind("<KeyRelease>", self._on_email_change)
 
         ctk.CTkLabel(
             self.contenido, text="Rol",
             font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
-        # Determinar opciones según si hay usuarios en BD
         es_primer_usuario = self._verificar_primer_usuario()
 
         if es_primer_usuario:
-            # Primer usuario: puede elegir cualquier rol (incluido supervisor)
             roles_disponibles = ["supervisor", "encargado", "empleado"]
             ctk.CTkLabel(
                 self.contenido,
@@ -177,12 +198,10 @@ class RegistroView(ctk.CTkFrame):
                 font=("Comic Sans MS", 12), text_color=COMPLETADO,
             ).pack(anchor="w", pady=(3, 5))
         else:
-            # Ya hay usuarios: solo empleado por defecto
             roles_disponibles = ["empleado"]
             ctk.CTkLabel(
                 self.contenido,
-                text="Solo puedes registrarte como empleado.\n"
-                     "Un supervisor puede cambiarte el rol después.",
+                text="Un supervisor puede cambiarte el rol después",
                 font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
             ).pack(anchor="w", pady=(3, 5))
 
@@ -199,12 +218,17 @@ class RegistroView(ctk.CTkFrame):
             corner_radius=8,
         )
         self.combo_rol.pack(fill="x", pady=(3, 10))
-        self.combo_rol.set(roles_disponibles[0])
+        
+        rol_guardado = self.datos_paso_1.get("rol", roles_disponibles[0])
+        if rol_guardado in roles_disponibles:
+            self.combo_rol.set(rol_guardado)
+        else:
+            self.combo_rol.set(roles_disponibles[0])
 
     def _mostrar_paso_2(self):
         """Paso 2: Parámetros de contraseña."""
         self._limpiar_contenido()
-        self.label_paso.configure(text="Paso 2 de 4 — Parámetros de contraseña")
+        self.label_paso.configure(text="Paso 2 de 3 — Parámetros de contraseña")
         self.progreso.set(0.5)
         self.boton_atras.configure(state="normal")
         self.boton_atras.pack(side="left")
@@ -219,7 +243,6 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 15))
 
-        # Slider longitud
         ctk.CTkLabel(
             self.contenido, text="Longitud de la contraseña",
             font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
@@ -242,15 +265,15 @@ class RegistroView(ctk.CTkFrame):
         )
         self.label_longitud.pack(anchor="e")
 
-        # Slider se configura al final para evitar callbacks prematuros
-        self.slider_longitud.set(20)
+        longitud = self.datos_paso_2.get("longitud", 20)
+        self.slider_longitud.set(longitud)
+        self.label_longitud.configure(text=f"{longitud} caracteres")
         self.slider_longitud.configure(command=self._actualizar_longitud)
 
-        # Toggles
-        self.var_mayus = ctk.BooleanVar(value=True)
-        self.var_num = ctk.BooleanVar(value=True)
-        self.var_simb = ctk.BooleanVar(value=True)
-        self.var_ambig = ctk.BooleanVar(value=False)
+        self.var_mayus = ctk.BooleanVar(value=self.datos_paso_2.get("usar_mayusculas", True))
+        self.var_num = ctk.BooleanVar(value=self.datos_paso_2.get("usar_numeros", True))
+        self.var_simb = ctk.BooleanVar(value=self.datos_paso_2.get("usar_simbolos", True))
+        self.var_ambig = ctk.BooleanVar(value=self.datos_paso_2.get("excluir_ambiguos", False))
 
         for texto, var in [
             ("Incluir mayúsculas (A-Z)", self.var_mayus),
@@ -264,10 +287,9 @@ class RegistroView(ctk.CTkFrame):
                 fg_color=FONDO_SECUNDARIO, checkmark_color=TEXTO_PRINCIPAL,
             ).pack(anchor="w", pady=(8, 0))
 
-        # Opcion contrasena personalizada
         ctk.CTkFrame(self.contenido, fg_color=BORDE, height=1).pack(fill="x", pady=(15, 10))
 
-        self.tipo_contraseña = ctk.StringVar(value="sistema")
+        self.tipo_contraseña = ctk.StringVar(value=self.datos_paso_2.get("tipo", "sistema"))
 
         ctk.CTkRadioButton(
             self.contenido, text="Generada por el sistema (recomendado)",
@@ -300,6 +322,7 @@ class RegistroView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8,
         )
         self.entry_semilla.pack(fill="x")
+        self.entry_semilla.insert(0, self.datos_paso_2.get("semilla", ""))
 
         ctk.CTkLabel(
             self.frame_semilla,
@@ -307,9 +330,11 @@ class RegistroView(ctk.CTkFrame):
             font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(2, 0))
 
-        self.frame_semilla.pack_forget()  # Oculto por defecto
+        if self.tipo_contraseña.get() == "personalizada":
+            self.frame_semilla.pack(fill="x", pady=(0, 5))
+        else:
+            self.frame_semilla.pack_forget()
 
-        # Preview fortaleza
         self.label_preview = ctk.CTkLabel(
             self.contenido,
             text="Fortaleza estimada: calculando...",
@@ -319,53 +344,141 @@ class RegistroView(ctk.CTkFrame):
         self.label_preview.pack(anchor="w", pady=(15, 0))
 
     def _mostrar_paso_3(self):
-        """Paso 3: Contraseña generada."""
+        """Paso 3: Contraseña generada + Confirmación."""
         self._limpiar_contenido()
-        self.label_paso.configure(text="Paso 3 de 4 — Tu contraseña")
-        self.progreso.set(0.75)
+        self.label_paso.configure(text="Paso 3 de 3 — Completado")
+        self.progreso.set(1.0)
         self.boton_atras.pack_forget()
         self.link_login.pack_forget()
-        self.boton_siguiente.configure(text="Continuar →")
-        
+        self.boton_siguiente.pack_forget()
+
         ctk.CTkLabel(
             self.contenido,
-            text="⚠️ Esta es la única vez que la verás así.\nGuárdala en un lugar seguro.",
-            font=("Comic Sans MS", 14),
-            text_color=AVISO,
-            justify="center",
-        ).pack(pady=(10, 10))
+            text="✅",
+            font=("Segoe UI Emoji", 60),
+            text_color=COMPLETADO,
+        ).pack(pady=(15, 5))
 
-        self.label_contraseña = ctk.CTkLabel(
+        ctk.CTkLabel(
             self.contenido,
-            text=self.resultado_registro.get('contraseña_generada', ''),
+            text="Registro completado",
             font=("Comic Sans MS", 22, "bold"),
-            text_color=COMPLETADO,
-        )
-        self.label_contraseña.pack(pady=(5, 10))
-
-        ctk.CTkLabel(
-            self.contenido,
-            text="✅ Muy fuerte — 99%",
-            font=("Comic Sans MS", 16),
-            text_color=COMPLETADO,
+            text_color=TEXTO_PRINCIPAL,
         ).pack()
 
+        if self.resultado_registro:
+            usuario = self.resultado_registro.get('usuario', {})
+            email = usuario.get('email', '')
+            nombre = usuario.get('nombre', '')
+            rol = usuario.get('rol', '')
+            contrasena = self.resultado_registro.get('contraseña_generada', '')
+
+            frame_info = ctk.CTkFrame(self.contenido, fg_color="transparent")
+            frame_info.pack(fill="x", padx=30, pady=10)
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Nombre: ",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(anchor="w")
+            
+            ctk.CTkLabel(
+                frame_info,
+                text=nombre,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack(anchor="w", padx=(80, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Email: ",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(anchor="w", pady=(8, 0))
+            
+            ctk.CTkLabel(
+                frame_info,
+                text=email,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack(anchor="w", padx=(80, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Contraseña: ",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(anchor="w", pady=(8, 0))
+            
+            ctk.CTkLabel(
+                frame_info,
+                text=contrasena,
+                font=("Comic Sans MS", 16, "bold"),
+                text_color=COMPLETADO,
+            ).pack(anchor="w", padx=(80, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text="✅ Muy fuerte — 99%",
+                font=("Comic Sans MS", 12),
+                text_color=COMPLETADO,
+            ).pack(anchor="w", padx=(80, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Rol: ",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(anchor="w", pady=(8, 0))
+            
+            ctk.CTkLabel(
+                frame_info,
+                text=rol,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack(anchor="w", padx=(80, 0))
+
+        btn_frame = ctk.CTkFrame(self.contenido, fg_color="transparent")
+        btn_frame.pack(pady=15)
+
         ctk.CTkButton(
-            self.contenido,
-            text="📋 Copiar al portapapeles",
+            btn_frame,
+            text="📋 Copiar Todo",
             font=("Comic Sans MS", 14),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
             height=45,
             corner_radius=8,
-            command=self._copiar_contraseña,
-        ).pack(pady=10)
-        
-        self.boton_siguiente.pack(pady=(10, 20))
+            command=lambda: self._copiar_todo_registro(),
+        ).pack(pady=(0, 10))
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Ir al Login →",
+            font=("Comic Sans MS", 16, "bold"),
+            fg_color=BOTON_PRIMARIO,
+            hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=52,
+            corner_radius=10,
+            command=self.on_ir_login,
+        ).pack()
+
+    def _copiar_todo_registro(self):
+        if self.resultado_registro:
+            usuario = self.resultado_registro.get('usuario', {})
+            email = usuario.get('email', '')
+            nombre = usuario.get('nombre', '')
+            rol = usuario.get('rol', '')
+            contrasena = self.resultado_registro.get('contraseña_generada', '')
+            texto = f"Nombre: {nombre}\nEmail: {email}\nContraseña: {contrasena}\nRol: {rol}"
+            self.clipboard_clear()
+            self.clipboard_append(texto)
 
     def _mostrar_paso_4(self):
-        """Paso 4: Confirmación."""
+        """Placeholder - ya no se usa, ahora es paso 3"""
         self._limpiar_contenido()
         self.label_paso.configure(text="Paso 4 de 4 — Completado")
         self.progreso.set(1.0)
@@ -486,17 +599,78 @@ class RegistroView(ctk.CTkFrame):
         texto = self.entry_nombre.get()
         texto_filtrado = ""
         for c in texto:
-            if c.isalpha() or c in "áéíóúüÁÉÍÓÚÜñÑ ":
+            if c.isalpha() or c.isdigit() or c in "áéíóúüÁÉÍÓÚÜñÑ ":
                 texto_filtrado += c
         if len(texto_filtrado) > 50:
             texto_filtrado = texto_filtrado[:50]
         if texto != texto_filtrado:
             self.entry_nombre.delete(0, "end")
             self.entry_nombre.insert(0, texto_filtrado)
+        
+        tiene_letra = bool(any(c.isalpha() or c in "áéíóúüÁÉÍÓÚÜñÑ" for c in texto_filtrado))
+        
         if len(texto_filtrado) < 2 and len(texto_filtrado) > 0:
             self.label_error.configure(text="El nombre debe tener al menos 2 caracteres")
-        elif len(texto_filtrado) >= 2:
+        elif len(texto_filtrado) >= 2 and not tiene_letra:
+            self.label_error.configure(text="El nombre debe contener al menos una letra")
+        elif len(texto_filtrado) >= 2 and tiene_letra:
             self.label_error.configure(text="")
+
+    def _on_nombre_change(self, event=None):
+        self.datos_paso_1["nombre"] = self.entry_nombre.get()
+        self._validate_nombre(event)
+        self._verificar_duplicados_tiempo_real()
+
+    def _on_email_change(self, event=None):
+        self.datos_paso_1["email"] = self.entry_email.get()
+        self._validate_email(event)
+        self._verificar_duplicados_tiempo_real()
+
+    def _verificar_duplicados_tiempo_real(self):
+        import re
+        nombre = self.entry_nombre.get().strip()
+        email = self.entry_email.get().strip()
+        
+        self.label_error.configure(text="")
+        
+        tiene_letra_nombre = bool(re.search(r"[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]", nombre))
+        nombre_valido = len(nombre) >= 2 and tiene_letra_nombre and re.match(r"^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ0-9\s]+$", nombre)
+        
+        if nombre_valido:
+            try:
+                from src.db.conexion import conexion_global
+                coleccion = conexion_global.obtener_coleccion('usuarios')
+                existe_nombre = coleccion.find_one({'nombre': {'$regex': f'^{re.escape(nombre)}$', '$options': 'i'}})
+                if existe_nombre:
+                    self.label_error.configure(text="El nombre ya está en uso")
+                    self._actualizar_boton_siguiente(False)
+                    return
+            except Exception:
+                pass
+        
+        partes_email = email.split("@") if "@" in email else []
+        email_valido = False
+        if len(partes_email) == 2 and partes_email[1]:
+            dominio = partes_email[1]
+            if "." in dominio:
+                tld = dominio.rsplit(".", 1)[-1]
+                if tld and len(tld) >= 2 and tld.isalpha() and len(tld) <= 10:
+                    email_valido = True
+                    try:
+                        from src.db.conexion import conexion_global
+                        coleccion = conexion_global.obtener_coleccion('usuarios')
+                        existe_email = coleccion.find_one({'email': {'$regex': f'^{re.escape(email)}$', '$options': 'i'}})
+                        if existe_email:
+                            self.label_error.configure(text="El email ya está registrado")
+                            self._actualizar_boton_siguiente(False)
+                            return
+                    except Exception:
+                        pass
+        
+        if nombre_valido and email_valido:
+            self._actualizar_boton_siguiente(True)
+        else:
+            self._actualizar_boton_siguiente(False)
 
     def _validate_email(self, event=None):
         texto = self.entry_email.get()
@@ -519,35 +693,63 @@ class RegistroView(ctk.CTkFrame):
 
         if not nombre:
             self.label_error.configure(text="El nombre es obligatorio")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if len(nombre) < 2:
             self.label_error.configure(text="El nombre debe tener al menos 2 caracteres")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if len(nombre) > 50:
             self.label_error.configure(text="El nombre debe tener máximo 50 caracteres")
+            self._actualizar_boton_siguiente(False)
             return False
 
-        if not re.match(r"^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]+$", nombre):
-            self.label_error.configure(text="El nombre solo puede contener letras")
+        tiene_letra = bool(re.search(r"[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]", nombre))
+        tiene_numero = bool(re.search(r"[0-9]", nombre))
+        
+        if not tiene_letra:
+            self.label_error.configure(text="El nombre debe contener al menos una letra")
+            self._actualizar_boton_siguiente(False)
             return False
+        
+        if not re.match(r"^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ0-9\s]+$", nombre):
+            self.label_error.configure(text="El nombre contiene caracteres inválidos")
+            self._actualizar_boton_siguiente(False)
+            return False
+
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            
+            existe_nombre = coleccion.find_one({'nombre': {'$regex': f'^{re.escape(nombre)}$', '$options': 'i'}})
+            if existe_nombre:
+                self.label_error.configure(text="El nombre ya está en uso")
+                self._actualizar_boton_siguiente(False)
+                return False
+        except Exception:
+            pass
 
         if not email:
             self.label_error.configure(text="El email es obligatorio")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if len(email) > 64:
             self.label_error.configure(text="El email debe tener máximo 64 caracteres")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if "@" not in email:
             self.label_error.configure(text="El email debe contener @")
+            self._actualizar_boton_siguiente(False)
             return False
 
         partes = email.split("@")
         if len(partes) != 2 or not partes[0] or not partes[1]:
             self.label_error.configure(text="El formato del email es inválido")
+            self._actualizar_boton_siguiente(False)
             return False
 
         local = partes[0]
@@ -555,139 +757,208 @@ class RegistroView(ctk.CTkFrame):
 
         if local.startswith(".") or local.endswith("."):
             self.label_error.configure(text="El email no puede empezar o terminar con punto")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if ".." in local:
             self.label_error.configure(text="El email no puede tener puntos consecutivos")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if not re.match(r"^[a-zA-Z0-9._+-]+$", local):
             self.label_error.configure(text="El email contiene caracteres inválidos")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if "." not in dominio:
             self.label_error.configure(text="El dominio debe tener un punto")
+            self._actualizar_boton_siguiente(False)
             return False
 
         dominio_partes = dominio.rsplit(".", 1)
         if len(dominio_partes) != 2:
             self.label_error.configure(text="El dominio debe tener un TLD válido")
+            self._actualizar_boton_siguiente(False)
             return False
 
         tld = dominio_partes[1]
         if len(tld) < 2:
             self.label_error.configure(text="El TLD debe tener mínimo 2 caracteres")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if len(tld) > 10:
             self.label_error.configure(text="El TLD debe tener máximo 10 caracteres")
+            self._actualizar_boton_siguiente(False)
             return False
 
         if not tld.isalpha():
             self.label_error.configure(text="El TLD solo puede contener letras")
+            self._actualizar_boton_siguiente(False)
             return False
 
+        try:
+            from src.db.conexion import conexion_global
+            coleccion = conexion_global.obtener_coleccion('usuarios')
+            
+            existe_email = coleccion.find_one({'email': {'$regex': f'^{re.escape(email)}$', '$options': 'i'}})
+            if existe_email:
+                self.label_error.configure(text="El email ya está registrado")
+                self._actualizar_boton_siguiente(False)
+                return False
+        except Exception:
+            pass
+
         self.label_error.configure(text="")
+        self._actualizar_boton_siguiente(True)
         return True
+
+    def _actualizar_boton_siguiente(self, habilitado):
+        if hasattr(self, 'boton_siguiente'):
+            if habilitado:
+                self.boton_siguiente.configure(state="normal", fg_color=BOTON_PRIMARIO)
+            else:
+                self.boton_siguiente.configure(state="disabled", fg_color=BOTON_SECUNDARIO)
 
     def _siguiente(self):
         if self.paso_actual == 1:
             if not self._validar_paso_1():
                 return
-            # Registrar usuario con parámetros por defecto (se ajustan en paso 2)
-            try:
-                from src.auth import registrar_usuario
-                parametros_defecto = {
-                    "longitud": 20,
-                    "usar_mayusculas": True,
-                    "usar_numeros": True,
-                    "usar_simbolos": True,
-                    "excluir_ambiguos": False,
-                }
-                self.resultado_registro = registrar_usuario(
-                    self.entry_email.get().strip(),
-                    self.entry_nombre.get().strip(),
-                    self.combo_rol.get(),
-                    parametros_defecto,
-                )
-                self.paso_actual = 2
-                self._mostrar_paso_2()
-            except Exception as e:
-                self.label_error.configure(text=str(e))
-                return
+            
+            self.datos_paso_1["nombre"] = self.entry_nombre.get().strip()
+            self.datos_paso_1["email"] = self.entry_email.get().strip()
+            self.datos_paso_1["rol"] = self.combo_rol.get()
+            
+            self.paso_actual = 2
+            self._mostrar_paso_2()
 
         elif self.paso_actual == 2:
-            try:
-                uid = str(self.resultado_registro['usuario']['_id'])
-
-                if hasattr(self, 'tipo_contraseña') and self.tipo_contraseña.get() == "personalizada":
-                    # Contrasena personalizada con semilla
-                    semilla = self.entry_semilla.get().strip()
+            self.datos_paso_2["longitud"] = int(self.slider_longitud.get())
+            self.datos_paso_2["usar_mayusculas"] = self.var_mayus.get()
+            self.datos_paso_2["usar_numeros"] = self.var_num.get()
+            self.datos_paso_2["usar_simbolos"] = self.var_simb.get()
+            self.datos_paso_2["excluir_ambiguos"] = self.var_ambig.get()
+            self.datos_paso_2["tipo"] = self.tipo_contraseña.get()
+            
+            if hasattr(self, 'entry_semilla') and hasattr(self.entry_semilla, 'winfo_exists') and self.entry_semilla.winfo_exists():
+                semilla = self.entry_semilla.get().strip()
+                if self.tipo_contraseña.get() == "personalizada":
                     if len(semilla) < 8:
-                        self.label_error.configure(text="La semilla debe tener minimo 8 caracteres")
+                        self.label_error.configure(text="La semilla debe tener mínimo 8 caracteres")
                         return
-                    from src.generador import generar_contraseña_personalizada
-                    from src.seguridad.encriptacion import hashear_contraseña, cifrar
-                    from src.db.conexion import conexion_global
-
-                    pw = generar_contraseña_personalizada(semilla)
-                    nuevo_hash = hashear_contraseña(pw)
-                    nueva_enc = cifrar(pw)
-
-                    coleccion = conexion_global.obtener_coleccion('usuarios')
-                    coleccion.update_one(
-                        {'_id': self.resultado_registro['usuario']['_id']},
-                        {'$set': {
-                            'contraseña_hash': nuevo_hash,
-                            'contraseña_encriptada': nueva_enc,
-                        }}
-                    )
-                    self.resultado_registro['contraseña_generada'] = pw
-                else:
-                    # Contrasena generada por el sistema
-                    if hasattr(self, 'slider_longitud'):
-                        from src.auth import regenerar_contraseña
-                        nuevos_params = {
-                            "longitud": int(self.slider_longitud.get()),
-                            "usar_mayusculas": self.var_mayus.get(),
-                            "usar_numeros": self.var_num.get(),
-                            "usar_simbolos": self.var_simb.get(),
-                            "excluir_ambiguos": self.var_ambig.get(),
-                        }
-                        self.resultado_registro = regenerar_contraseña(uid, nuevos_params)
-                        self.resultado_registro['usuario'] = self.resultado_registro.get('usuario', {})
-                        if 'nueva_contraseña' in self.resultado_registro:
-                            self.resultado_registro['contraseña_generada'] = self.resultado_registro['nueva_contraseña']
-
+                    if len(semilla) > 64:
+                        self.label_error.configure(text="La semilla debe tener máximo 64 caracteres")
+                        return
+                    
+                    import re
+                    letras = [c for c in semilla if c.isalpha()]
+                    numeros = [c for c in semilla if c.isdigit()]
+                    letras_unicas = set(letras)
+                    numeros_unicos = set(numeros)
+                    
+                    if len(letras_unicas) < 4:
+                        self.label_error.configure(text=f"La semilla debe tener al menos 4 letras distintas. Tienes {len(letras_unicas)}")
+                        return
+                    
+                    if len(numeros_unicos) < 4:
+                        self.label_error.configure(text=f"La semilla debe tener al menos 4 números distintos. Tienes {len(numeros_unicos)}")
+                        return
+                    
+                    if not re.match(r"^[a-zA-Z0-9_.\[\]]+$", semilla):
+                        self.label_error.configure(text="Solo letras, números, guiones bajos, puntos y corchetes")
+                        return
+                self.datos_paso_2["semilla"] = semilla
+            
+            try:
+                from src.auth import registrar_usuario
+                self.resultado_registro = registrar_usuario(
+                    self.datos_paso_1["email"],
+                    self.datos_paso_1["nombre"],
+                    self.datos_paso_1["rol"],
+                    self.datos_paso_2,
+                )
                 self.paso_actual = 3
                 self._mostrar_paso_3()
             except Exception as e:
                 self.label_error.configure(text=str(e))
                 return
 
-        elif self.paso_actual == 3:
-            self.paso_actual = 4
-            self._mostrar_paso_4()
-
-        elif self.paso_actual == 4:
-            self.on_ir_login()
-
     def _atras(self):
-        if self.paso_actual > 1:
-            self.paso_actual -= 1
-            if self.paso_actual == 1:
-                self._mostrar_paso_1()
-            elif self.paso_actual == 2:
-                self._mostrar_paso_2()
-            elif self.paso_actual == 3:
-                self._mostrar_paso_3()
-        else:
-            # Volver al login
+        print(f"DEBUG: _atras llamado, paso_actual={self.paso_actual}")
+        
+        if self.paso_actual == 2:
+            if hasattr(self, 'entry_nombre') and self.entry_nombre.winfo_exists():
+                self.datos_paso_1["nombre"] = self.entry_nombre.get().strip()
+                self.datos_paso_1["email"] = self.entry_email.get().strip()
+                if hasattr(self, 'combo_rol'):
+                    self.datos_paso_1["rol"] = self.combo_rol.get()
+                print(f"DEBUG: Guardado nombre={self.datos_paso_1['nombre']}, email={self.datos_paso_1['email']}")
+            
+            self.paso_actual = 1
+            self.resultado_registro = None
+            print(f"DEBUG: Nuevo paso_actual={self.paso_actual}")
+            print("DEBUG: Llamando _mostrar_paso_1")
+            self._mostrar_paso_1()
+            
+        elif self.paso_actual == 3:
+            if hasattr(self, 'slider_longitud') and self.slider_longitud.winfo_exists():
+                self.datos_paso_2["longitud"] = int(self.slider_longitud.get())
+                self.datos_paso_2["usar_mayusculas"] = self.var_mayus.get()
+                self.datos_paso_2["usar_numeros"] = self.var_num.get()
+                self.datos_paso_2["usar_simbolos"] = self.var_simb.get()
+                self.datos_paso_2["excluir_ambiguos"] = self.var_ambig.get()
+                self.datos_paso_2["tipo"] = self.tipo_contraseña.get()
+                if hasattr(self, 'entry_semilla') and self.entry_semilla.winfo_exists():
+                    self.datos_paso_2["semilla"] = self.entry_semilla.get().strip()
+            
+            self.paso_actual = 2
+            self.resultado_registro = None
+            print(f"DEBUG: Nuevo paso_actual={self.paso_actual}")
+            print("DEBUG: Llamando _mostrar_paso_2")
+            self._mostrar_paso_2()
+            
+        elif self.paso_actual == 1:
+            print("DEBUG: Ir a login")
+            self.datos_paso_1 = {"nombre": "", "email": "", "rol": "empleado"}
+            self.datos_paso_2 = {
+                "longitud": 20,
+                "usar_mayusculas": True,
+                "usar_numeros": True,
+                "usar_simbolos": True,
+                "excluir_ambiguos": False,
+                "tipo": "sistema",
+                "semilla": ""
+            }
+            self.resultado_registro = None
             self.on_ir_login()
 
     def limpiar(self):
         """Resetea la vista de registro."""
         self.paso_actual = 1
         self.resultado_registro = None
+        self.datos_paso_1 = {"nombre": "", "email": "", "rol": "empleado"}
+        self.datos_paso_2 = {
+            "longitud": 20,
+            "usar_mayusculas": True,
+            "usar_numeros": True,
+            "usar_simbolos": True,
+            "excluir_ambiguos": False,
+            "tipo": "sistema",
+            "semilla": ""
+        }
         self._mostrar_paso_1()
+
+    def _ir_a_login(self):
+        """Ir al login y limpiar datos."""
+        self.datos_paso_1 = {"nombre": "", "email": "", "rol": "empleado"}
+        self.datos_paso_2 = {
+            "longitud": 20,
+            "usar_mayusculas": True,
+            "usar_numeros": True,
+            "usar_simbolos": True,
+            "excluir_ambiguos": False,
+            "tipo": "sistema",
+            "semilla": ""
+        }
+        self.on_ir_login()
 

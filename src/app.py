@@ -29,7 +29,7 @@ class PomodoroSecureApp(ctk.CTk):
 
     def _configurar_ventana(self):
         self.title("PomodoroSecure")
-        self.geometry("1280x1000")
+        self.geometry("1200x1000")
         self.resizable(False, False)
         self.configure(fg_color=FONDO_PRINCIPAL)
 
