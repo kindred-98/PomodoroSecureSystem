@@ -24,15 +24,15 @@ class RegistroView(ctk.CTkFrame):
             self,
             fg_color=FONDO_CARD,
             corner_radius=16,
-            width=600,
-            height=650,
+            width=660,
+            height=760,
         )
         self.card.place(relx=0.5, rely=0.5, anchor="center")
         self.card.pack_propagate(False)
 
         # Header con pasos
         self.header = ctk.CTkFrame(self.card, fg_color="transparent")
-        self.header.pack(fill="x", padx=30, pady=(25, 10))
+        self.header.pack(fill="x", padx=35, pady=(30, 10))
 
         self.label_paso = ctk.CTkLabel(
             self.header,
@@ -66,47 +66,47 @@ class RegistroView(ctk.CTkFrame):
         self.label_error.pack(pady=(0, 5))
 
         # Botonera inferior
-        botones = ctk.CTkFrame(self.card, fg_color="transparent")
-        botones.pack(fill="x", padx=30, pady=(0, 20))
+        self.botones = ctk.CTkFrame(self.card, fg_color="transparent")
+        self.botones.pack(fill="x", padx=35, pady=(0, 25))
 
         self.boton_atras = ctk.CTkButton(
-            botones,
+            self.botones,
             text="← Atrás",
             font=("Comic Sans MS", 14),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
-            width=120,
-            height=45,
+            width=130,
+            height=48,
             corner_radius=8,
             command=self._atras,
         )
         self.boton_atras.pack(side="left")
 
         self.boton_siguiente = ctk.CTkButton(
-            botones,
+            self.botones,
             text="Siguiente →",
             font=("Comic Sans MS", 14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
-            width=160,
-            height=45,
+            width=170,
+            height=48,
             corner_radius=8,
             command=self._siguiente,
         )
         self.boton_siguiente.pack(side="right")
 
         # Link login
-        link = ctk.CTkLabel(
+        self.link_login = ctk.CTkLabel(
             self.card,
             text="¿Ya tienes cuenta? Inicia sesión",
             font=("Comic Sans MS", 14, "underline"),
             text_color=INFORMACION,
             cursor="hand2",
         )
-        link.pack(pady=(0, 15))
-        link.bind("<Button-1>", lambda e: self.on_ir_login())
+        self.link_login.pack(pady=(0, 20))
+        self.link_login.bind("<Button-1>", lambda e: self.on_ir_login())
 
         self._mostrar_paso_1()
 
@@ -129,7 +129,10 @@ class RegistroView(ctk.CTkFrame):
         self.label_paso.configure(text="Paso 1 de 4 — Datos personales")
         self.progreso.set(0.25)
         self.boton_atras.configure(state="normal")
+        self.boton_atras.pack(side="left")
+        self.link_login.pack()
         self.boton_siguiente.configure(text="Siguiente →")
+        self.boton_siguiente.pack(side="right")
 
         ctk.CTkLabel(
             self.contenido, text="Nombre completo",
@@ -204,7 +207,10 @@ class RegistroView(ctk.CTkFrame):
         self.label_paso.configure(text="Paso 2 de 4 — Parámetros de contraseña")
         self.progreso.set(0.5)
         self.boton_atras.configure(state="normal")
+        self.boton_atras.pack(side="left")
+        self.link_login.pack()
         self.boton_siguiente.configure(text="Generar →")
+        self.boton_siguiente.pack(side="right")
 
         ctk.CTkLabel(
             self.contenido,
@@ -317,26 +323,26 @@ class RegistroView(ctk.CTkFrame):
         self._limpiar_contenido()
         self.label_paso.configure(text="Paso 3 de 4 — Tu contraseña")
         self.progreso.set(0.75)
+        self.boton_atras.pack_forget()
+        self.link_login.pack_forget()
         self.boton_siguiente.configure(text="Continuar →")
-
+        
         ctk.CTkLabel(
             self.contenido,
             text="⚠️ Esta es la única vez que la verás así.\nGuárdala en un lugar seguro.",
             font=("Comic Sans MS", 14),
             text_color=AVISO,
             justify="center",
-        ).pack(pady=(20, 15))
+        ).pack(pady=(10, 10))
 
-        # Contraseña generada
         self.label_contraseña = ctk.CTkLabel(
             self.contenido,
             text=self.resultado_registro.get('contraseña_generada', ''),
             font=("Comic Sans MS", 22, "bold"),
             text_color=COMPLETADO,
         )
-        self.label_contraseña.pack(pady=10)
+        self.label_contraseña.pack(pady=(5, 10))
 
-        # Fortaleza
         ctk.CTkLabel(
             self.contenido,
             text="✅ Muy fuerte — 99%",
@@ -344,7 +350,6 @@ class RegistroView(ctk.CTkFrame):
             text_color=COMPLETADO,
         ).pack()
 
-        # Botón copiar
         ctk.CTkButton(
             self.contenido,
             text="📋 Copiar al portapapeles",
@@ -355,21 +360,25 @@ class RegistroView(ctk.CTkFrame):
             height=45,
             corner_radius=8,
             command=self._copiar_contraseña,
-        ).pack(pady=15)
+        ).pack(pady=10)
+        
+        self.boton_siguiente.pack(pady=(10, 20))
 
     def _mostrar_paso_4(self):
         """Paso 4: Confirmación."""
         self._limpiar_contenido()
         self.label_paso.configure(text="Paso 4 de 4 — Completado")
         self.progreso.set(1.0)
+        self.boton_atras.pack_forget()
+        self.link_login.pack_forget()
         self.boton_siguiente.configure(text="Ir al Login →")
-
+        
         ctk.CTkLabel(
             self.contenido,
             text="✅",
             font=("Segoe UI Emoji", 80),
             text_color=COMPLETADO,
-        ).pack(pady=(40, 10))
+        ).pack(pady=(20, 5))
 
         ctk.CTkLabel(
             self.contenido,
@@ -383,18 +392,86 @@ class RegistroView(ctk.CTkFrame):
             text="Ya puedes iniciar sesión con tu email y contraseña",
             font=("Comic Sans MS", 15),
             text_color=TEXTO_SECUNDARIO,
-        ).pack(pady=10)
+        ).pack(pady=(5, 15))
 
-        # Info del usuario
         if self.resultado_registro:
             usuario = self.resultado_registro.get('usuario', {})
+            email = usuario.get('email', '')
+            rol = usuario.get('rol', '')
+            nombre = usuario.get('nombre', '')
+
+            frame_info = ctk.CTkFrame(self.contenido, fg_color="transparent")
+            frame_info.pack(pady=5)
+
             ctk.CTkLabel(
-                self.contenido,
-                text=f"Email: {usuario.get('email', '')}\nRol: {usuario.get('rol', '')}",
-                font=("Comic Sans MS", 14),
+                frame_info,
+                text="Nombre:",
+                font=("Comic Sans MS", 14, "bold"),
                 text_color=TEXTO_SECUNDARIO,
-                justify="center",
-            ).pack(pady=10)
+            ).pack()
+
+            ctk.CTkLabel(
+                frame_info,
+                text=nombre,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack()
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Email:",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(pady=(10, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text=email,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack()
+
+            ctk.CTkLabel(
+                frame_info,
+                text="Rol:",
+                font=("Comic Sans MS", 14, "bold"),
+                text_color=TEXTO_SECUNDARIO,
+            ).pack(pady=(10, 0))
+
+            ctk.CTkLabel(
+                frame_info,
+                text=rol,
+                font=("Comic Sans MS", 14),
+                text_color=TEXTO_PRINCIPAL,
+            ).pack()
+
+            ctk.CTkButton(
+                frame_info,
+                text="📋 Copiar Email y Rol",
+                font=("Comic Sans MS", 14),
+                fg_color=BOTON_SECUNDARIO,
+                hover_color=BOTON_SECUNDARIO_HOVER,
+                text_color=TEXTO_PRINCIPAL,
+                height=40,
+                corner_radius=8,
+                command=lambda: self._copiar_al_portapapeles(f"Email: {email}\nRol: {rol}"),
+            ).pack(pady=15)
+
+        ctk.CTkButton(
+            self.contenido,
+            text="Ir al Login →",
+            font=("Comic Sans MS", 16, "bold"),
+            fg_color=BOTON_PRIMARIO,
+            hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=52,
+            corner_radius=10,
+            command=self.on_ir_login,
+        ).pack(pady=15)
+
+    def _copiar_al_portapapeles(self, texto):
+        self.clipboard_clear()
+        self.clipboard_append(texto)
 
     def _actualizar_longitud(self, valor):
         if hasattr(self, 'label_longitud') and self.label_longitud.winfo_exists():
@@ -416,11 +493,15 @@ class RegistroView(ctk.CTkFrame):
         if texto != texto_filtrado:
             self.entry_nombre.delete(0, "end")
             self.entry_nombre.insert(0, texto_filtrado)
+        if len(texto_filtrado) < 2 and len(texto_filtrado) > 0:
+            self.label_error.configure(text="El nombre debe tener al menos 2 caracteres")
+        elif len(texto_filtrado) >= 2:
+            self.label_error.configure(text="")
 
     def _validate_email(self, event=None):
         texto = self.entry_email.get()
-        if len(texto) > 50:
-            texto = texto[:50]
+        if len(texto) > 64:
+            texto = texto[:64]
             self.entry_email.delete(0, "end")
             self.entry_email.insert(0, texto)
 
@@ -440,6 +521,10 @@ class RegistroView(ctk.CTkFrame):
             self.label_error.configure(text="El nombre es obligatorio")
             return False
 
+        if len(nombre) < 2:
+            self.label_error.configure(text="El nombre debe tener al menos 2 caracteres")
+            return False
+
         if len(nombre) > 50:
             self.label_error.configure(text="El nombre debe tener máximo 50 caracteres")
             return False
@@ -452,18 +537,36 @@ class RegistroView(ctk.CTkFrame):
             self.label_error.configure(text="El email es obligatorio")
             return False
 
+        if len(email) > 64:
+            self.label_error.configure(text="El email debe tener máximo 64 caracteres")
+            return False
+
         if "@" not in email:
             self.label_error.configure(text="El email debe contener @")
             return False
 
         partes = email.split("@")
         if len(partes) != 2 or not partes[0] or not partes[1]:
-            self.label_error.configure(text="El formato del email es inválido debe contener @ y punto")
+            self.label_error.configure(text="El formato del email es inválido")
             return False
 
+        local = partes[0]
         dominio = partes[1]
+
+        if local.startswith(".") or local.endswith("."):
+            self.label_error.configure(text="El email no puede empezar o terminar con punto")
+            return False
+
+        if ".." in local:
+            self.label_error.configure(text="El email no puede tener puntos consecutivos")
+            return False
+
+        if not re.match(r"^[a-zA-Z0-9._+-]+$", local):
+            self.label_error.configure(text="El email contiene caracteres inválidos")
+            return False
+
         if "." not in dominio:
-            self.label_error.configure(text="El dominio debe tener un punto (.)")
+            self.label_error.configure(text="El dominio debe tener un punto")
             return False
 
         dominio_partes = dominio.rsplit(".", 1)
@@ -477,15 +580,11 @@ class RegistroView(ctk.CTkFrame):
             return False
 
         if len(tld) > 10:
-            self.label_error.configure(text="El dominio debe tener máximo 10 caracteres")
+            self.label_error.configure(text="El TLD debe tener máximo 10 caracteres")
             return False
 
         if not tld.isalpha():
             self.label_error.configure(text="El TLD solo puede contener letras")
-            return False
-
-        if len(email) > 50:
-            self.label_error.configure(text="El email debe tener máximo 50 caracteres")
             return False
 
         self.label_error.configure(text="")
