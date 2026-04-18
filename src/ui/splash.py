@@ -24,7 +24,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="🍅🔐",
-            font=("Segoe UI Emoji", 64),
+            font=("Segoe UI Emoji", 100),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(0, 20))
 
@@ -32,7 +32,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="PomodoroSecure",
-            font=("Comic Sans MS", 32, "bold"),
+            font=("Comic Sans MS", 40, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack()
 
@@ -40,7 +40,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="Sistema de Gestión Segura de Tiempo",
-            font=("Comic Sans MS", 12),
+            font=("Comic Sans MS", 20),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(5, 30))
 
@@ -59,7 +59,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="v1.0.0",
-            font=("Comic Sans MS", 10),
+            font=("Comic Sans MS", 12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(20, 0))
 

@@ -29,8 +29,8 @@ class LoginView(ctk.CTkFrame):
             self,
             fg_color=FONDO_CARD,
             corner_radius=16,
-            width=520,
-            height=640,
+            width=660,
+            height=760,
         )
         card.place(relx=0.5, rely=0.5, anchor="center")
         card.pack_propagate(False)
@@ -61,7 +61,7 @@ class LoginView(ctk.CTkFrame):
 
         self.entry_email = ctk.CTkEntry(
             card,
-            placeholder_text="usuario@empresa.com",
+            placeholder_text="TuCorreo@empresa.com",
             font=("Comic Sans MS", 15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
@@ -116,9 +116,13 @@ class LoginView(ctk.CTkFrame):
         )
         self.label_error.pack(pady=(0, 10))
 
+        # Footer con botones en la parte inferior
+        footer = ctk.CTkFrame(card, fg_color="transparent")
+        footer.pack(side="bottom", fill="x", padx=45, pady=(0, 25))
+
         # Botón Iniciar Sesión
         self.boton_login = ctk.CTkButton(
-            card,
+            footer,
             text="Iniciar Sesión",
             font=("Comic Sans MS", 16, "bold"),
             fg_color=BOTON_PRIMARIO,
@@ -128,11 +132,11 @@ class LoginView(ctk.CTkFrame):
             corner_radius=10,
             command=self._on_login_click,
         )
-        self.boton_login.pack(fill="x", padx=45, pady=(0, 15))
+        self.boton_login.pack(fill="x", pady=(0, 10))
 
         # Botón Registro
         ctk.CTkButton(
-            card,
+            footer,
             text="¿Primera vez? Regístrate",
             font=("Comic Sans MS", 14),
             fg_color=BOTON_SECUNDARIO,
@@ -141,11 +145,11 @@ class LoginView(ctk.CTkFrame):
             height=45,
             corner_radius=8,
             command=self.on_ir_registro,
-        ).pack(fill="x", padx=45, pady=(0, 5))
+        ).pack(fill="x", pady=(0, 10))
 
         # Olvidé mi contraseña
         ctk.CTkButton(
-            card,
+            footer,
             text="¿Olvidaste tu contraseña? Usa Frase Semilla",
             font=("Comic Sans MS", 14, "bold"),
             fg_color=BOTON_PRIMARIO,
@@ -154,7 +158,7 @@ class LoginView(ctk.CTkFrame):
             height=45,
             corner_radius=8,
             command=self._recuperar_contraseña,
-        ).pack(fill="x", padx=45, pady=(5, 0))
+        ).pack(fill="x")
 
         # Footer
         ctk.CTkLabel(
@@ -170,11 +174,28 @@ class LoginView(ctk.CTkFrame):
         )
 
     def _on_login_click(self):
+        import re
         email = self.entry_email.get().strip()
         contraseña = self.entry_contraseña.get()
 
-        if not email or not contraseña:
-            self.label_error.configure(text="Todos los campos son obligatorios")
+        if not email:
+            self.label_error.configure(text="El email es obligatorio")
+            self.boton_login.configure(state="normal", text="Iniciar Sesión")
+            return
+
+        if not contraseña:
+            self.label_error.configure(text="La contraseña es obligatoria")
+            self.boton_login.configure(state="normal", text="Iniciar Sesión")
+            return
+
+        if len(email) > 64:
+            self.label_error.configure(text="El email debe tener máximo 64 caracteres")
+            self.boton_login.configure(state="normal", text="Iniciar Sesión")
+            return
+
+        if "@" not in email or "." not in email.split("@")[-1]:
+            self.label_error.configure(text="El formato del email es inválido")
+            self.boton_login.configure(state="normal", text="Iniciar Sesión")
             return
 
         self.label_error.configure(text="")
