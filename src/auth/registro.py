@@ -108,22 +108,21 @@ def registrar_usuario(
         raise ValueError("El TLD solo puede contener letras")
     if not nombre:
         raise ValueError("nombre no puede estar vacío")
-    
+
     # Verificar si es el primer usuario para forzar supervisor
-    from src.db.conexion import conexion_global
     coleccion = conexion_global.obtener_coleccion('usuarios')
     es_primer_usuario = coleccion.count_documents({}) == 0
-    
+
     if es_primer_usuario:
         rol = "supervisor"
     else:
         roles_validos = {"empleado"}
         if rol not in roles_validos:
             rol = "empleado"
-    
+
     # Determinar tipo de contraseña: personalizada vs generada por sistema
     tipo = parametros_contraseña.get("tipo", "sistema")
-    
+
     # Valores por defecto si params vacío
     params = {
         "longitud": parametros_contraseña.get("longitud", 16),
@@ -132,43 +131,37 @@ def registrar_usuario(
         "usar_simbolos": parametros_contraseña.get("usar_simbolos", True),
         "excluir_ambiguos": parametros_contraseña.get("excluir_ambiguos", False),
     }
-    
+
     if tipo == "personalizada":
         contraseña_generada = parametros_contraseña.get("contraseña", "")
         if not contraseña_generada:
             raise ValueError("Contraseña personalizada no proporcionada")
     else:
         contraseña_generada = generar_contraseña(params)
-    
+
     # Crear hash para verificación de login (no reversible)
     contraseña_hash = hashear_contraseña(contraseña_generada)
-    
+
     # Encriptar para recuperación del usuario (reversible)
     contraseña_encriptada = cifrar(contraseña_generada)
-    
+
     # Guardar en base de datos (inicialmente no verificado)
     usuario = crear_usuario(email, nombre, contraseña_hash, rol)
-    
-    # Campo email_verificado = False por defecto
-    coleccion = conexion_global.obtener_coleccion('usuarios')
-    coleccion.update_one(
-        {'_id': usuario['_id']},
-        {'$set': {'email_verificado': False, 'fecha_verificacion': None}}
-    )
-    usuario['email_verificado'] = False
-    usuario['fecha_verificacion'] = None
-    
-    # Agregar campos de encriptación
-    coleccion = conexion_global.obtener_coleccion('usuarios')
+
+    # Actualizar campos en una sola operación
     coleccion.update_one(
         {'_id': usuario['_id']},
         {'$set': {
+            'email_verificado': False,
+            'fecha_verificacion': None,
             'contraseña_encriptada': contraseña_encriptada,
-            'parametros_contraseña': parametros_contraseña
+            'parametros_contraseña': params
         }}
     )
+    usuario['email_verificado'] = False
+    usuario['fecha_verificacion'] = None
     usuario['contraseña_encriptada'] = contraseña_encriptada
-    usuario['parametros_contraseña'] = parametros_contraseña
+    usuario['parametros_contraseña'] = params
     
     return {
         'usuario': usuario,

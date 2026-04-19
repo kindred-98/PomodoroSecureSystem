@@ -230,10 +230,24 @@ class RegistroView(ctk.CTkFrame):
         self.label_paso.configure(text="Paso 3 de 3 — Completado")
         self.progreso.set(1.0)
         self.paso_actual = 3
-        
-        # Botón Login centrado
+
+        # Botón Verificar email + Ir a Login
+        frame_botones = ctk.CTkFrame(self.contenido, fg_color="transparent")
+        frame_botones.pack(side="top", pady=(0, 10))
+
+        ctk.CTkButton(
+            frame_botones,
+            text="📧 Verificar Email",
+            font=("Comic Sans MS", 14, "bold"),
+            fg_color=BOTON_PRIMARIO,
+            hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=45,
+            command=self._ir_a_verificacion,
+        ).pack(side="left", padx=(0, 10))
+
         self.boton_atras.configure(text="Ir a Login", command=self._ir_a_login)
-        self.boton_atras.pack(side="top", pady=(0, 10))
+        self.boton_atras.pack(side="left")
         self.link_login.pack_forget()
         self.boton_siguiente.pack_forget()
 
@@ -253,6 +267,34 @@ class RegistroView(ctk.CTkFrame):
 
         if self.resultado_registro:
             self._mostrar_info_registro()
+
+    def _ir_a_verificacion(self):
+        """Navega a la pantalla de verificación de email."""
+        self.pack_forget()
+        self.on_registro_completo(self.email_registrado)
+
+    def _on_verificacion_exitosa(self):
+        """Callback cuando verificación es exitosa - vuelve al paso 3."""
+        self.verificacion_view = None
+        self.pack(fill="both", expand=True)
+        self._mostrar_paso_3()
+
+    def mostrar_paso_3_directo(self, email):
+        """Muestra paso 3 directamente después de verificación."""
+        from src.db.conexion import conexion_global
+        coleccion = conexion_global.obtener_coleccion('usuarios')
+        usuario = coleccion.find_one({'email': email.lower()})
+        if usuario:
+            self.resultado_registro = {
+                'usuario': usuario,
+                'contraseña_generada': '••••••••••••••••'
+            }
+            self.datos_paso_1 = {
+                'nombre': usuario.get('nombre', ''),
+                'email': usuario.get('email', ''),
+                'rol': usuario.get('rol', 'empleado')
+            }
+        self._mostrar_paso_3()
 
     # ============================================
     # CAMPOS DE ENTRADA
@@ -757,16 +799,26 @@ class RegistroView(ctk.CTkFrame):
         elif self.paso_actual == 2:
             if not self._validar_paso_2():
                 return
-            
+
             try:
                 from src.auth import registrar_usuario
+                from src.auth.verificacion_email import crear_o_actualizar_verificacion, enviar_token_por_email
+
+                email = self.datos_paso_1["email"]
+
                 self.resultado_registro = registrar_usuario(
-                    self.datos_paso_1["email"],
+                    email,
                     self.datos_paso_1["nombre"],
                     self.datos_paso_1["rol"],
                     self.datos_paso_2,
                 )
-                self._mostrar_paso_3()
+
+                token = crear_o_actualizar_verificacion(email)
+                enviar_token_por_email(email, token)
+
+                self.email_registrado = email
+                self._ir_a_verificacion()
+
             except Exception as e:
                 self.label_error.configure(text=str(e))
 

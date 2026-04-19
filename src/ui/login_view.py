@@ -8,6 +8,7 @@ from src.ui.templates import (
     FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
     TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, PELIGRO, INFORMACION,
     BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER,
+    COMPLETADO,
     crear_fuente, NORMAL_NEGRITA, PEQUENO, MINIMO
 )
 
@@ -211,13 +212,26 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkButton(
             footer,
             text="¿Olvidaste tu contraseña? Usa Frase Semilla",
-            font=crear_fuente(14, "bold"),
+            font=NORMAL_NEGRITA,
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
             height=45,
             corner_radius=8,
             command=self._recuperar_contraseña,
+        ).pack(fill="x", pady=(0, 10))
+
+        # Botón Verificar Email
+        ctk.CTkButton(
+            footer,
+            text="¿No recibiste el código? Verifica tu email",
+            font=NORMAL_NEGRITA,
+            fg_color=BOTON_SECUNDARIO,
+            hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=INFORMACION,
+            height=45,
+            corner_radius=8,
+            command=self._reenviar_codigo_verificacion,
         ).pack(fill="x")
 
     # --------------------------------------------
@@ -278,6 +292,233 @@ class LoginView(ctk.CTkFrame):
         """Muestra mensaje de error y resetea botón."""
         self.label_error.configure(text=mensaje)
         self.boton_login.configure(state="normal", text="Iniciar Sesión")
+
+    # ============================================
+    # REENVÍO DE CÓDIGO DE VERIFICACIÓN
+    # ============================================
+
+    def _reenviar_codigo_verificacion(self):
+        """Abre diálogo para reenviar código de verificación."""
+        dialogo = ctk.CTkToplevel(self)
+        dialogo.title("📧 Reenviar Código")
+        dialogo.geometry("480x350")
+        dialogo.transient(self)
+        dialogo.grab_set()
+
+        self._crear_dialogo_verificacion(dialogo)
+
+        dialogo.bind("<Destroy>", lambda e: self.boton_login.configure(state="normal", text="Iniciar Sesión"))
+
+    def _crear_dialogo_verificacion(self, dialogo):
+        """Crea el contenido del diálogo de verificación."""
+        dialogo.geometry("480x420")
+
+        ctk.CTkLabel(
+            dialogo,
+            text="📧 Verificar tu Email",
+            font=crear_fuente(16, "bold"),
+            text_color=TEXTO_PRINCIPAL,
+        ).pack(pady=20)
+
+        ctk.CTkLabel(
+            dialogo,
+            text="Tu Email:",
+            font=crear_fuente(12),
+            text_color=TEXTO_SECUNDARIO,
+            anchor="w",
+        ).pack(fill="x", padx=30)
+
+        entry_email = ctk.CTkEntry(
+            dialogo,
+            placeholder_text="tu@email.com",
+            font=crear_fuente(14),
+            fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL,
+            height=44,
+        )
+        entry_email.pack(fill="x", padx=30, pady=(5, 15))
+
+        label_error = ctk.CTkLabel(
+            dialogo,
+            text="",
+            font=crear_fuente(12),
+            text_color=PELIGRO,
+        )
+        label_error.pack(pady=(0, 10))
+
+        frame_codigo = ctk.CTkFrame(dialogo, fg_color="transparent")
+        frame_codigo.pack(fill="x", padx=30, pady=(10, 15))
+        frame_codigo.pack_forget()
+
+        entry_codigo = ctk.CTkEntry(
+            frame_codigo,
+            placeholder_text="123456",
+            font=crear_fuente(20),
+            fg_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_PRINCIPAL,
+            height=44,
+            justify="center",
+        )
+        entry_codigo.pack(fill="x")
+
+        label_verificado = ctk.CTkLabel(
+            dialogo,
+            text="",
+            font=crear_fuente(14, "bold"),
+            text_color=COMPLETADO,
+        )
+        label_verificado.pack(pady=(0, 10))
+
+        btn_enviar = ctk.CTkButton(
+            dialogo,
+            text="📧 Enviar Código",
+            font=crear_fuente(14, "bold"),
+            fg_color=BOTON_PRIMARIO,
+            hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=44,
+        )
+        btn_enviar.pack(fill="x", padx=30, pady=(10, 15))
+
+        def verificar():
+            email = entry_email.get().strip()
+            if not email:
+                label_error.configure(text="El email es obligatorio")
+                return
+
+            try:
+                from src.db.conexion import conexion_global
+                from src.auth.verificacion_email import crear_o_actualizar_verificacion, enviar_token_por_email
+
+                usuarios = conexion_global.obtener_coleccion('usuarios')
+                usuario = usuarios.find_one({'email': {'$regex': f'^{email.lower()}$', '$options': 'i'}})
+
+                if not usuario:
+                    label_error.configure(text="Email no registrado")
+                    return
+
+                if usuario.get('email_verified', False):
+                    label_error.configure(text="✅ Este email ya está verificado. Ve a Login.", text_color=COMPLETADO)
+                    return
+
+                token = crear_o_actualizar_verificacion(email.lower())
+                enviar_token_por_email(email.lower(), token)
+
+                label_error.configure(text="📧 Código enviado. Revisa tu email/consola.", text_color=COMPLETADO)
+                entry_codigo.delete(0, "end")
+                frame_codigo.pack(fill="x", padx=30, pady=(10, 15))
+                entry_codigo.focus()
+                btn_enviar.configure(text="✓ Verificar Código", command=verificar_codigo)
+
+            except Exception as e:
+                label_error.configure(text=f"Error: {str(e)}")
+
+        def verificar_codigo():
+            email = entry_email.get().strip()
+            codigo = entry_codigo.get().strip()
+
+            if not email or not codigo:
+                label_error.configure(text="Completa todos los campos")
+                return
+
+            try:
+                from src.auth.verificacion_email import verificar_token_db
+
+                resultado = verificar_token_db(email.lower(), codigo)
+
+                if resultado['valido']:
+                    for widget in dialogo.winfo_children():
+                        widget.destroy()
+
+                    ctk.CTkLabel(
+                        dialogo,
+                        text="✅",
+                        font=("Segoe UI Emoji", 50),
+                        text_color=COMPLETADO,
+                    ).pack(pady=20)
+
+                    ctk.CTkLabel(
+                        dialogo,
+                        text="Email verificado",
+                        font=crear_fuente(18, "bold"),
+                        text_color=TEXTO_PRINCIPAL,
+                    ).pack(pady=(0, 10))
+
+                    try:
+                        from src.db.conexion import conexion_global
+                        from src.seguridad.encriptacion import descifrar
+
+                        usuarios = conexion_global.obtener_coleccion('usuarios')
+                        usuario = usuarios.find_one({'email': email.lower()})
+
+                        if usuario:
+                            contraseña_real = descifrar(usuario.get('contraseña_encriptada', ''))
+
+                            frame_info = ctk.CTkFrame(dialogo, fg_color="transparent")
+                            frame_info.pack(fill="x", padx=30, pady=15)
+
+                            def fila(label_texto, valor):
+                                f = ctk.CTkFrame(frame_info, fg_color="transparent")
+                                f.pack(anchor="w", pady=4)
+                                ctk.CTkLabel(f, text=f"{label_texto}: ", font=NORMAL_NEGRITA, text_color=TEXTO_SECUNDARIO).pack(side="left")
+                                ctk.CTkLabel(f, text=valor, font=crear_fuente(14), text_color=COMPLETADO).pack(side="left")
+
+                            fila("Nombre", usuario.get('nombre', ''))
+                            fila("Email", usuario.get('email', ''))
+                            fila("Rol", usuario.get('rol', 'empleado'))
+                            fila("Contraseña", contraseña_real)
+
+                            def copiar():
+                                import pyperclip
+                                texto = f"Nombre: {usuario.get('nombre', '')}\nEmail: {usuario.get('email', '')}\nContraseña: {contraseña_real}\nRol: {usuario.get('rol', 'empleado')}"
+                                pyperclip.copy(texto)
+                                label_copiar.configure(text="✅ Copiado", text_color=COMPLETADO)
+
+                            ctk.CTkButton(
+                                dialogo,
+                                text="📋 Copiar todo",
+                                font=crear_fuente(14, "bold"),
+                                fg_color=BOTON_PRIMARIO,
+                                hover_color=BOTON_PRIMARIO_HOVER,
+                                text_color=TEXTO_PRINCIPAL,
+                                height=45,
+                                command=copiar,
+                            ).pack(fill="x", padx=30, pady=(10, 15))
+
+                            label_copiar = ctk.CTkLabel(dialogo, text="", font=crear_fuente(12))
+                            label_copiar.pack()
+
+                    except Exception:
+                        pass
+
+                    ctk.CTkButton(
+                        dialogo,
+                        text="Ir a Login",
+                        font=crear_fuente(14),
+                        fg_color=BOTON_SECUNDARIO,
+                        hover_color=BOTON_SECUNDARIO_HOVER,
+                        text_color=TEXTO_PRINCIPAL,
+                        height=45,
+                        command=dialogo.destroy,
+                    ).pack(fill="x", padx=30, pady=20)
+
+                else:
+                    label_error.configure(text=resultado['mensaje'])
+
+            except Exception as e:
+                label_error.configure(text=f"Error: {str(e)}")
+
+        btn_enviar.configure(command=verificar)
+
+        ctk.CTkButton(
+            dialogo,
+            text="Cancelar",
+            font=crear_fuente(12),
+            fg_color="transparent",
+            text_color=TEXTO_SECUNDARIO,
+            height=35,
+            command=dialogo.destroy,
+        ).pack(pady=(0, 20))
 
     # ============================================
     # RECUPERACIÓN DE CONTRASEÑA

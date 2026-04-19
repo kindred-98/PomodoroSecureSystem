@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import verificar_contraseña, generar_token_sesion
 from src.auth.sesion import crear_sesion
+from src.auth.verificacion_email import esta_verificado
 
 
 def iniciar_sesion(email: str, contraseña: str) -> dict:
@@ -58,10 +59,9 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
 # Verificar que está activo
     if not usuario.get('activo', True):
         raise Exception("Usuario desactivado")
-    
+
     # Verificar que email está verificado
-    email_verificado = usuario.get('email_verified', False)
-    if not email_verificado:
+    if not esta_verificado(email):
         raise Exception("Debes verificar tu email antes de iniciar sesión")
 
     # Verificar contraseña

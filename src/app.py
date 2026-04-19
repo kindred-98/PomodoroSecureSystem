@@ -10,6 +10,8 @@ from src.config.colores import aplicar_tema
 from src.ui.splash import SplashView
 from src.ui.login_view import LoginView
 from src.ui.registro_view import RegistroView
+from src.ui.verificar_email_view import VerificarEmailView
+from src.ui.registro_resultado_view import RegistroResultadoView
 from src.ui.dashboard_empleado import DashboardEmpleado
 from src.ui.dashboard_encargado import DashboardEncargado
 from src.ui.dashboard_supervisor import DashboardSupervisor
@@ -63,6 +65,18 @@ class PomodoroSecureApp(ctk.CTk):
             self,
             on_registro_completo=self._on_registro_completo,
             on_ir_login=self._mostrar_login,
+        )
+        vista.pack(fill="both", expand=True)
+        self.vista_actual = vista
+
+    def _mostrar_verificar_email(self, email, on_verificado):
+        self._email_verificado = email
+        self._limpiar_vista()
+        vista = VerificarEmailView(
+            self,
+            email=email,
+            on_verificado=on_verificado,
+            on_volver=self._mostrar_login,
         )
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista
@@ -229,6 +243,23 @@ class PomodoroSecureApp(ctk.CTk):
         self.usuario_actual = None
         self._mostrar_login()
 
-    def _on_registro_completo(self):
-        """Callback cuando el registro termina."""
-        self._mostrar_login()
+    def _on_registro_completo(self, email):
+        """Callback cuando el registro termina - va a verificación."""
+        self._mostrar_verificar_email(email, self._on_email_verificado)
+
+    def _on_email_verificado(self):
+        """Callback después de verificar email - mostrar paso 3."""
+        self._mostrar_registro_verificado(self._email_verificado)
+
+    def _mostrar_registro_verificado(self, email):
+        """Muestra el paso 3 del registro después de verificación."""
+        self._limpiar_vista()
+
+        from src.ui.registro_resultado_view import RegistroResultadoView
+        vista = RegistroResultadoView(
+            self,
+            email=email,
+            on_login=self._mostrar_login,
+        )
+        vista.pack(fill="both", expand=True)
+        self.vista_actual = vista

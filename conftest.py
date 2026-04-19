@@ -248,12 +248,9 @@ def mock_conexion_global(conexion_mongodb_mock):
     modulos_otp = [
         'src.otp.gestor_otp',
     ]
-    modulos_verificacion = [
-        'src.auth.verificacion_email',
-    ]
-    
+
     with ExitStack() as stack:
-        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra + modulos_conexion + modulos_verificacion:
+        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra + modulos_conexion:
             stack.enter_context(
                 patch(f'{modulo}.conexion_global', conexion_mongodb_mock)
             )

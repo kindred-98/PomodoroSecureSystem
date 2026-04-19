@@ -13,9 +13,13 @@ from src.auth.cambiar_contraseña import cambiar_contraseña
 from src.auth.exportar_contraseña import exportar_contraseña
 from src.auth.verificacion_email import (
     crear_token_verificacion,
-    verificar_token,
+    verificar_token_legacy as verificar_token,
     verificar_email_esta_verificado,
     obtener_token_pendiente,
+    crear_o_actualizar_verificacion,
+    verificar_token_db,
+    enviar_token_por_email,
+    esta_verificado,
 )
 
 def obtener_contraseña(usuario_id: str) -> str:
@@ -53,7 +57,11 @@ __all__ = [
     "exportar_contraseña",
     "obtener_contraseña",
     "crear_token_verificacion",
+    "crear_o_actualizar_verificacion",
     "verificar_token",
+    "verificar_token_db",
     "verificar_email_esta_verificado",
     "obtener_token_pendiente",
+    "enviar_token_por_email",
+    "esta_verificado",
 ]
