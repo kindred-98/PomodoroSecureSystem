@@ -59,12 +59,53 @@ def registrar_usuario(
         )
     
     # Validación de valores
-    email = email.strip()
+    import re
+    
+    email = email.strip().lower()
     nombre = nombre.strip()
     rol = rol.lower().strip()
     
     if not email:
         raise ValueError("email no puede estar vacío")
+    
+    # Validación de formato email
+    if "@" not in email:
+        raise ValueError("El email debe contener @")
+    
+    partes = email.split("@")
+    if len(partes) != 2 or not partes[0] or not partes[1]:
+        raise ValueError("El formato del email es inválido")
+    
+    local, dominio = partes
+    
+    # Local no puede empezar/terminar con punto
+    if local.startswith(".") or local.endswith("."):
+        raise ValueError("El email no puede empezar o terminar con punto")
+    if ".." in local:
+        raise ValueError("El email no puede tener puntos consecutivos")
+    
+    # Solo caracteres válidos en local
+    if not re.match(r"^[a-zA-Z0-9._+-]+$", local):
+        raise ValueError("El email contiene caracteres inválidos")
+    
+    # Dominio debe tener punto
+    if "." not in dominio:
+        raise ValueError("El dominio debe tener un punto")
+    
+    if dominio.startswith("."):
+        raise ValueError("El dominio no puede empezar con punto")
+    
+    dominio_partes = dominio.rsplit(".", 1)
+    if len(dominio_partes) != 2 or not dominio_partes[0]:
+        raise ValueError("El dominio debe tener un TLD válido")
+    
+    tld = dominio_partes[1]
+    if len(tld) < 2:
+        raise ValueError("El TLD debe tener mínimo 2 caracteres")
+    if len(tld) > 10:
+        raise ValueError("El TLD debe tener máximo 10 caracteres")
+    if not tld.isalpha():
+        raise ValueError("El TLD solo puede contener letras")
     if not nombre:
         raise ValueError("nombre no puede estar vacío")
     
@@ -83,12 +124,21 @@ def registrar_usuario(
     # Determinar tipo de contraseña: personalizada vs generada por sistema
     tipo = parametros_contraseña.get("tipo", "sistema")
     
+    # Valores por defecto si params vacío
+    params = {
+        "longitud": parametros_contraseña.get("longitud", 16),
+        "usar_mayusculas": parametros_contraseña.get("usar_mayusculas", True),
+        "usar_numeros": parametros_contraseña.get("usar_numeros", True),
+        "usar_simbolos": parametros_contraseña.get("usar_simbolos", True),
+        "excluir_ambiguos": parametros_contraseña.get("excluir_ambiguos", False),
+    }
+    
     if tipo == "personalizada":
         contraseña_generada = parametros_contraseña.get("contraseña", "")
         if not contraseña_generada:
             raise ValueError("Contraseña personalizada no proporcionada")
     else:
-        contraseña_generada = generar_contraseña(parametros_contraseña)
+        contraseña_generada = generar_contraseña(params)
     
     # Crear hash para verificación de login (no reversible)
     contraseña_hash = hashear_contraseña(contraseña_generada)
@@ -96,8 +146,17 @@ def registrar_usuario(
     # Encriptar para recuperación del usuario (reversible)
     contraseña_encriptada = cifrar(contraseña_generada)
     
-    # Guardar en base de datos
+    # Guardar en base de datos (inicialmente no verificado)
     usuario = crear_usuario(email, nombre, contraseña_hash, rol)
+    
+    # Campo email_verificado = False por defecto
+    coleccion = conexion_global.obtener_coleccion('usuarios')
+    coleccion.update_one(
+        {'_id': usuario['_id']},
+        {'$set': {'email_verificado': False, 'fecha_verificacion': None}}
+    )
+    usuario['email_verificado'] = False
+    usuario['fecha_verificacion'] = None
     
     # Agregar campos de encriptación
     coleccion = conexion_global.obtener_coleccion('usuarios')

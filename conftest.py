@@ -248,9 +248,12 @@ def mock_conexion_global(conexion_mongodb_mock):
     modulos_otp = [
         'src.otp.gestor_otp',
     ]
+    modulos_verificacion = [
+        'src.auth.verificacion_email',
+    ]
     
     with ExitStack() as stack:
-        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra + modulos_conexion:
+        for modulo in modulos_db + modulos_auth + modulos_timer + modulos_otp + modulos_equipos_extra + modulos_conexion + modulos_verificacion:
             stack.enter_context(
                 patch(f'{modulo}.conexion_global', conexion_mongodb_mock)
             )
@@ -297,6 +300,8 @@ def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contrase
         'parametros_contraseña': parametros_contraseña_defecto,
         'rol': 'empleado',
         'activo': True,
+        'email_verified': True,
+        'fecha_verificacion': datetime.now(timezone.utc),
         'fecha_registro': datetime.now(timezone.utc),
         'ultimo_acceso': datetime.now(timezone.utc),
         'puntuacion_pomodoro': 0,

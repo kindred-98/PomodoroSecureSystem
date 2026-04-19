@@ -144,3 +144,99 @@ class TestRegistroContraseñaPersonalizada:
             "sistema@test.com", "Sistema User", "empleado", params
         )
         assert len(resultado['contraseña_generada']) == 12
+
+
+class TestRegistroValidacionesSeguridad:
+    """Tests para validaciones de seguridad adicionales"""
+    
+    def test_email_con_espacios(self, mock_conexion_global, fernet_key_env):
+        """Email con espacios debe ser limpiado"""
+        resultado = registrar_usuario(
+            "  usuario@test.com  ", "Usuario Prueba", "empleado", {"longitud": 8}
+        )
+        assert resultado['usuario']['email'] == "usuario@test.com"
+    
+    def test_nombre_con_espacios(self, mock_conexion_global, fernet_key_env):
+        """Nombre con espacios debe ser limpiado"""
+        resultado = registrar_usuario(
+            "nom@test.com", "  Juan Perez  ", "empleado", {"longitud": 8}
+        )
+        assert resultado['usuario']['nombre'] == "Juan Perez"
+    
+    def test_email_mayusculas_minusculas(self, mock_conexion_global, fernet_key_env):
+        """Email debe guardarse en minúsculas"""
+        resultado = registrar_usuario(
+            "USUARIO@TEST.COM", "Usuario Test", "empleado", {"longitud": 8}
+        )
+        # Primer usuario siempre es supervisor y email debe ser lowercase
+        assert resultado['usuario']['email'] == "usuario@test.com"
+        assert resultado['usuario']['rol'] == "supervisor"
+    
+    def test_rol_con_mayusculas(self, mock_conexion_global, fernet_key_env):
+        """Rol debe forzarse a minúsculas"""
+        # Primer usuario: rol se fuerza a supervisor
+        resultado_1 = registrar_usuario(
+            "rol1@test.com", "Rol Test 1", "ENCARGADO", {"longitud": 8}
+        )
+        assert resultado_1['usuario']['rol'] == "supervisor"
+        
+        # Segundo usuario: rol se fuerza a empleado
+        resultado_2 = registrar_usuario(
+            "rol2@test.com", "Rol Test 2", "SUPERVISOR", {"longitud": 8}
+        )
+        assert resultado_2['usuario']['rol'] == "empleado" 
+    
+    def test_contraseña_vacia_personalizada(self, mock_conexion_global, fernet_key_env):
+        """Contraseña personalizada vacía debe fallar"""
+        with pytest.raises(ValueError, match="Contraseña personalizada no proporcionada"):
+            registrar_usuario(
+                "vacio@test.com", "Vacio", "empleado", 
+                {"tipo": "personalizada", "contraseña": ""}
+            )
+    
+    def test_parametros_vacios(self, mock_conexion_global, fernet_key_env):
+        """Parámetros vacíos deben usar valores por defecto"""
+        resultado = registrar_usuario(
+            "defecto@test.com", "Defecto", "empleado", {}
+        )
+        assert resultado is not None
+        assert 'contraseña_generada' in resultado
+
+
+class TestRegistroValidacionEmail:
+    """Tests para validación de formato email"""
+    
+    def test_email_sin_arroba(self, mock_conexion_global, fernet_key_env):
+        """Email sin @ debe fallar"""
+        with pytest.raises(ValueError, match="@"):
+            registrar_usuario("emailinvalido.com", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_sin_dominio(self, mock_conexion_global, fernet_key_env):
+        """Email sin dominio debe fallar"""
+        with pytest.raises(ValueError, match="formato|dominio"):
+            registrar_usuario("test@", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_punto_inicio(self, mock_conexion_global, fernet_key_env):
+        """Email con punto al inicio debe fallar"""
+        with pytest.raises(ValueError, match="punto"):
+            registrar_usuario(".test@test.com", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_puntos_consecutivos(self, mock_conexion_global, fernet_key_env):
+        """Email con puntos consecutivos debe fallar"""
+        with pytest.raises(ValueError, match="consecutivos"):
+            registrar_usuario("te..st@test.com", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_tld_muy_corto(self, mock_conexion_global, fernet_key_env):
+        """Email con TLD muy corto debe fallar"""
+        with pytest.raises(ValueError, match="TLD"):
+            registrar_usuario("test@test.c", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_tld_sin_letras(self, mock_conexion_global, fernet_key_env):
+        """Email con TLD con números debe fallar"""
+        with pytest.raises(ValueError, match="letras"):
+            registrar_usuario("test@test.c1", "Test", "empleado", {"longitud": 8})
+    
+    def test_email_valido(self, mock_conexion_global, fernet_key_env):
+        """Email válido debe pasar"""
+        resultado = registrar_usuario("test@dominio.co", "Test", "empleado", {"longitud": 8})
+        assert resultado is not None

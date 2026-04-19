@@ -26,32 +26,8 @@ class PomodoroSecureApp(ctk.CTk):
         self._configurar_ventana()
         self.usuario_actual = None
         self.vista_actual = None
-        self.bind("<Control-r>", self._recargar_theme)
-        self.bind("<Control-R>", self._recargar_theme)
         self._mostrar_splash()
     
-    def _recargar_theme(self, event=None):
-        """Recarga los colores sin cerrar la app."""
-        import importlib
-        import sys
-        for mod in list(sys.modules.keys()):
-            if mod.startswith('src.ui.templates'):
-                del sys.modules[mod]
-        
-        from src.ui.templates import (
-            FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
-            TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, COMPLETADO,
-        )
-        
-        self.configure(fg_color=FONDO_PRINCIPAL)
-        
-        if self.vista_actual:
-            self.vista_actual.configure(fg_color=FONDO_PRINCIPAL)
-            if hasattr(self.vista_actual, 'card'):
-                self.vista_actual.configure(fg_color=FONDO_CARD)
-        
-        print("✓ Theme recargado!")
-
     def _configurar_ventana(self):
         self.title("PomodoroSecure")
         self.geometry("1200x1000")

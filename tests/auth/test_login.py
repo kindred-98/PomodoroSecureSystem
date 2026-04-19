@@ -83,3 +83,21 @@ class TestLoginSesion:
         usuario_bd = coleccion.find_one({'_id': usr['usuario']['_id']})
         
         assert usuario_bd['ultimo_acceso'] is not None
+
+
+class TestLoginValidacionesSeguridad:
+    """Tests para validaciones de seguridad adicionales"""
+    
+    def test_login_email_con_espacios(self, mock_conexion_global, fernet_key_env, usuario_registrado):
+        """Email con espacios debe ser limpiado y aceptado"""
+        usr = usuario_registrado
+        # Con strip y lowercase debe funcionar
+        resultado = iniciar_sesion("  " + usr['usuario']['email'] + "  ", usr['contraseña'])
+        assert resultado is not None
+    
+    def test_login_email_mayusculas(self, mock_conexion_global, fernet_key_env, usuario_registrado):
+        """Email en mayúsculas debe funcionar"""
+        usr = usuario_registrado
+        email_mayus = usr['usuario']['email'].upper()
+        resultado = iniciar_sesion(email_mayus, usr['contraseña'])
+        assert resultado is not None

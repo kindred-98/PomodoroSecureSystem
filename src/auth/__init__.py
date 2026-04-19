@@ -11,7 +11,12 @@ from src.auth.ver_contraseña import ver_contraseña
 from src.auth.regenerar_contraseña import regenerar_contraseña
 from src.auth.cambiar_contraseña import cambiar_contraseña
 from src.auth.exportar_contraseña import exportar_contraseña
-from src.auth.ver_contraseña import ver_contraseña
+from src.auth.verificacion_email import (
+    crear_token_verificacion,
+    verificar_token,
+    verificar_email_esta_verificado,
+    obtener_token_pendiente,
+)
 
 def obtener_contraseña(usuario_id: str) -> str:
     """
@@ -47,4 +52,8 @@ __all__ = [
     "cambiar_contraseña",
     "exportar_contraseña",
     "obtener_contraseña",
+    "crear_token_verificacion",
+    "verificar_token",
+    "verificar_email_esta_verificado",
+    "obtener_token_pendiente",
 ]

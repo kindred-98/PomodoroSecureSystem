@@ -41,7 +41,7 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
     if not isinstance(contraseña, str):
         raise TypeError(f"contraseña debe ser string, recibido: {type(contraseña).__name__}")
     
-    email = email.strip()
+    email = email.strip().lower()
     
     if not email:
         raise ValueError("email no puede estar vacío")
@@ -55,10 +55,15 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
     if usuario is None:
         raise Exception("Credenciales incorrectas")
     
-    # Verificar que está activo
+# Verificar que está activo
     if not usuario.get('activo', True):
         raise Exception("Usuario desactivado")
     
+    # Verificar que email está verificado
+    email_verificado = usuario.get('email_verified', False)
+    if not email_verificado:
+        raise Exception("Debes verificar tu email antes de iniciar sesión")
+
     # Verificar contraseña
     hash_almacenado = usuario.get('contraseña_hash', '')
     if not verificar_contraseña(contraseña, hash_almacenado):
