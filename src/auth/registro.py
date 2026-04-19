@@ -7,6 +7,7 @@ from src.seguridad.encriptacion import hashear_contraseña, cifrar
 from src.generador import generar_contraseña
 from src.db.usuarios import crear_usuario
 from src.db.conexion import conexion_global
+from src.auth.audit import audit_registro
 
 
 def registrar_usuario(
@@ -162,7 +163,9 @@ def registrar_usuario(
     usuario['fecha_verificacion'] = None
     usuario['contraseña_encriptada'] = contraseña_encriptada
     usuario['parametros_contraseña'] = params
-    
+
+    audit_registro(email, True)
+
     return {
         'usuario': usuario,
         'contraseña_generada': contraseña_generada

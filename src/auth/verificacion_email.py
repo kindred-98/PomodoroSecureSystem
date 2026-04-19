@@ -9,6 +9,7 @@ import time
 import hashlib
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
+from src.auth.audit import audit_verificacion
 
 
 def generar_token(longitud: int = 6) -> str:
@@ -138,6 +139,7 @@ def verificar_token_db(email: str, token_input: str) -> dict:
             {'$inc': {'intentos': 1}}
         )
         intentos_restantes = max_intentos - intentos - 1
+        audit_verificacion(email, False)
         return {
             'valido': False,
             'mensaje': f'Token incorrecto. Intentos restantes: {intentos_restantes}'
@@ -155,7 +157,9 @@ def verificar_token_db(email: str, token_input: str) -> dict:
     
     # Eliminar token usado
     coleccion.delete_one({'email': email})
-    
+
+    audit_verificacion(email, True)
+
     return {
         'valido': True,
         'mensaje': 'Email verificado correctamente'
@@ -286,6 +290,17 @@ def enviar_token_por_email(email: str, token: str, asunto: str = "Verificación 
     except Exception as e:
         print(f"❌ Error al enviar email: {e}")
         return {'enviado': False, 'error': str(e)}
+
+
+def enviar_email_recuperacion(email: str, token: str) -> dict:
+    """
+    Envía email de recuperación de contraseña.
+    """
+    return enviar_token_por_email(
+        email,
+        token,
+        "Recuperar tu contraseña"
+    )
 
 
 # Funciones legacy (compatibilidad)

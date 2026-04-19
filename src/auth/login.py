@@ -8,6 +8,8 @@ from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import verificar_contraseña, generar_token_sesion
 from src.auth.sesion import crear_sesion
 from src.auth.verificacion_email import esta_verificado
+from src.auth.rate_limiting import verificar_rate_limit_login, registrar_intento_login
+from src.auth.audit import audit_login, audit_bloqueo_cuenta
 
 
 def iniciar_sesion(email: str, contraseña: str) -> dict:
@@ -43,12 +45,17 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
         raise TypeError(f"contraseña debe ser string, recibido: {type(contraseña).__name__}")
     
     email = email.strip().lower()
-    
+
     if not email:
         raise ValueError("email no puede estar vacío")
     if not contraseña:
         raise ValueError("contraseña no puede estar vacía")
-    
+
+    puede_intentar, mensaje_rate = verificar_rate_limit_login(email)
+    if not puede_intentar:
+        audit_bloqueo_cuenta(email, "rate_limit_login")
+        raise Exception(mensaje_rate)
+
     # Buscar usuario por email
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     usuario = coleccion_usuarios.find_one({'email': email})
@@ -64,10 +71,15 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
     if not esta_verificado(email):
         raise Exception("Debes verificar tu email antes de iniciar sesión")
 
-    # Verificar contraseña
+# Verificar contraseña
     hash_almacenado = usuario.get('contraseña_hash', '')
     if not verificar_contraseña(contraseña, hash_almacenado):
+        registrar_intento_login(email, False)
+        audit_login(email, False)
         raise Exception("Credenciales incorrectas")
+
+    # Registrar intento exitoso
+    registrar_intento_login(email, True)
     
     # Actualizar último acceso
     coleccion_usuarios.update_one(
@@ -78,7 +90,9 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
     # Generar token y crear sesión
     token_sesion = generar_token_sesion()
     crear_sesion(str(usuario['_id']), token_sesion)
-    
+
+    audit_login(email, True)
+
     return {
         'usuario': usuario,
         'token_sesion': token_sesion
