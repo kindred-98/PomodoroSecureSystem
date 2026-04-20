@@ -5,7 +5,29 @@ Responsabilidad: Logging de auditoría para eventos de seguridad.
 
 import logging as log
 import os
+import json
+from datetime import datetime
 from typing import Optional
+
+
+def _asegurar_directorio_logs():
+    """Crea el directorio logs si no existe."""
+    directorio = 'logs'
+    if not os.path.exists(directorio):
+        os.makedirs(directorio, exist_ok=True)
+
+
+def _formatear_json(accion: str, email: str, exitoso: bool, detalles: dict = None) -> str:
+    """Formatea mensaje como JSON estructurado."""
+    data = {
+        'timestamp': datetime.utcnow().isoformat(),
+        'accion': accion,
+        'email': email,
+        'exitoso': exitoso,
+    }
+    if detalles:
+        data['detalles'] = detalles
+    return json.dumps(data, ensure_ascii=False)
 
 
 def obtener_logger() -> log.Logger:
@@ -23,6 +45,7 @@ def obtener_logger() -> log.Logger:
 
         if not os.environ.get('ENVIRONMENT') or os.environ.get('ENVIRONMENT') == 'produccion':
             try:
+                _asegurar_directorio_logs()
                 import logging.handlers
                 file_handler = logging.handlers.RotatingFileHandler(
                     'logs/auditoria.log',

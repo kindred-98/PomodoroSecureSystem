@@ -4,7 +4,16 @@ Responsabilidad: Gestión de sesiones activas de usuario.
 """
 
 from datetime import datetime, timezone
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from src.db.conexion import conexion_global
+
+# Expiración de sesiones en segundos (default 8 horas = 28800 segundos)
+_EXPIRAR_SESION_SEGUNDOS = int(os.getenv('EXPIRAR_SESION_SEGUNDOS', '28800'))
+
+# Máximo sesiones simultáneas por usuario
+_MAX_SESIONES_POR_USUARIO = int(os.getenv('MAX_SESIONES_POR_USUARIO', '3'))
 
 
 def crear_sesion(usuario_id: str, token_sesion: str) -> dict:
@@ -81,7 +90,7 @@ def verificar_sesion(token_sesion: str) -> dict:
     if sesion is None:
         raise Exception("Sesión inválida o expirada")
     
-    # Verificar expiración (8 horas)
+    # Verificar expiración configurada
     inicio = sesion.get('inicio')
     if inicio:
         ahora = datetime.now(timezone.utc)
@@ -90,7 +99,7 @@ def verificar_sesion(token_sesion: str) -> dict:
             if hasattr(inicio, 'tzinfo') and inicio.tzinfo is None:
                 ahora = ahora.replace(tzinfo=None)
         diferencia = (ahora - inicio).total_seconds()
-        if diferencia > 28800:  # 8 horas
+        if diferencia > _EXPIRAR_SESION_SEGUNDOS:
             # Marcar sesión como inactiva
             coleccion_sesiones.update_one(
                 {'_id': sesion['_id']},
