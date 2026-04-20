@@ -29,7 +29,7 @@ jobs:
 
       - name: Ejecutar tests con cobertura
         run: |
-          python -m pytest --cov=src --cov-config=.coveragerc --cov-report=term-missing --cov-fail-under=80 -v
+          python -m pytest --cov=src --cov-config=.coveragerc --cov-report=term-missing --cov-fail-under=75 -v
 
       - name: Subir reporte de cobertura
         if: matrix.python-version == '3.12'

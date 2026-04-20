@@ -121,7 +121,7 @@ def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
     if len(letras_unicas) < 4:
         raise ValueError(
             f"La semilla debe tener al menos 4 letras distintas. "
-            f"Tienes {len(letras_unicas)}: {''.join(letras_unicos)}"
+            f"Tienes {len(letras_unicas)}: {''.join(letras_unicas)}"
         )
     
     if len(numeros_unicos) < 4:

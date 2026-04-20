@@ -41,17 +41,17 @@ class TestGenerarContraseñaPersonalizada:
             generar_contraseña_personalizada("aaaa")
 
     def test_longitud_personalizada(self):
-        """Longitud personnalisée."""
+        """Longitud personalizada."""
         from src.generador.generar_contraseña import generar_contraseña_personalizada
         
-        resultado = generar_contraseña_personalizada("abcdefghijklmnop", longitud=20)
+        resultado = generar_contraseña_personalizada("abcd1234efgh5678", longitud=20)
         assert len(resultado) == 20
 
     def test_solo_usa_caracteres_semilla(self):
         """Solo usa caracteres de la semilla."""
         from src.generador.generar_contraseña import generar_contraseña_personalizada
         
-        semilla = "abcdefgh"  # 8 únicos mínimos
+        semilla = "abcd1234"  # 4 letras + 4 números únicos mínimos
         resultado = generar_contraseña_personalizada(semilla)
         
         for char in resultado:
