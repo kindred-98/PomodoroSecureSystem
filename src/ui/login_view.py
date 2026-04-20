@@ -3,11 +3,13 @@ Módulo: login_view.py
 Responsabilidad: Pantalla de login con email y contraseña.
 """
 
+import importlib
 import customtkinter as ctk
-from src.ui.templates import (
+from src.ui.templates.theme import (
     FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
     TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, PELIGRO, INFORMACION,
-    BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER,
+    BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER, BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
     COMPLETADO,
     crear_fuente, NORMAL_NEGRITA, PEQUENO, MINIMO
 )
@@ -240,12 +242,66 @@ class LoginView(ctk.CTkFrame):
 
     def _crear_footer(self):
         """Crea el pie de página."""
+        frame_tema = ctk.CTkFrame(self, fg_color="transparent")
+        frame_tema.place(relx=0.5, rely=0.92, anchor="center")
+
+        from dotenv import load_dotenv
+        load_dotenv()
+        import os
+        self.tema_actual = os.getenv("TEMA", "dark")
+        self.btn_tema = ctk.CTkButton(
+            frame_tema,
+            text="☀️" if self.tema_actual == "light" else "🌙",
+            font=PEQUENO,
+            fg_color="transparent",
+            hover_color=FONDO_SECUNDARIO,
+            text_color=TEXTO_SECUNDARIO,
+            width=40,
+            height=30,
+            command=self._cambiar_tema,
+        )
+        self.btn_tema.pack()
+
         ctk.CTkLabel(
             self,
             text="v1.0.0 — Dicampus",
             font=MINIMO,
             text_color=TEXTO_SECUNDARIO,
-        ).place(relx=0.5, rely=0.95, anchor="center")
+        ).place(relx=0.5, rely=0.97, anchor="center")
+
+    def _cambiar_tema(self):
+        """Cambia el tema y reinicia la app."""
+        import customtkinter as ctk
+        import sys
+        import os
+        import subprocess
+        import time
+
+        # Alternar tema
+        nuevo_tema = "light" if self.tema_actual == "dark" else "dark"
+
+        # Guardar en .env
+        from dotenv import set_key, load_dotenv
+        set_key(".env", "TEMA", nuevo_tema)
+
+        # Forzar reload del .env en este proceso
+        load_dotenv(override=True)
+        os.environ["TEMA"] = nuevo_tema
+
+        # Actualizar CustomTkinter
+        ctk.set_appearance_mode(nuevo_tema)
+
+        # Pequeño delay para asegurar que .env se guardó
+        time.sleep(0.2)
+
+        # Cerrar esta ventana
+        self.master.destroy()
+
+        # Iniciar nuevo proceso
+        python = sys.executable
+        args = [python, "main.py"]
+        subprocess.Popen(args, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP, cwd=os.getcwd())
+        sys.exit(0)
 
     # ============================================
     # EVENTOS

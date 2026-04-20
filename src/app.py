@@ -24,15 +24,21 @@ class PomodoroSecureApp(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+
+        from src.config.colores import aplicar_tema
+        aplicar_tema("dark")
+
         from src.db.conexion import conexion_global
         conexion_global.conectar()
-        aplicar_tema()
+
         self._configurar_ventana()
         self.usuario_actual = None
         self.vista_actual = None
+        self.tema_actual = "dark"
         self._mostrar_splash()
-    
+
     def _configurar_ventana(self):
+        from src.ui.templates import FONDO_PRINCIPAL
         self.title("PomodoroSecure")
         self.geometry("1200x1000")
         self.resizable(False, False)

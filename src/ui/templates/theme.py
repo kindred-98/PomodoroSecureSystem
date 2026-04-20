@@ -1,60 +1,88 @@
 """
 Módulo: theme.py
-Responsabilidad: Paleta de colores centralizada para toda la UI.
-Tema oscuro profesional inspirado en Linear/VSCode/Vercel.
+Colores para UI. Se definen según TEMA en .env.
 """
 
-# ============================================
-# FONDOS
-# ============================================
-FONDO_PRINCIPAL = "#1E1E2E"
-FONDO_SECUNDARIO = "#2A2A3E"
-FONDO_CARD = "#313145"
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-# ============================================
-# ACENTOS FUNCIONALES
-# ============================================
-TRABAJO_ACTIVO = "#7C3AED"      # violeta — pomodoro corriendo
-COMPLETADO = "#10B981"           # verde esmeralda
-AVISO = "#F59E0B"                # naranja ámbar
-PELIGRO = "#EF4444"              # rojo
-INFORMACION = "#fbe600"          # azul
+_TEMA = os.getenv("TEMA", "dark")
 
-# ============================================
-# TEXTO
-# ============================================
-TEXTO_PRINCIPAL = "#fff8f8"
-TEXTO_SECUNDARIO = "#fffffe"
+# Tema oscuro
+FONDO_PRINCIPAL_OSCURO = "#1E1E2E"
+FONDO_SECUNDARIO_OSCURO = "#2A2A3E"
+FONDO_CARD_OSCURO = "#313145"
+TEXTO_PRINCIPAL_OSCURO = "#F8F8F2"
+TEXTO_SECUNDARIO_OSCURO = "#94A3B8"
+BORDE_OSCURO = "#3E3E5E"
+BOTON_PRIMARIO_OSCURO = "#7C3AED"
+BOTON_PRIMARIO_HOVER_OSCURO = "#6D28D9"
+BOTON_SECUNDARIO_OSCURO = "#313145"
+BOTON_SECUNDARIO_HOVER_OSCURO = "#3E3E5E"
 
-# ============================================
-# PANTALLA DE BLOQUEO
-# ============================================
-BLOQUEO_CORTO = "#0F2744"        # azul oscuro
-BLOQUEO_LARGO = "#0F2F1F"        # verde oscuro
-BLOQUEO_FIJO = "#2D1B00"         # naranja oscuro
+# Tema claro
+FONDO_PRINCIPAL_CLARO = "#F0F4F8"
+FONDO_SECUNDARIO_CLARO = "#FFFFFF"
+FONDO_CARD_CLARO = "#FFFFFF"
+TEXTO_PRINCIPAL_CLARO = "#1E293B"
+TEXTO_SECUNDARIO_CLARO = "#64748B"
+BORDE_CLARO = "#CBD5E1"
+BOTON_PRIMARIO_CLARO = "#3B82F6"
+BOTON_PRIMARIO_HOVER_CLARO = "#2563EB"
+BOTON_SECUNDARIO_CLARO = "#E2E8F0"
+BOTON_SECUNDARIO_HOVER_CLARO = "#CBD5E1"
 
-# ============================================
-# BORDES Y SEPARADORES
-# ============================================
-BORDE = "#3E3E5E"
-BORDE_ACTIVO = "#7C3AED"
+# Asignar según tema
+if _TEMA == "light":
+    FONDO_PRINCIPAL = FONDO_PRINCIPAL_CLARO
+    FONDO_SECUNDARIO = FONDO_SECUNDARIO_CLARO
+    FONDO_CARD = FONDO_CARD_CLARO
+    TEXTO_PRINCIPAL = TEXTO_PRINCIPAL_CLARO
+    TEXTO_SECUNDARIO = TEXTO_SECUNDARIO_CLARO
+    BORDE = BORDE_CLARO
+    BORDE_ACTIVO = "#3B82F6"
+    BOTON_PRIMARIO = BOTON_PRIMARIO_CLARO
+    BOTON_PRIMARIO_HOVER = BOTON_PRIMARIO_HOVER_CLARO
+    BOTON_SECUNDARIO = BOTON_SECUNDARIO_CLARO
+    BOTON_SECUNDARIO_HOVER = BOTON_SECUNDARIO_HOVER_CLARO
+    TRABAJO_ACTIVO = "#3B82F6"
+    BLOQUEO_CORTO = "#DBEAFE"
+    BLOQUEO_LARGO = "#D1FAE5"
+    BLOQUEO_FIJO = "#FEF3C7"
+else:
+    FONDO_PRINCIPAL = FONDO_PRINCIPAL_OSCURO
+    FONDO_SECUNDARIO = FONDO_SECUNDARIO_OSCURO
+    FONDO_CARD = FONDO_CARD_OSCURO
+    TEXTO_PRINCIPAL = TEXTO_PRINCIPAL_OSCURO
+    TEXTO_SECUNDARIO = TEXTO_SECUNDARIO_OSCURO
+    BORDE = BORDE_OSCURO
+    BORDE_ACTIVO = "#7C3AED"
+    BOTON_PRIMARIO = BOTON_PRIMARIO_OSCURO
+    BOTON_PRIMARIO_HOVER = BOTON_PRIMARIO_HOVER_OSCURO
+    BOTON_SECUNDARIO = BOTON_SECUNDARIO_OSCURO
+    BOTON_SECUNDARIO_HOVER = BOTON_SECUNDARIO_HOVER_OSCURO
+    TRABAJO_ACTIVO = "#7C3AED"
+    BLOQUEO_CORTO = "#0F2744"
+    BLOQUEO_LARGO = "#0F2F1F"
+    BLOQUEO_FIJO = "#2D1B00"
 
-# ============================================
-# BOTONES
-# ============================================
-BOTON_PRIMARIO = "#59339b"
-BOTON_PRIMARIO_HOVER = "#7C3AED"
-BOTON_SECUNDARIO = "#595968"
-BOTON_SECUNDARIO_HOVER = "#4242c9"
+# Colores comunes
+PELIGRO = "#EF4444"
+AVISO = "#F59E0B"
+COMPLETADO = "#10B981"
+INFORMACION = "#3B82F6"
 BOTON_PELIGRO = "#EF4444"
 BOTON_PELIGRO_HOVER = "#DC2626"
 BOTON_EXITO = "#10B981"
 BOTON_EXITO_HOVER = "#059669"
 
-# ============================================
-# COLORES DE TIMER
-# ============================================
-TIMER_TRABAJO = "#7C3AED"
-TIMER_DESCANSO_CORTO = "#3B82F6"
-TIMER_DESCANSO_LARGO = "#10B981"
-TIMER_PAUSADO = "#F59E0B"
+TIMER_TRABAJO = TRABAJO_ACTIVO
+TIMER_DESCANSO_CORTO = INFORMACION
+TIMER_DESCANSO_LARGO = COMPLETADO
+TIMER_PAUSADO = AVISO
+
+from src.ui.templates.fuentes import (
+    crear_fuente, TITULO, SUBTITULO, CABECERA, NORMAL, NORMAL_NEGRITA,
+    PEQUENO, MINIMO, FOOTER
+)
