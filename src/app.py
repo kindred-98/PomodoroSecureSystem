@@ -24,6 +24,8 @@ class PomodoroSecureApp(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+        from src.db.conexion import conexion_global
+        conexion_global.conectar()
         aplicar_tema()
         self._configurar_ventana()
         self.usuario_actual = None

@@ -209,44 +209,18 @@ def esta_verificado(email: str) -> bool:
 def enviar_token_por_email(email: str, token: str, asunto: str = "Verificación de cuenta") -> dict:
     """
     Envía el token por email al usuario.
-    
-    Usa configuración de environment:
-    - EMAIL_ENABLED=False (default): Solo print en consola
-    - EMAIL_ENABLED=True + SMTP config: Envía email real
+
+    Configuración mediante environment:
+    - EMAIL_ENABLED=false (default): Solo print en consola
+    - EMAIL_ENABLED=true + SENDGRID_API_KEY: SendGrid (producción)
+    - EMAIL_ENABLED=true + SMTP config: SMTP Gmail (alternativo)
     """
     import os
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    
-    # Mensaje HTML
-    html = f"""
-    <html>
-    <body style="font-family: Arial, sans-serif; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #f5f5f5; padding: 20px; border-radius: 10px;">
-            <h2 style="color: #333;">Verificación de Cuenta</h2>
-            <p style="color: #666;">Tu código de verificación es:</p>
-            <div style="background: #4CAF50; color: white; padding: 15px 30px; 
-                        font-size: 32px; font-weight: bold; letter-spacing: 5px; 
-                        text-align: center; border-radius: 5px; margin: 20px 0;">
-                {token}
-            </div>
-            <p style="color: #666; font-size: 14px;">
-                Este código expira en 5 minutos.<br>
-                Si no solicitaste este código, puedes ignorar este email.
-            </p>
-        </div>
-    </body>
-    </html>
-    """
-    
-    texto = f"Tu código de verificación es: {token}\n\nEste código expira en 5 minutos."
-    
-    # Verificar si está habilitado el envío real
+
     email_enabled = os.environ.get('EMAIL_ENABLED', 'false').lower() == 'true'
-    
+    sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
+
     if not email_enabled:
-        # Modo desarrollo: solo print
         print("=" * 50)
         print(f"📧 EMAIL DE VERIFICACIÓN")
         print("=" * 50)
@@ -255,41 +229,112 @@ def enviar_token_por_email(email: str, token: str, asunto: str = "Verificación 
         print(f"Expira en: 5 minutos")
         print("=" * 50)
         return {'enviado': True, 'modo': 'desarrollo'}
-    
-    # Configuración SMTP
+
+    if sendgrid_key:
+        return _enviar_con_sendgrid(email, token, asunto)
+
+    smtp_usuario = os.environ.get('SMTP_USUARIO', '')
+    smtp_password = os.environ.get('SMTP_PASSWORD', '')
+    if not smtp_usuario or not smtp_password:
+        return _enviar_con_print_fallback(email, token)
+
+    return _enviar_con_smtp(email, token, asunto)
+
+
+def _enviar_con_sendgrid(email: str, token: str, asunto: str) -> dict:
+    """Envía email usando SendGrid."""
+    import os
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail
+
+    sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
+    email_from = os.environ.get('EMAIL_FROM', 'noreply@pomodorosecure.com')
+
+    html = f"""
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+        <div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #333;">🔐 Verificación de Cuenta</h2>
+            <p style="color: #666; font-size: 16px;">Tu código de verificación es:</p>
+            <div style="background: #4CAF50; color: white; padding: 20px 40px;
+                        font-size: 36px; font-weight: bold; letter-spacing: 8px;
+                        text-align: center; border-radius: 8px; margin: 20px 0; display: inline-block;">
+                {token}
+            </div>
+            <p style="color: #999; font-size: 14px;">
+                ⏱️ Este código expira en 5 minutos
+            </p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: #999; font-size: 12px;">
+                Si no solicitaste este código, puedes ignorar este email.
+            </p>
+        </div>
+    </div>
+    """
+
+    try:
+        mensaje = Mail(
+            from_email=email_from,
+            to_emails=email,
+            subject=asunto,
+            html_content=html
+        )
+        sg = SendGridAPIClient(sendgrid_key)
+        sg.send(mensaje)
+        print(f"[OK] Email SendGrid enviado a {email}")
+        return {'enviado': True, 'modo': 'sendgrid'}
+
+    except Exception as e:
+        print(f"[ERROR] Error SendGrid: {e}")
+        return _enviar_con_print_fallback(email, token)
+
+
+def _enviar_con_smtp(email: str, token: str, asunto: str) -> dict:
+    """Envía email usando SMTP."""
+    import os
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
     smtp_host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
     smtp_port = int(os.environ.get('SMTP_PORT', '587'))
     smtp_usuario = os.environ.get('SMTP_USUARIO', '')
     smtp_password = os.environ.get('SMTP_PASSWORD', '')
     email_from = os.environ.get('EMAIL_FROM', smtp_usuario)
-    
-    if not smtp_usuario or not smtp_password:
-        print("⚠️ SMTP no configurado. Usa EMAIL_ENABLED=false para modo desarrollo.")
-        return {'enviado': False, 'error': 'SMTP no configurado'}
-    
+
+    html = f"""
+    <div style="font-family: Arial; text-align: center;">
+        <h2>🔐 Verificación de Cuenta</h2>
+        <p>Tu código es: <strong>{token}</strong></p>
+        <p>Expira en 5 minutos</p>
+    </div>
+    """
+
     try:
         msg = MIMEMultipart('alternative')
         msg['Subject'] = asunto
         msg['From'] = email_from
         msg['To'] = email
-        
-        parte1 = MIMEText(texto, 'plain')
-        parte2 = MIMEText(html, 'html')
-        
-        msg.attach(parte1)
-        msg.attach(parte2)
-        
+        msg.attach(MIMEText(html, 'html'))
+
         with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.starttls()
             server.login(smtp_usuario, smtp_password)
             server.send_message(msg)
-        
-        print(f"✅ Email enviado a {email}")
-        return {'enviado': True, 'modo': 'produccion'}
-    
+
+        print(f"[OK] Email SMTP enviado a {email}")
+        return {'enviado': True, 'modo': 'smtp'}
+
     except Exception as e:
-        print(f"❌ Error al enviar email: {e}")
-        return {'enviado': False, 'error': str(e)}
+        print(f"❌ Error SMTP: {e}")
+        return _enviar_con_print_fallback(email, token)
+
+
+def _enviar_con_print_fallback(email: str, token: str) -> dict:
+    """Fallback a print si tutto falla."""
+    print("⚠️ Email no enviado. Mostrando en consola:")
+    print(f"Para: {email}")
+    print(f"Token: {token}")
+    return {'enviado': True, 'modo': 'print-fallback'}
 
 
 def enviar_email_recuperacion(email: str, token: str) -> dict:

@@ -606,34 +606,33 @@ class LoginView(ctk.CTkFrame):
         """Intenta login con frase semilla."""
         email = entry_email.get().strip()
         frase = entry_frase.get().strip()
-        
+
         if not email or not frase:
             label_error.configure(text="Completa todos los campos")
             return
-        
+
         try:
             from src.db.conexion import conexion_global
             from src.auth.frase_semilla import verificar_frase_semilla
-            
+
             usuarios = conexion_global.obtener_coleccion('usuarios')
             usuario = usuarios.find_one({'email': email})
-            
+
             if not usuario:
                 label_error.configure(text="Email no encontrado")
                 return
-            
+
             uid = str(usuario['_id'])
             if not verificar_frase_semilla(uid, frase):
                 label_error.configure(text="Frase incorrecta")
                 return
-            
-            # Frase correcta - hacer login
+
             dialogo.destroy()
             if self._login_con_frase:
                 self._login_con_frase(email, usuario)
             else:
                 self.on_login(email, "")
-                
+
         except Exception as e:
             label_error.configure(text=f"Error: {str(e)}")
 
