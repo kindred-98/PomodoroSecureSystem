@@ -4,7 +4,6 @@ Ejecutar: python main.py
 """
 
 import os
-import sys
 from pathlib import Path
 
 # Cargar .env
