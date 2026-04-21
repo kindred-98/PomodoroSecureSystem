@@ -8,7 +8,7 @@ import logging as log
 import os
 import json
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 
@@ -33,7 +33,7 @@ def _sanitizar_email(email: str) -> str:
 def _formatear_json(accion: str, email: str, exitoso: bool, detalles: dict = None) -> str:
     """Formatea mensaje como JSON estructurado con email sanitizado."""
     data = {
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'accion': accion,
         'email_hash': _sanitizar_email(email),
         'exitoso': exitoso,
@@ -110,16 +110,16 @@ def audit_logout(email: str, ip: Optional[str] = None):
     logger.info(f"LOGOUT - Email: {email_seguro}{ip_info}")
 
 
-def audit_cambio_contraseña(email: str, exitoso: bool, ip: Optional[str] = None):
-    """Log de cambio de contraseña."""
+def audit_cambio_contrasena(email: str, exitoso: bool, ip: Optional[str] = None):
+    """Log de cambio de contrasena."""
     logger = obtener_logger()
-    logger.info(_formatear_mensaje("CAMBIO_CONTRASEÑA", email, exitoso, ip))
+    logger.info(_formatear_mensaje("CAMBIO_CONTRASENA", email, exitoso, ip))
 
 
-def audit_recuperacion_contraseña(email: str, exitoso: bool, ip: Optional[str] = None):
-    """Log de recuperación de contraseña."""
+def audit_recuperacion_contrasena(email: str, exitoso: bool, ip: Optional[str] = None):
+    """Log de recuperacion de contrasena."""
     logger = obtener_logger()
-    logger.info(_formatear_mensaje("RECUPERACION_CONTRASEÑA", email, exitoso, ip))
+    logger.info(_formatear_mensaje("RECUPERACION_CONTRASENA", email, exitoso, ip))
 
 
 def audit_bloqueo_cuenta(email: str, razon: str, ip: Optional[str] = None):
