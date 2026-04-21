@@ -1,11 +1,13 @@
 """
 Módulo: audit.py
 Responsabilidad: Logging de auditoría para eventos de seguridad.
+Los emails se sanitizan (hash) para proteger privacidad.
 """
 
 import logging as log
 import os
 import json
+import hashlib
 from datetime import datetime
 from typing import Optional
 
@@ -17,12 +19,23 @@ def _asegurar_directorio_logs():
         os.makedirs(directorio, exist_ok=True)
 
 
+def _sanitizar_email(email: str) -> str:
+    """
+    Hashea el email para no guardarlo en texto plano.
+    Usa los primeros 8 caracteres del hash para identificación.
+    """
+    if not email:
+        return "unknown"
+    hash_email = hashlib.sha256(email.lower().encode()).hexdigest()[:8]
+    return f"user_{hash_email}"
+
+
 def _formatear_json(accion: str, email: str, exitoso: bool, detalles: dict = None) -> str:
-    """Formatea mensaje como JSON estructurado."""
+    """Formatea mensaje como JSON estructurado con email sanitizado."""
     data = {
         'timestamp': datetime.utcnow().isoformat(),
         'accion': accion,
-        'email': email,
+        'email_hash': _sanitizar_email(email),
         'exitoso': exitoso,
     }
     if detalles:
@@ -63,75 +76,66 @@ def obtener_logger() -> log.Logger:
     return logger
 
 
+def _formatear_mensaje(accion: str, email: str, exitoso: bool, ip: Optional[str] = None) -> str:
+    """Formatea mensaje con email sanitizado."""
+    email_seguro = _sanitizar_email(email)
+    ip_info = f" - IP: {ip}" if ip else ""
+    resultado = "EXITOSO" if exitoso else "FALLIDO"
+    return f"{accion}_{resultado} - Email: {email_seguro}{ip_info}"
+
+
 def audit_registro(email: str, exitoso: bool, ip: Optional[str] = None):
     """Log de registro de usuario."""
     logger = obtener_logger()
-    ip_info = f" - IP: {ip}" if ip else ""
-    if exitoso:
-        logger.info(f"REGISTRO_EXITOSO - Email: {email}{ip_info}")
-    else:
-        logger.warning(f"REGISTRO_FALLIDO - Email: {email}{ip_info}")
+    logger.info(_formatear_mensaje("REGISTRO", email, exitoso, ip))
 
 
 def audit_verificacion(email: str, exitosa: bool, ip: Optional[str] = None):
     """Log de verificación de email."""
     logger = obtener_logger()
-    ip_info = f" - IP: {ip}" if ip else ""
-    if exitosa:
-        logger.info(f"VERIFICACION_EXITOSA - Email: {email}{ip_info}")
-    else:
-        logger.warning(f"VERIFICACION_FALLIDA - Email: {email}{ip_info}")
+    logger.info(_formatear_mensaje("VERIFICACION", email, exitosa, ip))
 
 
 def audit_login(email: str, exitoso: bool, ip: Optional[str] = None):
     """Log de inicio de sesión."""
     logger = obtener_logger()
-    ip_info = f" - IP: {ip}" if ip else ""
-    if exitoso:
-        logger.info(f"LOGIN_EXITOSO - Email: {email}{ip_info}")
-    else:
-        logger.warning(f"LOGIN_FALLIDO - Email: {email}{ip_info}")
+    logger.info(_formatear_mensaje("LOGIN", email, exitoso, ip))
 
 
 def audit_logout(email: str, ip: Optional[str] = None):
     """Log de cierre de sesión."""
     logger = obtener_logger()
+    email_seguro = _sanitizar_email(email)
     ip_info = f" - IP: {ip}" if ip else ""
-    logger.info(f"LOGOUT - Email: {email}{ip_info}")
+    logger.info(f"LOGOUT - Email: {email_seguro}{ip_info}")
 
 
 def audit_cambio_contraseña(email: str, exitoso: bool, ip: Optional[str] = None):
     """Log de cambio de contraseña."""
     logger = obtener_logger()
-    ip_info = f" - IP: {ip}" if ip else ""
-    if exitoso:
-        logger.info(f"CAMBIO_CONTRASEÑA_EXITOSO - Email: {email}{ip_info}")
-    else:
-        logger.warning(f"CAMBIO_CONTRASEÑA_FALLIDO - Email: {email}{ip_info}")
+    logger.info(_formatear_mensaje("CAMBIO_CONTRASEÑA", email, exitoso, ip))
 
 
 def audit_recuperacion_contraseña(email: str, exitoso: bool, ip: Optional[str] = None):
     """Log de recuperación de contraseña."""
     logger = obtener_logger()
-    ip_info = f" - IP: {ip}" if ip else ""
-    if exitoso:
-        logger.info(f"RECUPERACION_EXITOSA - Email: {email}{ip_info}")
-    else:
-        logger.warning(f"RECUPERACION_FALLIDA - Email: {email}{ip_info}")
+    logger.info(_formatear_mensaje("RECUPERACION_CONTRASEÑA", email, exitoso, ip))
 
 
 def audit_bloqueo_cuenta(email: str, razon: str, ip: Optional[str] = None):
     """Log de bloqueo de cuenta."""
     logger = obtener_logger()
+    email_seguro = _sanitizar_email(email)
     ip_info = f" - IP: {ip}" if ip else ""
-    logger.warning(f"BLOQUEO_CUENTA - Email: {email} - Razón: {razon}{ip_info}")
+    logger.warning(f"BLOQUEO_CUENTA - Email: {email_seguro} - Razón: {razon}{ip_info}")
 
 
 def audit_desbloqueo_cuenta(email: str, ip: Optional[str] = None):
     """Log de desbloqueo de cuenta."""
     logger = obtener_logger()
+    email_seguro = _sanitizar_email(email)
     ip_info = f" - IP: {ip}" if ip else ""
-    logger.info(f"DESBLOQUEO_CUENTA - Email: {email}{ip_info}")
+    logger.info(f"DESBLOQUEO_CUENTA - Email: {email_seguro}{ip_info}")
 
 
 def audit_intento_sospechoso(evento: str, detalles: str, ip: Optional[str] = None):
