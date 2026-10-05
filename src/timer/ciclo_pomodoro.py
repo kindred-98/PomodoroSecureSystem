@@ -52,6 +52,36 @@ def _emitir_evento(evento: str, datos: dict):
             pass
 
 
+def _validar_usuario_id(usuario_id: str):
+    """Valida el usuario_id y devuelve su ObjectId."""
+    if not isinstance(usuario_id, str):
+        raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
+    if not usuario_id.strip():
+        raise ValueError("usuario_id no puede estar vacío")
+
+    from bson import ObjectId
+    try:
+        return ObjectId(usuario_id)
+    except Exception:
+        raise ValueError(f"usuario_id inválido: '{usuario_id}'")
+
+
+def _validar_configuracion(configuracion: dict) -> tuple:
+    """Valida la configuración y devuelve (pomodoro_min, descansos_cortos, descanso_largo)."""
+    configuracion = configuracion or {}
+
+    pomodoro_min = configuracion.get('pomodoro_min', 25)
+    descansos_cortos = configuracion.get('descansos_cortos', [5, 5, 5, 5])
+    descanso_largo = configuracion.get('descanso_largo', 30)
+
+    if not isinstance(pomodoro_min, int) or pomodoro_min < 1:
+        raise ValueError(f"pomodoro_min debe ser int positivo, recibido: {pomodoro_min}")
+    if not isinstance(descansos_cortos, list):
+        raise ValueError("descansos_cortos debe ser list")
+
+    return pomodoro_min, descansos_cortos, descanso_largo
+
+
 def iniciar_ciclo(usuario_id: str, configuracion: dict = None) -> dict:
     """
     Inicia un nuevo ciclo Pomodoro para un usuario.
@@ -80,30 +110,9 @@ def iniciar_ciclo(usuario_id: str, configuracion: dict = None) -> dict:
         ValueError: Si usuario_id vacío o configuración inválida
         Exception: Si usuario ya tiene un ciclo activo
     """
-    if not isinstance(usuario_id, str):
-        raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
-    if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
-    
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        raise ValueError(f"usuario_id inválido: '{usuario_id}'")
-    
-    # Configuración por defecto
-    if configuracion is None:
-        configuracion = {}
-    
-    pomodoro_min = configuracion.get('pomodoro_min', 25)
-    descansos_cortos = configuracion.get('descansos_cortos', [5, 5, 5, 5])
-    descanso_largo = configuracion.get('descanso_largo', 30)
-    
-    if not isinstance(pomodoro_min, int) or pomodoro_min < 1:
-        raise ValueError(f"pomodoro_min debe ser int positivo, recibido: {pomodoro_min}")
-    if not isinstance(descansos_cortos, list):
-        raise ValueError("descansos_cortos debe ser list")
-    
+    usuario_oid = _validar_usuario_id(usuario_id)
+    pomodoro_min, descansos_cortos, descanso_largo = _validar_configuracion(configuracion)
+
     # Verificar que no hay ciclo activo
     coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
 
@@ -163,17 +172,8 @@ def obtener_estado_ciclo(usuario_id: str) -> dict:
         TypeError: Si usuario_id no es string
         ValueError: Si usuario_id vacío
     """
-    if not isinstance(usuario_id, str):
-        raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
-    if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
-    
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        raise ValueError(f"usuario_id inválido: '{usuario_id}'")
-    
+    usuario_oid = _validar_usuario_id(usuario_id)
+
     coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
     ciclo = coleccion.find_one({
         'usuario_id': usuario_oid,
@@ -222,173 +222,184 @@ def manejar_evento_timer(usuario_id: str, evento: str) -> dict:
         ValueError: Si evento no es válido
         Exception: Si no hay ciclo activo o transición inválida
     """
-    if not isinstance(usuario_id, str):
-        raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
+    usuario_oid = _validar_usuario_id(usuario_id)
+
+    eventos_validos = {"pomodoro_completado", "descanso_completado"}
     if not isinstance(evento, str):
         raise TypeError(f"evento debe ser string, recibido: {type(evento).__name__}")
-    
-    eventos_validos = {"pomodoro_completado", "descanso_completado"}
     if evento not in eventos_validos:
         raise ValueError(f"evento debe ser uno de {eventos_validos}, recibido: {evento}")
-    
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        raise ValueError(f"usuario_id inválido: '{usuario_id}'")
-    
+
     coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
     ciclo = coleccion.find_one({
         'usuario_id': usuario_oid,
         'completado': False,
     })
-    
+
     if ciclo is None:
         raise Exception("No hay ciclo Pomodoro activo para este usuario")
-    
-    estado_actual = ciclo['estado_actual']
-    pomodoro_actual = ciclo['pomodoro_actual']
-    pomodoros_totales = ciclo['pomodoros_totales']
-    cortos_restantes = list(ciclo.get('descansos_cortos_restantes', []))
+
+    manejadores = {
+        "pomodoro_completado": _manejar_pomodoro_completado,
+        "descanso_completado": _manejar_descanso_completado,
+    }
+    return manejadores[evento](usuario_id, ciclo, coleccion)
+
+
+def _cerrar_pausa_manual(usuario_id: str) -> None:
+    """Cierra la pausa manual si existe (el descanso automático la reemplaza)."""
+    try:
+        from src.pausas.gestor_pausas import limpiar_pausa_huerfana
+        limpiar_pausa_huerfana(usuario_id)
+    except Exception:  # nosec B110
+        pass
+
+
+def _iniciar_descanso_largo(usuario_id, ciclo, coleccion, pomodoro_actual):
+    """Transiciona al descanso largo tras el último pomodoro del ciclo."""
+    nuevo_estado = ESTADO_DESCANSO_LARGO
+    descanso_duracion = ciclo['configuracion']['descanso_largo']
+
+    coleccion.update_one(
+        {'_id': ciclo['_id']},
+        {'$set': {'estado_actual': nuevo_estado}}
+    )
+
+    _emitir_evento('descanso_iniciado', {
+        'usuario_id': usuario_id,
+        'tipo_descanso': 'largo',
+        'duracion_min': descanso_duracion,
+        'ciclo_id': str(ciclo['_id']),
+    })
+
+    return {
+        'nuevo_estado': nuevo_estado,
+        'pomodoro_actual': pomodoro_actual,
+        'accion': 'descanso_largo',
+        'datos_extra': {'duracion_min': descanso_duracion},
+    }
+
+
+def _iniciar_descanso_corto(usuario_id, ciclo, coleccion, pomodoro_actual):
+    """Transiciona al siguiente descanso corto consumiendo uno de la cola."""
+    nuevos_cortos = list(ciclo.get('descansos_cortos_restantes', []))
+    descanso_duracion = nuevos_cortos[0] if nuevos_cortos else 5
+    nuevos_cortos.pop(0)
+
+    coleccion.update_one(
+        {'_id': ciclo['_id']},
+        {'$set': {
+            'estado_actual': ESTADO_DESCANSO_CORTO,
+            'descansos_cortos_restantes': nuevos_cortos,
+        }}
+    )
+
+    _emitir_evento('descanso_iniciado', {
+        'usuario_id': usuario_id,
+        'tipo_descanso': 'corto',
+        'duracion_min': descanso_duracion,
+        'ciclo_id': str(ciclo['_id']),
+    })
+
+    return {
+        'nuevo_estado': ESTADO_DESCANSO_CORTO,
+        'pomodoro_actual': pomodoro_actual,
+        'accion': 'descanso_corto',
+        'datos_extra': {'duracion_min': descanso_duracion},
+    }
+
+
+def _manejar_pomodoro_completado(usuario_id, ciclo, coleccion):
+    """Registra el pomodoro terminado y arranca el descanso que corresponda."""
+    from src.timer.servicio_sesiones import registrar_sesion_pomodoro
+
     config = ciclo['configuracion']
-    
-    if evento == "pomodoro_completado":
-        # Registrar sesión del pomodoro completado
-        from src.timer.servicio_sesiones import registrar_sesion_pomodoro
-        registrar_sesion_pomodoro(usuario_id, ciclo, config['pomodoro_min'])
-        
-        # Incrementar contador
-        pomodoros_completados = ciclo['pomodoros_completados'] + 1
-        coleccion.update_one(
-            {'_id': ciclo['_id']},
-            {'$set': {'pomodoros_completados': pomodoros_completados}}
-        )
-        
-        # Emitir evento
-        _emitir_evento('pomodoro_completado', {
-            'usuario_id': usuario_id,
-            'ciclo_id': str(ciclo['_id']),
-            'pomodoro_numero': pomodoros_completados,
-        })
-        
-        # Cerrar pausa manual si existe (el descanso automático reemplaza la pausa)
-        try:
-            from src.pausas.gestor_pausas import limpiar_pausa_huerfana
-            limpiar_pausa_huerfana(usuario_id)
-        except Exception:  # nosec B110
-            pass
-        
-        # ¿Es el último pomodoro del ciclo?
-        if pomodoro_actual >= pomodoros_totales:
-            # Descanso largo
-            nuevo_estado = ESTADO_DESCANSO_LARGO
-            descanso_duracion = config['descanso_largo']
-            coleccion.update_one(
-                {'_id': ciclo['_id']},
-                {'$set': {'estado_actual': nuevo_estado}}
-            )
-            
-            _emitir_evento('descanso_iniciado', {
-                'usuario_id': usuario_id,
-                'tipo_descanso': 'largo',
-                'duracion_min': descanso_duracion,
-                'ciclo_id': str(ciclo['_id']),
-            })
-            
-            return {
-                'nuevo_estado': nuevo_estado,
-                'pomodoro_actual': pomodoro_actual,
-                'accion': 'descanso_largo',
-                'datos_extra': {'duracion_min': descanso_duracion},
-            }
-        else:
-            # Descanso corto
-            nuevo_estado = ESTADO_DESCANSO_CORTO
-            descanso_duracion = cortos_restantes[0] if cortos_restantes else 5
-            cortos_restantes.pop(0)
-            
-            coleccion.update_one(
-                {'_id': ciclo['_id']},
-                {'$set': {
-                    'estado_actual': nuevo_estado,
-                    'descansos_cortos_restantes': cortos_restantes,
-                }}
-            )
-            
-            _emitir_evento('descanso_iniciado', {
-                'usuario_id': usuario_id,
-                'tipo_descanso': 'corto',
-                'duracion_min': descanso_duracion,
-                'ciclo_id': str(ciclo['_id']),
-            })
-            
-            return {
-                'nuevo_estado': nuevo_estado,
-                'pomodoro_actual': pomodoro_actual,
-                'accion': 'descanso_corto',
-                'datos_extra': {'duracion_min': descanso_duracion},
-            }
-    
-    elif evento == "descanso_completado":
-        if estado_actual == ESTADO_DESCANSO_LARGO:
-            # Ciclo completado
-            coleccion.update_one(
-                {'_id': ciclo['_id']},
-                {'$set': {
-                    'completado': True,
-                    'fin_ciclo': datetime.now(timezone.utc),
-                    'estado_actual': ESTADO_INACTIVO,
-                }}
-            )
-            
-            _emitir_evento('ciclo_completado', {
-                'usuario_id': usuario_id,
-                'ciclo_id': str(ciclo['_id']),
-                'numero_ciclo': ciclo['numero_ciclo'],
-                'pomodoros_completados': ciclo['pomodoros_completados'] + 1,
-            })
-            
-            # Intentar iniciar siguiente ciclo automáticamente
-            try:
-                resultado_siguiente = iniciar_ciclo(usuario_id, config)
-                return {
-                    'nuevo_estado': ESTADO_TRABAJANDO,
-                    'pomodoro_actual': 1,
-                    'accion': 'nuevo_ciclo',
-                    'datos_extra': resultado_siguiente,
-                }
-            except Exception:
-                # No se pudo iniciar (no hay tiempo o hay activo)
-                return {
-                    'nuevo_estado': ESTADO_INACTIVO,
-                    'pomodoro_actual': 0,
-                    'accion': 'fin_jornada',
-                    'datos_extra': {},
-                }
-        else:
-            # Descanso corto terminó, siguiente pomodoro
-            siguiente_pomodoro = pomodoro_actual + 1
-            
-            coleccion.update_one(
-                {'_id': ciclo['_id']},
-                {'$set': {
-                    'estado_actual': ESTADO_TRABAJANDO,
-                    'pomodoro_actual': siguiente_pomodoro,
-                }}
-            )
-            
-            _emitir_evento('descanso_finalizado', {
-                'usuario_id': usuario_id,
-                'tipo_descanso': 'corto',
-                'siguiente_pomodoro': siguiente_pomodoro,
-            })
-            
-            return {
-                'nuevo_estado': ESTADO_TRABAJANDO,
-                'pomodoro_actual': siguiente_pomodoro,
-                'accion': 'trabajar',
-                'datos_extra': {'duracion_min': config['pomodoro_min']},
-            }
-    
-    # No debería llegar aquí
-    raise ValueError(f"Evento '{evento}' no manejado en estado '{estado_actual}'")
+    pomodoro_actual = ciclo['pomodoro_actual']
+    registrar_sesion_pomodoro(usuario_id, ciclo, config['pomodoro_min'])
+
+    pomodoros_completados = ciclo['pomodoros_completados'] + 1
+    coleccion.update_one(
+        {'_id': ciclo['_id']},
+        {'$set': {'pomodoros_completados': pomodoros_completados}}
+    )
+
+    _emitir_evento('pomodoro_completado', {
+        'usuario_id': usuario_id,
+        'ciclo_id': str(ciclo['_id']),
+        'pomodoro_numero': pomodoros_completados,
+    })
+
+    _cerrar_pausa_manual(usuario_id)
+
+    if pomodoro_actual >= ciclo['pomodoros_totales']:
+        return _iniciar_descanso_largo(usuario_id, ciclo, coleccion, pomodoro_actual)
+    return _iniciar_descanso_corto(usuario_id, ciclo, coleccion, pomodoro_actual)
+
+
+def _completar_ciclo(usuario_id, ciclo, coleccion):
+    """Marca el ciclo como finalizado y arranca el siguiente si queda jornada."""
+    coleccion.update_one(
+        {'_id': ciclo['_id']},
+        {'$set': {
+            'completado': True,
+            'fin_ciclo': datetime.now(timezone.utc),
+            'estado_actual': ESTADO_INACTIVO,
+        }}
+    )
+
+    _emitir_evento('ciclo_completado', {
+        'usuario_id': usuario_id,
+        'ciclo_id': str(ciclo['_id']),
+        'numero_ciclo': ciclo['numero_ciclo'],
+        'pomodoros_completados': ciclo['pomodoros_completados'] + 1,
+    })
+
+    try:
+        resultado_siguiente = iniciar_ciclo(usuario_id, ciclo['configuracion'])
+        return {
+            'nuevo_estado': ESTADO_TRABAJANDO,
+            'pomodoro_actual': 1,
+            'accion': 'nuevo_ciclo',
+            'datos_extra': resultado_siguiente,
+        }
+    except Exception:
+        # No se pudo iniciar (no hay tiempo o hay ciclo activo)
+        return {
+            'nuevo_estado': ESTADO_INACTIVO,
+            'pomodoro_actual': 0,
+            'accion': 'fin_jornada',
+            'datos_extra': {},
+        }
+
+
+def _reanudar_trabajo(usuario_id, ciclo, coleccion):
+    """Tras un descanso corto vuelve al siguiente pomodoro del ciclo."""
+    siguiente_pomodoro = ciclo['pomodoro_actual'] + 1
+
+    coleccion.update_one(
+        {'_id': ciclo['_id']},
+        {'$set': {
+            'estado_actual': ESTADO_TRABAJANDO,
+            'pomodoro_actual': siguiente_pomodoro,
+        }}
+    )
+
+    _emitir_evento('descanso_finalizado', {
+        'usuario_id': usuario_id,
+        'tipo_descanso': 'corto',
+        'siguiente_pomodoro': siguiente_pomodoro,
+    })
+
+    return {
+        'nuevo_estado': ESTADO_TRABAJANDO,
+        'pomodoro_actual': siguiente_pomodoro,
+        'accion': 'trabajar',
+        'datos_extra': {'duracion_min': ciclo['configuracion']['pomodoro_min']},
+    }
+
+
+def _manejar_descanso_completado(usuario_id, ciclo, coleccion):
+    """Tras un descanso largo cierra el ciclo; tras uno corto, sigue trabajando."""
+    if ciclo['estado_actual'] == ESTADO_DESCANSO_LARGO:
+        return _completar_ciclo(usuario_id, ciclo, coleccion)
+    return _reanudar_trabajo(usuario_id, ciclo, coleccion)

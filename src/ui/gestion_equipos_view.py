@@ -4,7 +4,29 @@ Responsabilidad: Vista para gestionar equipos (crear, editar, asignar miembros).
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    AVISO,
+    BORDE,
+    BOTON_EXITO,
+    BOTON_EXITO_HOVER,
+    BOTON_PELIGRO,
+    BOTON_PELIGRO_HOVER,
+    BOTON_PRIMARIO,
+    BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    FONDO_CARD,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+)
+from src.ui.templates.fuentes import crear_fuente
+
+# Valores por defecto cuando un campo de texto no trae nombre
+_SIN_NOMBRE = "Sin nombre"
+_SIN_ASIGNAR = "-- Sin asignar --"
 
 
 class GestionEquiposView(ctk.CTkToplevel):
@@ -33,12 +55,12 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             header, text="👥 Gestión de Equipos",
-            font=("Comic Sans MS", 18, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(18, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20, pady=12)
 
         ctk.CTkButton(
             header, text="+ Crear Equipo",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=120, height=36, corner_radius=8,
             command=self._crear_equipo,
@@ -55,7 +77,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             lista_frame, text="Equipos",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 10))
 
         self.frame_equipos = ctk.CTkScrollableFrame(
@@ -71,7 +93,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         self.label_detalle_vacio = ctk.CTkLabel(
             self.panel_detalle,
             text="Selecciona un equipo para ver sus detalles",
-            font=("Comic Sans MS", 14),
+            font=crear_fuente(14),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_detalle_vacio.pack(pady=50)
@@ -91,7 +113,7 @@ class GestionEquiposView(ctk.CTkToplevel):
                 ctk.CTkLabel(
                     self.frame_equipos,
                     text="No hay equipos creados.\nUsa el botón 'Crear Equipo'",
-                    font=("Comic Sans MS", 11),
+                    font=crear_fuente(11),
                     text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 return
@@ -102,13 +124,13 @@ class GestionEquiposView(ctk.CTkToplevel):
                 )
                 frame.pack(fill="x", pady=3)
 
-                nombre = equipo.get('nombre', 'Sin nombre')
+                nombre = equipo.get('nombre', _SIN_NOMBRE)
                 miembros = equipo.get('miembros', [])
                 encargado = equipo.get('encargado_id')
 
                 btn = ctk.CTkButton(
                     frame, text=f"📁 {nombre}",
-                    font=("Comic Sans MS", 11),
+                    font=crear_fuente(11),
                     fg_color="transparent", hover_color=FONDO_CARD,
                     text_color=TEXTO_PRINCIPAL, height=36, corner_radius=6,
                     command=lambda e=equipo: self._seleccionar_equipo(e),
@@ -118,7 +140,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
                 info = ctk.CTkLabel(
                     frame, text=f"{len(miembros)} miembros" + (f" | Con encargado" if encargado else " | Sin encargado"),
-                    font=("Comic Sans MS", 9),
+                    font=crear_fuente(9),
                     text_color=TEXTO_SECUNDARIO,
                     anchor="w",
                 )
@@ -128,7 +150,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             ctk.CTkLabel(
                 self.frame_equipos,
                 text=f"Error: {e}",
-                font=("Comic Sans MS", 11),
+                font=crear_fuente(11),
                 text_color=PELIGRO,
             ).pack(pady=20)
 
@@ -150,13 +172,13 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             nombre_frame, text="Nombre:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
             width=100,
         ).pack(side="left")
 
         self.entry_nombre = ctk.CTkEntry(
             nombre_frame,
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=36, corner_radius=8,
         )
@@ -165,7 +187,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             nombre_frame, text="Guardar",
-            font=("Comic Sans MS", 11),
+            font=crear_fuente(11),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=80, height=32, corner_radius=6,
             command=self._guardar_nombre,
@@ -177,7 +199,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             encargado_frame, text="Encargado:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
             width=100,
         ).pack(side="left")
 
@@ -186,7 +208,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         # Miembros
         miembros_label = ctk.CTkLabel(
             detalle_card, text="Miembros del equipo:",
-            font=("Comic Sans MS", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(12, "bold"), text_color=TEXTO_PRINCIPAL,
         )
         miembros_label.pack(anchor="w", padx=20, pady=(15, 5))
 
@@ -204,7 +226,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         self.entry_agregar = ctk.CTkEntry(
             agregar_frame, placeholder_text="ID o email del usuario...",
-            font=("Comic Sans MS", 11),
+            font=crear_fuente(11),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=36, corner_radius=8,
         )
@@ -212,7 +234,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             agregar_frame, text="+ Agregar",
-            font=("Comic Sans MS", 11),
+            font=crear_fuente(11),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=36, corner_radius=8,
             command=self._agregar_miembro,
@@ -221,7 +243,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         # Botón eliminar equipo
         btn_eliminar = ctk.CTkButton(
             detalle_card, text="🗑 Eliminar Equipo",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=self._eliminar_equipo,
@@ -235,10 +257,10 @@ class GestionEquiposView(ctk.CTkToplevel):
             coleccion = conexion_global.obtener_coleccion('usuarios')
             usuarios = list(coleccion.find({'rol': 'encargado', 'activo': True}))
 
-            valores = ["-- Sin asignar --"]
-            self._encargados_map = {"-- Sin asignar --": None}
+            valores = [_SIN_ASIGNAR]
+            self._encargados_map = {_SIN_ASIGNAR: None}
             for u in usuarios:
-                nombre = u.get('nombre', 'Sin nombre')
+                nombre = u.get('nombre', _SIN_NOMBRE)
                 email = u.get('email', '')
                 valores.append(f"{nombre} ({email})")
                 self._encargados_map[f"{nombre} ({email})"] = str(u['_id'])
@@ -246,7 +268,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             self.combo_encargado = ctk.CTkComboBox(
                 parent,
                 values=valores,
-                font=("Comic Sans MS", 11),
+                font=crear_fuente(11),
                 fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
                 button_color=BORDE, width=200,
             )
@@ -262,7 +284,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
             ctk.CTkButton(
                 parent, text="Asignar",
-                font=("Comic Sans MS", 11),
+                font=crear_fuente(11),
                 fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
                 text_color=TEXTO_PRINCIPAL, width=80, height=32, corner_radius=6,
                 command=self._asignar_encargado,
@@ -271,7 +293,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         except Exception as e:
             ctk.CTkLabel(
                 parent, text=f"Error: {e}",
-                font=("Comic Sans MS", 10),
+                font=crear_fuente(10),
                 text_color=PELIGRO,
             ).pack(side="left")
 
@@ -284,7 +306,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             if not miembros:
                 ctk.CTkLabel(
                     parent, text="No hay miembros en este equipo",
-                    font=("Comic Sans MS", 11),
+                    font=crear_fuente(11),
                     text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=10)
                 return
@@ -293,25 +315,25 @@ class GestionEquiposView(ctk.CTkToplevel):
                 frame = ctk.CTkFrame(parent, fg_color=FONDO_SECUNDARIO, corner_radius=6)
                 frame.pack(fill="x", pady=2)
 
-                nombre = m.get('nombre', 'Sin nombre')
+                nombre = m.get('nombre', _SIN_NOMBRE)
                 rol = m.get('rol', 'empleado').title()
                 email = m.get('email', '')
 
                 ctk.CTkLabel(
                     frame, text=f"👤 {nombre}",
-                    font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
+                    font=crear_fuente(11), text_color=TEXTO_PRINCIPAL,
                     anchor="w",
                 ).pack(side="left", padx=10, pady=8)
 
                 ctk.CTkLabel(
                     frame, text=rol,
-                    font=("Comic Sans MS", 9),
+                    font=crear_fuente(9),
                     text_color=AVISO,
                 ).pack(side="left", padx=5)
 
                 ctk.CTkButton(
                     frame, text="Quitar",
-                    font=("Comic Sans MS", 9),
+                    font=crear_fuente(9),
                     fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
                     text_color=TEXTO_PRINCIPAL, width=60, height=24, corner_radius=4,
                     command=lambda mm=m: self._quitar_miembro(mm),
@@ -320,7 +342,7 @@ class GestionEquiposView(ctk.CTkToplevel):
         except Exception as e:
             ctk.CTkLabel(
                 parent, text=f"Error: {e}",
-                font=("Comic Sans MS", 10),
+                font=crear_fuente(10),
                 text_color=PELIGRO,
             ).pack(pady=10)
 
@@ -346,7 +368,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             return
 
         valor = self.combo_encargado.get()
-        if valor == "-- Sin asignar --":
+        if valor == _SIN_ASIGNAR:
             return
 
         encargado_id = self._encargados_map.get(valor)
@@ -435,12 +457,12 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             dialogo, text="Nombre del nuevo equipo:",
-            font=("Comic Sans MS", 14), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14), text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
 
         entry_nombre = ctk.CTkEntry(
             dialogo, placeholder_text="Ej: Equipo de Frontend",
-            font=("Comic Sans MS", 13),
+            font=crear_fuente(13),
             fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL,
             height=40, corner_radius=8,
         )
@@ -461,7 +483,7 @@ class GestionEquiposView(ctk.CTkToplevel):
 
         ctk.CTkButton(
             dialogo, text="Crear",
-            font=("Comic Sans MS", 12, "bold"),
+            font=crear_fuente(12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=confirmar,

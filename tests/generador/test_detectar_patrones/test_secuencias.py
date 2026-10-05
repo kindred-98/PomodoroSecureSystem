@@ -22,7 +22,7 @@ class TestSecuenciaConsecutiva:
         assert resultado['tiene_secuencias_consecutivas']
         assert '123' in resultado['secuencias_encontradas']
     
-    def test_detecta_ABC(self):
+    def test_detecta_abc_mayusculas(self):
         """Test: Detecta secuencia 'ABC' en mayúsculas"""
         resultado = detectar_patrones("ABCXYZ")
         assert resultado['tiene_secuencias_consecutivas']

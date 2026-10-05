@@ -4,7 +4,30 @@ Responsabilidad: Dashboard del supervisor con gestión global.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from bson.errors import InvalidId
+from src.config.colores import (
+    AVISO,
+    BORDE,
+    BOTON_PELIGRO,
+    BOTON_PELIGRO_HOVER,
+    BOTON_PRIMARIO,
+    BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    COMPLETADO,
+    FONDO_CARD,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    INFORMACION,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente
+
+# Valor por defecto cuando un documento no trae nombre
+_SIN_NOMBRE = "Sin nombre"
 
 
 class DashboardSupervisor(ctk.CTkFrame):
@@ -27,13 +50,13 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="🍅 PomodoroSecure",
-            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         nombre = self.usuario.get('nombre', 'Supervisor')
         ctk.CTkLabel(
             header, text=f"{nombre} | Supervisor",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="right", padx=20)
 
         # ── BODY CON SCROLL ──
@@ -50,7 +73,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="⚙️ Gestión",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 10))
 
         botones = [
@@ -65,7 +88,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             hover = BOTON_PELIGRO_HOVER if "Sesión" in texto else BOTON_SECUNDARIO_HOVER
             ctk.CTkButton(
                 lateral, text=texto,
-                font=("Comic Sans MS", 12),
+                font=crear_fuente(12),
                 fg_color=color, hover_color=hover,
                 text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
                 command=cmd,
@@ -81,7 +104,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             buscador_card, text="🔍 Buscar empleado",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         frame_buscador = ctk.CTkFrame(buscador_card, fg_color="transparent")
@@ -89,7 +112,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         self.entry_buscador = ctk.CTkEntry(
             frame_buscador, placeholder_text="Escribe el nombre del empleado...",
-            font=("Comic Sans MS", 12), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(12), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=38, corner_radius=8,
         )
         self.entry_buscador.pack(side="left", fill="x", expand=True, padx=(0, 10))
@@ -97,7 +120,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         self.label_resultado_busqueda = ctk.CTkLabel(
             frame_buscador, text="",
-            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(11), text_color=TEXTO_SECUNDARIO,
         )
         self.label_resultado_busqueda.pack(side="right")
 
@@ -107,7 +130,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             resumen_card, text="📊 Resumen General",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         self.frame_stats = ctk.CTkFrame(resumen_card, fg_color="transparent")
@@ -115,7 +138,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         self.label_stats = ctk.CTkLabel(
             self.frame_stats, text="Cargando...",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_stats.pack()
 
@@ -125,7 +148,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             equipos_card, text="👥 Equipos",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         self.frame_equipos = ctk.CTkScrollableFrame(
@@ -141,7 +164,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             usuarios_card, text="Usuarios",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         self.frame_usuarios = ctk.CTkScrollableFrame(
@@ -160,12 +183,12 @@ class DashboardSupervisor(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header_anom, text="🚨 Anomalías Recientes",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left")
 
         self.badge_anomalias = ctk.CTkLabel(
             header_anom, text="",
-            font=("Comic Sans MS", 12, "bold"), text_color=PELIGRO,
+            font=crear_fuente(12, "bold"), text_color=PELIGRO,
         )
         self.badge_anomalias.pack(side="right")
 
@@ -198,7 +221,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             })
             
             if usuario:
-                nombre = usuario.get('nombre', 'Sin nombre')
+                nombre = usuario.get('nombre', _SIN_NOMBRE)
                 email = usuario.get('email', '')
                 rol = usuario.get('rol', 'empleado').title()
                 
@@ -233,7 +256,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 widget.destroy()
 
             for equipo in equipos:
-                eq_nombre = equipo.get('nombre', 'Sin nombre')
+                eq_nombre = equipo.get('nombre', _SIN_NOMBRE)
                 miembros = equipo.get('miembros', [])
                 total_usuarios += len(miembros)
                 
@@ -247,7 +270,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 
                 ctk.CTkLabel(
                     info, text=f"📁 {eq_nombre} ({len(miembros)} miembros)",
-                    font=("Comic Sans MS", 12), text_color=TEXTO_PRINCIPAL,
+                    font=crear_fuente(12), text_color=TEXTO_PRINCIPAL,
                 ).pack(side="left", padx=10, pady=6)
                 
                 # Botón para minimizar/maximizar
@@ -256,7 +279,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 
                 ctk.CTkButton(
                     info, text="👁️ Ver",
-                    font=("Comic Sans MS", 10),
+                    font=crear_fuente(10),
                     fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
                     width=60, height=28,
                     command=toggle,
@@ -281,7 +304,7 @@ class DashboardSupervisor(ctk.CTkFrame):
         
         ctk.CTkLabel(
             popup, text=f"👥 {nombre_equipo}",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(pady=15)
         
         from src.db.conexion import conexion_global
@@ -295,18 +318,18 @@ class DashboardSupervisor(ctk.CTkFrame):
             try:
                 membro = usuarios.find_one({'_id': ObjectId(member_id)})
                 if membro:
-                    nombre = membro.get('nombre', 'Sin nombre')
+                    nombre = membro.get('nombre', _SIN_NOMBRE)
                     email = membro.get('email', '')
                     ctk.CTkLabel(
                         frame_lista, text=f"• {nombre} ({email})",
-                        font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
+                        font=crear_fuente(11), text_color=TEXTO_PRINCIPAL,
                     ).pack(anchor="w", pady=2)
-            except:  # nosec B112
+            except (InvalidId, TypeError):
                 continue
         
         ctk.CTkButton(
             popup, text="Cerrar",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             command=popup.destroy,
         ).pack(pady=15)
 
@@ -328,7 +351,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 ctk.CTkLabel(
                     self.frame_usuarios,
                     text="No hay usuarios registrados.",
-                    font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+                    font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=10)
                 return
 
@@ -337,7 +360,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 frame = ctk.CTkFrame(self.frame_usuarios, fg_color=FONDO_SECUNDARIO, corner_radius=6)
                 frame.pack(fill="x", pady=2)
 
-                nombre = usr.get('nombre', 'Sin nombre')
+                nombre = usr.get('nombre', _SIN_NOMBRE)
                 email = usr.get('email', '')
                 rol = usr.get('rol', 'empleado')
                 
@@ -353,7 +376,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
                 ctk.CTkLabel(
                     info, text=f"{status_icon} {nombre} ({email})",
-                    font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL, anchor="w",
+                    font=crear_fuente(11), text_color=TEXTO_PRINCIPAL, anchor="w",
                 ).pack(fill="x")
 
                 meta_frame = ctk.CTkFrame(info, fg_color="transparent")
@@ -361,7 +384,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
                 rol_label = ctk.CTkLabel(
                     meta_frame, text=f"Rol: {rol.upper()}",
-                    font=("Comic Sans MS", 9, "bold"),
+                    font=crear_fuente(9, "bold"),
                     text_color=self._color_rol(rol),
                     anchor="w",
                 )
@@ -369,7 +392,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
                 status_label = ctk.CTkLabel(
                     meta_frame, text=status_text,
-                    font=("Comic Sans MS", 9),
+                    font=crear_fuente(9),
                     text_color=status_color,
                     anchor="w",
                 )
@@ -377,7 +400,7 @@ class DashboardSupervisor(ctk.CTkFrame):
 
                 combo = ctk.CTkComboBox(
                     frame, values=["empleado", "encargado", "supervisor"],
-                    font=("Comic Sans MS", 10), width=120, height=28,
+                    font=crear_fuente(10), width=120, height=28,
                     fg_color=FONDO_CARD, text_color=TEXTO_PRINCIPAL,
                     button_color=TRABAJO_ACTIVO,
                     command=lambda r, u=usr, rl=rol_label: self._cambiar_rol(u, r, rl),
@@ -389,7 +412,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.frame_usuarios,
                 text=f"Error: {e}",
-                font=("Comic Sans MS", 12), text_color=PELIGRO,
+                font=crear_fuente(12), text_color=PELIGRO,
             ).pack(pady=10)
 
     def _cambiar_rol(self, usuario, nuevo_rol, label_rol):
@@ -428,7 +451,7 @@ class DashboardSupervisor(ctk.CTkFrame):
                 ctk.CTkLabel(
                     self.frame_anomalias,
                     text="No hay anomalías registradas",
-                    font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+                    font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=20)
                 return
 
@@ -444,18 +467,18 @@ class DashboardSupervisor(ctk.CTkFrame):
 
                 ctk.CTkLabel(
                     frame, text=f"{icono} {anom.get('tipo', 'desconocido')}",
-                    font=("Comic Sans MS", 11, "bold"), text_color=color,
+                    font=crear_fuente(11, "bold"), text_color=color,
                 ).pack(side="left", padx=10, pady=6)
 
                 ctk.CTkLabel(
                     frame, text=anom.get('detalle', '')[:50],
-                    font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
+                    font=crear_fuente(10), text_color=TEXTO_SECUNDARIO,
                 ).pack(side="left", padx=5)
 
                 if not anom.get('resuelto', False):
                     ctk.CTkButton(
                         frame, text="Marcar vista",
-                        font=("Comic Sans MS", 9),
+                        font=crear_fuente(9),
                         fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
                         text_color=TEXTO_PRINCIPAL, height=24, width=80, corner_radius=4,
                         command=lambda a=anom: self._marcar_anomalia(a),

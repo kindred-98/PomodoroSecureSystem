@@ -13,6 +13,8 @@ from src.db.anomalias import registrar_anomalia
 DURACION_OTP_SEGUNDOS = 420  # 7 minutos
 MAXIMO_INTENTOS = 3
 
+_ERROR_USUARIO_VACIO = "usuario_id no puede estar vacío"
+
 
 def generar_otp(usuario_id: str, ciclo_id: str = None) -> dict:
     """
@@ -39,7 +41,7 @@ def generar_otp(usuario_id: str, ciclo_id: str = None) -> dict:
     if not isinstance(usuario_id, str):
         raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
     if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
+        raise ValueError(_ERROR_USUARIO_VACIO)
     
     from bson import ObjectId
     try:
@@ -117,7 +119,7 @@ def verificar_otp(usuario_id: str, codigo_introducido: str) -> dict:
     if not isinstance(codigo_introducido, str):
         raise TypeError(f"codigo_introducido debe ser string, recibido: {type(codigo_introducido).__name__}")
     if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
+        raise ValueError(_ERROR_USUARIO_VACIO)
     
     from bson import ObjectId
     try:
@@ -249,7 +251,7 @@ def obtener_estado_otp(usuario_id: str) -> dict:
     if not isinstance(usuario_id, str):
         raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
     if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
+        raise ValueError(_ERROR_USUARIO_VACIO)
     
     from bson import ObjectId
     try:
@@ -306,7 +308,7 @@ def cancelar_otp(usuario_id: str) -> bool:
     if not isinstance(usuario_id, str):
         raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
     if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
+        raise ValueError(_ERROR_USUARIO_VACIO)
     
     from bson import ObjectId
     try:

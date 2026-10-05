@@ -75,6 +75,52 @@ def esta_conectado(usuario_id: str) -> bool:
         return False
 
 
+def _buscar_ciclo(usuario_id: str, completado: bool):
+    """Devuelve el ciclo del usuario filtrando por completado, o None."""
+    from bson import ObjectId
+
+    coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
+    return coleccion_ciclos.find_one({
+        'usuario_id': ObjectId(usuario_id),
+        'completado': completado,
+    })
+
+
+def _estado_texto(ciclo) -> str:
+    """Traduce el estado actual del ciclo a texto para la UI."""
+    estado = ciclo.get('estado_actual', 'TRABAJANDO')
+    if estado in ('DESCANSO_CORTO', 'DESCANSO_LARGO'):
+        return "En descanso"
+    return "Trabajando"
+
+
+def _ultimo_ciclo_finalizado(usuario_id: str):
+    """Devuelve el ciclo completado más reciente, o None."""
+    from bson import ObjectId
+
+    coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
+    return coleccion.find_one(
+        {'usuario_id': ObjectId(usuario_id), 'completado': True},
+        sort=[('fin_ciclo', -1)]
+    )
+
+
+def _asegurar_utc(valor):
+    """Normaliza a UTC un datetime naive devuelto por MongoDB."""
+    if hasattr(valor, 'tzinfo') and valor.tzinfo is None:
+        return valor.replace(tzinfo=timezone.utc)
+    return valor
+
+
+def formatear_minutos_desconectado(minutos: int) -> str:
+    """Convierte minutos desconectados en texto legible."""
+    if minutos < 1:
+        return "Hace menos de 1 minuto"
+    if minutos < 60:
+        return f"Hace {minutos} min"
+    return f"Hace {minutos // 60}h {minutos % 60}m"
+
+
 def obtener_tiempo_desconectado(usuario_id: str) -> str:
     """
     Obtiene el tiempo desde la última desconexión.
@@ -86,49 +132,17 @@ def obtener_tiempo_desconectado(usuario_id: str) -> str:
         str: Texto con el tiempo desconectado o "Conectado"
     """
     try:
-        from bson import ObjectId
-        
-        # Verificar si tiene ciclo activo
-        coleccion_ciclos = conexion_global.obtener_coleccion('ciclos_pomodoro')
-        ciclo_activo = coleccion_ciclos.find_one({
-            'usuario_id': ObjectId(usuario_id),
-            'completado': False,
-        })
-        
+        ciclo_activo = _buscar_ciclo(usuario_id, False)
         if ciclo_activo:
-            estado = ciclo_activo.get('estado_actual', 'TRABAJANDO')
-            if estado == 'DESCANSO_CORTO' or estado == 'DESCANSO_LARGO':
-                return "En descanso"
-            return "Trabajando"
-        
-        # Buscar último ciclo completado
-        coleccion = conexion_global.obtener_coleccion('ciclos_pomodoro')
-        ultimo = coleccion.find_one(
-            {'usuario_id': ObjectId(usuario_id), 'completado': True},
-            sort=[('fin_ciclo', -1)]
-        )
-        
+            return _estado_texto(ciclo_activo)
+
+        ultimo = _ultimo_ciclo_finalizado(usuario_id)
         if ultimo and 'fin_ciclo' in ultimo:
-            ahora = datetime.now(timezone.utc)
-            fin = ultimo['fin_ciclo']
-            
-            if hasattr(fin, 'tzinfo') and fin.tzinfo is None:
-                fin = fin.replace(tzinfo=timezone.utc)
-            if hasattr(ahora, 'tzinfo') and ahora.tzinfo is None:
-                ahora = ahora.replace(tzinfo=timezone.utc)
-            
-            diferencia = ahora - fin
-            minutos = int(diferencia.total_seconds() / 60)
-            
-            if minutos < 1:
-                return "Hace menos de 1 minuto"
-            elif minutos < 60:
-                return f"Hace {minutos} min"
-            else:
-                horas = minutos // 60
-                mins = minutos % 60
-                return f"Hace {horas}h {mins}m"
-        
+            ahora = _asegurar_utc(datetime.now(timezone.utc))
+            fin = _asegurar_utc(ultimo['fin_ciclo'])
+            minutos = int((ahora - fin).total_seconds() / 60)
+            return formatear_minutos_desconectado(minutos)
+
         return "Sin actividad reciente"
     except Exception:
         return "Desconocido"

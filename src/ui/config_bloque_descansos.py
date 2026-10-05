@@ -5,7 +5,29 @@ Se muestra al supervisor la primera vez que inicia sesión.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    BORDE,
+    BOTON_PRIMARIO,
+    BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente
+
+# Etiqueta del preset por defecto (4 cortos de 5 min + 1 largo de 30 min)
+_PRESET_POR_DEFECTO = "5+5+5+5 + 30"
+_PRESETS = {
+    _PRESET_POR_DEFECTO: ([5, 5, 5, 5], 30),
+    "7+7+7+7 + 22": ([7, 7, 7, 7], 22),
+    "10+10+10+5 + 15": ([10, 10, 10, 5], 15),
+    "8+8+8+8 + 18": ([8, 8, 8, 8], 18),
+}
 
 
 class ConfigBloqueDescansos(ctk.CTkToplevel):
@@ -30,13 +52,13 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
     def _crear_widgets(self):
         ctk.CTkLabel(
             self, text="Configura tus descansos por bloque",
-            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(padx=20, pady=(20, 5))
 
         ctk.CTkLabel(
             self,
             text="Tienes 50 minutos de descanso por ciclo.\nRepartelos como prefieras (4 cortos + 1 largo).",
-            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(11), text_color=TEXTO_SECUNDARIO,
             justify="center",
         ).pack(padx=20, pady=(0, 10))
 
@@ -46,23 +68,18 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             presets_frame, text="Presets:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
-        presets = [
-            ("5+5+5+5 + 30", [5, 5, 5, 5], 30),
-            ("7+7+7+7 + 22", [7, 7, 7, 7], 22),
-            ("10+10+10+5 + 15", [10, 10, 10, 5], 15),
-            ("8+8+8+8 + 18", [8, 8, 8, 8], 18),
-        ]
+        presets = [(etiqueta, *valores) for etiqueta, valores in _PRESETS.items()]
 
-        self.preset_var = ctk.StringVar(value="5+5+5+5 + 30")
+        self.preset_var = ctk.StringVar(value=_PRESET_POR_DEFECTO)
 
         for texto, cortos, largo in presets:
             ctk.CTkRadioButton(
                 presets_frame, text=texto,
                 variable=self.preset_var, value=texto,
-                font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente(11), text_color=TEXTO_SECUNDARIO,
                 fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
             ).pack(anchor="w", pady=1)
 
@@ -72,43 +89,43 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
         # Personalizado
         ctk.CTkLabel(
             self, text="O personaliza:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", padx=20)
 
         custom_frame = ctk.CTkFrame(self, fg_color="transparent")
         custom_frame.pack(fill="x", padx=20, pady=(5, 5))
 
-        ctk.CTkLabel(custom_frame, text="Corto 1:", font=("Comic Sans MS", 10),
+        ctk.CTkLabel(custom_frame, text="Corto 1:", font=crear_fuente(10),
                      text_color=TEXTO_SECUNDARIO).grid(row=0, column=0, padx=3)
-        self.e1 = ctk.CTkEntry(custom_frame, width=45, height=28, font=("Comic Sans MS", 11),
+        self.e1 = ctk.CTkEntry(custom_frame, width=45, height=28, font=crear_fuente(11),
                                fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL)
         self.e1.grid(row=0, column=1, padx=3)
         self.e1.insert(0, "5")
 
-        ctk.CTkLabel(custom_frame, text="Corto 2:", font=("Comic Sans MS", 10),
+        ctk.CTkLabel(custom_frame, text="Corto 2:", font=crear_fuente(10),
                      text_color=TEXTO_SECUNDARIO).grid(row=0, column=2, padx=3)
-        self.e2 = ctk.CTkEntry(custom_frame, width=45, height=28, font=("Comic Sans MS", 11),
+        self.e2 = ctk.CTkEntry(custom_frame, width=45, height=28, font=crear_fuente(11),
                                fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL)
         self.e2.grid(row=0, column=3, padx=3)
         self.e2.insert(0, "5")
 
-        ctk.CTkLabel(custom_frame, text="Corto 3:", font=("Comic Sans MS", 10),
+        ctk.CTkLabel(custom_frame, text="Corto 3:", font=crear_fuente(10),
                      text_color=TEXTO_SECUNDARIO).grid(row=0, column=4, padx=3)
-        self.e3 = ctk.CTkEntry(custom_frame, width=45, height=28, font=("Comic Sans MS", 11),
+        self.e3 = ctk.CTkEntry(custom_frame, width=45, height=28, font=crear_fuente(11),
                                fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL)
         self.e3.grid(row=0, column=5, padx=3)
         self.e3.insert(0, "5")
 
-        ctk.CTkLabel(custom_frame, text="Corto 4:", font=("Comic Sans MS", 10),
+        ctk.CTkLabel(custom_frame, text="Corto 4:", font=crear_fuente(10),
                      text_color=TEXTO_SECUNDARIO).grid(row=0, column=6, padx=3)
-        self.e4 = ctk.CTkEntry(custom_frame, width=45, height=28, font=("Comic Sans MS", 11),
+        self.e4 = ctk.CTkEntry(custom_frame, width=45, height=28, font=crear_fuente(11),
                                fg_color=FONDO_SECUNDARIO, text_color=TEXTO_PRINCIPAL)
         self.e4.grid(row=0, column=7, padx=3)
         self.e4.insert(0, "5")
 
         self.label_info = ctk.CTkLabel(
             self, text="",
-            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(11), text_color=TEXTO_SECUNDARIO,
         )
         self.label_info.pack(pady=(5, 5))
 
@@ -118,7 +135,7 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
 
         ctk.CTkButton(
             botones, text="Usar preset seleccionado",
-            font=("Comic Sans MS", 12, "bold"),
+            font=crear_fuente(12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=self._usar_preset,
@@ -126,7 +143,7 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
 
         ctk.CTkButton(
             botones, text="Usar personalizado",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=40, corner_radius=8,
             command=self._usar_custom,
@@ -134,14 +151,8 @@ class ConfigBloqueDescansos(ctk.CTkToplevel):
 
     def _usar_preset(self):
         """Aplica el preset seleccionado."""
-        presets = {
-            "5+5+5+5 + 30": ([5, 5, 5, 5], 30),
-            "7+7+7+7 + 22": ([7, 7, 7, 7], 22),
-            "10+10+10+5 + 15": ([10, 10, 10, 5], 15),
-            "8+8+8+8 + 18": ([8, 8, 8, 8], 18),
-        }
         seleccion = self.preset_var.get()
-        cortos, largo = presets.get(seleccion, ([5, 5, 5, 5], 30))
+        cortos, largo = _PRESETS.get(seleccion, _PRESETS[_PRESET_POR_DEFECTO])
         self._guardar(cortos, largo)
 
     def _usar_custom(self):

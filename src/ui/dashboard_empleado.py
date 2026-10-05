@@ -5,7 +5,26 @@ Lee el estado del servicio_timer (no lo posee).
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    BORDE,
+    BOTON_PELIGRO,
+    BOTON_PELIGRO_HOVER,
+    BOTON_PRIMARIO,
+    BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    FONDO_CARD,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TIMER_DESCANSO_CORTO,
+    TIMER_DESCANSO_LARGO,
+    TIMER_PAUSADO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente
 
 
 class DashboardEmpleado(ctk.CTkFrame):
@@ -31,14 +50,14 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="PomodoroSecure",
-            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         nombre = self.usuario.get('nombre', 'Usuario')
         rol = self.usuario.get('rol', 'empleado')
         ctk.CTkLabel(
             header, text=f"{nombre} | {rol.title()}",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="right", padx=20)
 
         # BODY
@@ -52,18 +71,18 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Hoy",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 5))
 
         self.label_ciclos = ctk.CTkLabel(
             lateral, text="Ciclos: 0/inf",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_ciclos.pack(anchor="w", padx=15)
 
         self.label_trabajado = ctk.CTkLabel(
             lateral, text="Trabajado: 0h 0m",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_trabajado.pack(anchor="w", padx=15, pady=(3, 0))
 
@@ -71,12 +90,12 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Pausas",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15)
 
         self.label_pausas = ctk.CTkLabel(
             lateral, text="O O  (0 usadas)",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_pausas.pack(anchor="w", padx=15, pady=(5, 0))
 
@@ -86,7 +105,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         if self.usuario.get('rol') == 'supervisor':
             ctk.CTkButton(
                 lateral, text="Descansos (empresa)",
-                font=("Comic Sans MS", 12),
+                font=crear_fuente(12),
                 fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
                 text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
                 command=self._ver_descansos,
@@ -94,7 +113,7 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkButton(
             lateral, text="Contrasena",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=self.on_ver_contraseña,
@@ -102,7 +121,7 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkButton(
             lateral, text="Fin de Jornada",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color="#E67E22", hover_color="#D35400",
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=self._fin_jornada_click,
@@ -110,7 +129,7 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         ctk.CTkButton(
             lateral, text="Cerrar Sesion",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_PELIGRO, hover_color=BOTON_PELIGRO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=self._on_logout_click,
@@ -126,13 +145,13 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         self.label_estado = ctk.CTkLabel(
             timer_card, text="INACTIVO",
-            font=("Comic Sans MS", 18, "bold"), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(18, "bold"), text_color=TEXTO_SECUNDARIO,
         )
         self.label_estado.pack(pady=(25, 5))
 
         self.label_countdown = ctk.CTkLabel(
             timer_card, text="25:00",
-            font=("Comic Sans MS", 56, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(56, "bold"), text_color=TEXTO_PRINCIPAL,
         )
         self.label_countdown.pack()
 
@@ -150,7 +169,7 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         self.boton_iniciar = ctk.CTkButton(
             botones_control, text="Iniciar Jornada",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=180, corner_radius=10,
             command=self._iniciar_ciclo,
@@ -159,7 +178,7 @@ class DashboardEmpleado(ctk.CTkFrame):
 
         self.boton_pausar = ctk.CTkButton(
             botones_control, text="Pausar",
-            font=("Comic Sans MS", 13),
+            font=crear_fuente(13),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=130, corner_radius=10,
             command=self._pausar_reanudar,
@@ -305,14 +324,14 @@ class DashboardEmpleado(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="¿Finalizar jornada laboral?",
-            font=("Comic Sans MS", 16, "bold"),
+            font=crear_fuente(16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
         
         ctk.CTkLabel(
             dialogo,
             text="Se generará un reporte con tu actividad\ny se reiniciarán todos los contadores.",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=10)
         
@@ -334,7 +353,7 @@ class DashboardEmpleado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=mensaje,
-                    font=("Comic Sans MS", 12),
+                    font=crear_fuente(12),
                     text_color="#2ECC71",
                 ).pack(pady=20)
                 
@@ -344,13 +363,13 @@ class DashboardEmpleado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=f"Error: {resultado.get('error', 'Desconocido')}",
-                    font=("Comic Sans MS", 12),
+                    font=crear_fuente(12),
                     text_color=PELIGRO,
                 ).pack(pady=20)
         
         ctk.CTkButton(
             botones, text="Confirmar",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color="#27AE60", hover_color="#219A52",
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=confirmar,
@@ -359,7 +378,7 @@ class DashboardEmpleado(ctk.CTkFrame):
         
         ctk.CTkButton(
             botones, text="Cancelar",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=dialogo.destroy,

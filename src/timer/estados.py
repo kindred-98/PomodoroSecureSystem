@@ -47,6 +47,80 @@ def obtener_transiciones_validas() -> dict:
     return TRANSICIONES_VALIDAS.copy()
 
 
+def _minutos_desde_hora(horario: str, campo: str) -> int:
+    """Convierte un horario "HH:MM" a minutos desde medianoche."""
+    try:
+        partes = horario.split(":")
+        return int(partes[0]) * 60 + int(partes[1])
+    except (ValueError, IndexError):
+        raise ValueError(
+            f"Formato de hora inválido. Use 'HH:MM'. Recibido: {campo}='{horario}'"
+        )
+
+
+def _validar_horarios(horario_inicio: str, horario_fin: str) -> tuple:
+    """Valida tipos y coherencia del horario, devolviendo los minutos de inicio y fin."""
+    if not isinstance(horario_inicio, str):
+        raise TypeError(
+            f"horario_inicio debe ser string, "
+            f"recibido: {type(horario_inicio).__name__}"
+        )
+    if not isinstance(horario_fin, str):
+        raise TypeError(
+            f"horario_fin debe ser string, "
+            f"recibido: {type(horario_fin).__name__}"
+        )
+
+    minutos_inicio = _minutos_desde_hora(horario_inicio, "inicio")
+    minutos_fin = _minutos_desde_hora(horario_fin, "fin")
+
+    if minutos_fin <= minutos_inicio:
+        raise ValueError(
+            f"horario_fin ({horario_fin}) debe ser posterior a "
+            f"horario_inicio ({horario_inicio})"
+        )
+
+    return minutos_inicio, minutos_fin
+
+
+def _validar_descansos_cortos(descansos_cortos: list) -> list:
+    """Valida la lista de descansos cortos y devuelve los valores por defecto si es None."""
+    if descansos_cortos is None:
+        return [5, 5, 5, 5]
+
+    if not isinstance(descansos_cortos, list):
+        raise TypeError(
+            f"descansos_cortos debe ser list, "
+            f"recibido: {type(descansos_cortos).__name__}"
+        )
+
+    return descansos_cortos
+
+
+def _pomodoros_ciclo_reducido(
+    minutos_sobrantes: int,
+    pomodoro_min: int,
+    descansos_cortos: list,
+) -> int:
+    """Calcula cuántos pomodoros caben en el tiempo sobrante de la jornada."""
+    pomodoros = 0
+    tiempo_disponible = minutos_sobrantes
+
+    for i in range(len(descansos_cortos)):
+        if tiempo_disponible < pomodoro_min:
+            break
+        pomodoros += 1
+        tiempo_disponible -= pomodoro_min
+
+        # Después de cada pomodoro, salvo el último, debe caber un descanso corto
+        if i < len(descansos_cortos) - 1 and tiempo_disponible >= descansos_cortos[i]:
+            tiempo_disponible -= descansos_cortos[i]
+        else:
+            break
+
+    return pomodoros
+
+
 def calcular_ciclos_jornada(
     horario_inicio: str,
     horario_fin: str,
@@ -87,44 +161,9 @@ def calcular_ciclos_jornada(
         TypeError: Si tipos son incorrectos
         ValueError: Si formato de hora es inválido o fin <= inicio
     """
-    if not isinstance(horario_inicio, str):
-        raise TypeError(
-            f"horario_inicio debe ser string, "
-            f"recibido: {type(horario_inicio).__name__}"
-        )
-    if not isinstance(horario_fin, str):
-        raise TypeError(
-            f"horario_fin debe ser string, "
-            f"recibido: {type(horario_fin).__name__}"
-        )
-    
-    if descansos_cortos is None:
-        descansos_cortos = [5, 5, 5, 5]
-    
-    if not isinstance(descansos_cortos, list):
-        raise TypeError(
-            f"descansos_cortos debe ser list, "
-            f"recibido: {type(descansos_cortos).__name__}"
-        )
-    
-    # Parsear horas
-    try:
-        partes_inicio = horario_inicio.split(":")
-        partes_fin = horario_fin.split(":")
-        minutos_inicio = int(partes_inicio[0]) * 60 + int(partes_inicio[1])
-        minutos_fin = int(partes_fin[0]) * 60 + int(partes_fin[1])
-    except (ValueError, IndexError):
-        raise ValueError(
-            f"Formato de hora inválido. Use 'HH:MM'. "
-            f"Recibido: inicio='{horario_inicio}', fin='{horario_fin}'"
-        )
-    
-    if minutos_fin <= minutos_inicio:
-        raise ValueError(
-            f"horario_fin ({horario_fin}) debe ser posterior a "
-            f"horario_inicio ({horario_inicio})"
-        )
-    
+    descansos_cortos = _validar_descansos_cortos(descansos_cortos)
+    minutos_inicio, minutos_fin = _validar_horarios(horario_inicio, horario_fin)
+
     duracion_jornada = minutos_fin - minutos_inicio
     pomodoros_por_ciclo = len(descansos_cortos)
     
@@ -146,20 +185,10 @@ def calcular_ciclos_jornada(
     
     pomodoros_ciclo_reducido = 0
     if ciclo_reducido:
-        # Calcular cuántos pomodoros caben en el tiempo sobrante
-        tiempo_disponible = minutos_sobrantes
-        for i in range(pomodoros_por_ciclo):
-            if tiempo_disponible >= pomodoro_min:
-                pomodoros_ciclo_reducido += 1
-                tiempo_disponible -= pomodoro_min
-                # Después de cada pomodoro excepto el último quepa
-                if i < pomodoros_por_ciclo - 1 and tiempo_disponible >= descansos_cortos[i]:
-                    tiempo_disponible -= descansos_cortos[i]
-                else:
-                    break
-            else:
-                break
-    
+        pomodoros_ciclo_reducido = _pomodoros_ciclo_reducido(
+            minutos_sobrantes, pomodoro_min, descansos_cortos
+        )
+
     return {
         'inicio_jornada': horario_inicio,
         'fin_jornada': horario_fin,

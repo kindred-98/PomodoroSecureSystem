@@ -8,6 +8,8 @@ Responsabilidad: Definición de fuentes/tipografía para toda la UI.
 # ============================================
 FUENTE_PRINCIPAL = "Comic Sans MS"
 FUENTE_ALTERNATIVA = "Segoe UI"
+FUENTE_MONOESPACIADA = "JetBrains Mono"
+FUENTE_EMOJI = "Segoe UI Emoji"
 
 # ============================================
 # TAMAÑOS DE FUENTE
@@ -36,6 +38,17 @@ ICONO_COPIAR = "📋"
 def crear_fuente(tamano=14, peso="normal"):
     """Crea una tupla de fuente."""
     return (FUENTE_PRINCIPAL, tamano, peso)
+
+
+def crear_fuente_mono(tamano=14, peso="normal"):
+    """Crea una tupla de fuente monoespaciada."""
+    return (FUENTE_MONOESPACIADA, tamano, peso)
+
+
+def crear_fuente_emoji(tamano=14, peso="normal"):
+    """Crea una tupla de fuente para emojis."""
+    return (FUENTE_EMOJI, tamano, peso)
+
 
 TITULO = crear_fuente(TAMANO_TITULO, "bold")
 SUBTITULO = crear_fuente(TAMANO_SUBTITULO, "bold")

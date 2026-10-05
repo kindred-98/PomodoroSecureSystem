@@ -3,6 +3,7 @@ Actualizador de tema en tiempo real.
 """
 
 import customtkinter as ctk
+from tkinter import TclError
 
 tema_actual = "dark"
 
@@ -24,7 +25,7 @@ def _actualizar_ui():
     for widget in ctk.CTk._app_layer:
         try:
             widget.update()
-        except:
+        except (RuntimeError, TclError):
             pass
 
 

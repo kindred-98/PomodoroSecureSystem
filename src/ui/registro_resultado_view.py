@@ -12,6 +12,7 @@ from src.ui.templates import (
     TRABAJO_ACTIVO, COMPLETADO,
     crear_fuente, NORMAL, NORMAL_NEGRITA, PEQUENO, MINIMO
 )
+from src.ui.templates.fuentes import crear_fuente_emoji
 
 
 class RegistroResultadoView(ctk.CTkFrame):
@@ -54,7 +55,7 @@ class RegistroResultadoView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.card,
             text="✅",
-            font=("Segoe UI Emoji", 60),
+            font=crear_fuente_emoji(60),
             text_color=COMPLETADO,
         ).pack(pady=(20, 10))
 

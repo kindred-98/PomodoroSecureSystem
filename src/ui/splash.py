@@ -4,7 +4,14 @@ Responsabilidad: Splash Screen de carga inicial.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente, crear_fuente_emoji
 
 
 class SplashView(ctk.CTkFrame):
@@ -24,7 +31,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="🍅🔐",
-            font=("Segoe UI Emoji", 100),
+            font=crear_fuente_emoji(100),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(0, 20))
 
@@ -32,7 +39,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="PomodoroSecure",
-            font=("Comic Sans MS", 40, "bold"),
+            font=crear_fuente(40, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack()
 
@@ -40,7 +47,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="Sistema de Gestión Segura de Tiempo",
-            font=("Comic Sans MS", 20),
+            font=crear_fuente(20),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(5, 30))
 
@@ -59,7 +66,7 @@ class SplashView(ctk.CTkFrame):
         ctk.CTkLabel(
             centro,
             text="v1.0.0",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=(20, 0))
 

@@ -4,8 +4,12 @@ Responsabilidad: Componentes UI reutilizables (botones, inputs, cards).
 """
 
 import customtkinter as ctk
-from src.ui.templates.theme import *
-from src.ui.templates.fuentes import *
+from src.ui.templates.theme import (
+    BOTON_PELIGRO, BOTON_PELIGRO_HOVER, BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER, FONDO_CARD, FONDO_SECUNDARIO,
+    PELIGRO, TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import NORMAL, NORMAL_NEGRITA, PEQUENO, TITULO, crear_fuente
 
 
 # ============================================

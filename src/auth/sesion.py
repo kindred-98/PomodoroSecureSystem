@@ -15,6 +15,10 @@ _EXPIRAR_SESION_SEGUNDOS = int(os.getenv('EXPIRAR_SESION_SEGUNDOS', '28800'))
 # Máximo sesiones simultáneas por usuario
 _MAX_SESIONES_POR_USUARIO = int(os.getenv('MAX_SESIONES_POR_USUARIO', '3'))
 
+# Mensajes de validación reutilizados
+_ERROR_TOKEN_VACIO = "token_sesion no puede estar vacío"
+_ERROR_USUARIO_VACIO = "usuario_id no puede estar vacío"
+
 
 def crear_sesion(usuario_id: str, token_sesion: str) -> dict:
     """
@@ -37,9 +41,9 @@ def crear_sesion(usuario_id: str, token_sesion: str) -> dict:
         raise TypeError(f"token_sesion debe ser string, recibido: {type(token_sesion).__name__}")
     
     if not usuario_id.strip():
-        raise ValueError("usuario_id no puede estar vacío")
+        raise ValueError(_ERROR_USUARIO_VACIO)
     if not token_sesion.strip():
-        raise ValueError("token_sesion no puede estar vacío")
+        raise ValueError(_ERROR_TOKEN_VACIO)
     
     from bson import ObjectId
     try:
@@ -79,7 +83,7 @@ def verificar_sesion(token_sesion: str) -> dict:
     if not isinstance(token_sesion, str):
         raise TypeError(f"token_sesion debe ser string, recibido: {type(token_sesion).__name__}")
     if not token_sesion.strip():
-        raise ValueError("token_sesion no puede estar vacío")
+        raise ValueError(_ERROR_TOKEN_VACIO)
     
     coleccion_sesiones = conexion_global.obtener_coleccion('sesiones_auth')
     sesion = coleccion_sesiones.find_one({
@@ -135,7 +139,7 @@ def cerrar_sesion_por_token(token_sesion: str) -> bool:
     if not isinstance(token_sesion, str):
         raise TypeError(f"token_sesion debe ser string, recibido: {type(token_sesion).__name__}")
     if not token_sesion.strip():
-        raise ValueError("token_sesion no puede estar vacío")
+        raise ValueError(_ERROR_TOKEN_VACIO)
     
     coleccion = conexion_global.obtener_coleccion('sesiones_auth')
     sesion = coleccion.find_one({'token_sesion': token_sesion})

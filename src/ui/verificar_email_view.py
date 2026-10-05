@@ -12,6 +12,9 @@ from src.ui.templates import (
     crear_fuente, NORMAL, NORMAL_NEGRITA, PEQUENO, MINIMO
 )
 
+# Texto del botón de verificación de email
+_TXT_VERIFICAR = "\u2713 Verificar"
+
 
 class VerificarEmailView(ctk.CTkFrame):
     """Pantalla para verificar email con token."""
@@ -97,7 +100,7 @@ class VerificarEmailView(ctk.CTkFrame):
         # Botón verificar
         self.btn_verificar = ctk.CTkButton(
             self.card,
-            text="✓ Verificar",
+            text=_TXT_VERIFICAR,
             font=NORMAL_NEGRITA,
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
@@ -199,7 +202,7 @@ class VerificarEmailView(ctk.CTkFrame):
                     text=resultado['mensaje'],
                     text_color=PELIGRO
                 )
-                self.btn_verificar.configure(state="normal", text="✓ Verificar")
+                self.btn_verificar.configure(state="normal", text=_TXT_VERIFICAR)
                 self.entry_token.delete(0, "end")
                 
         except Exception as e:
@@ -207,7 +210,7 @@ class VerificarEmailView(ctk.CTkFrame):
                 text=f"Error: {str(e)}",
                 text_color=PELIGRO
             )
-            self.btn_verificar.configure(state="normal", text="✓ Verificar")
+            self.btn_verificar.configure(state="normal", text=_TXT_VERIFICAR)
 
     def _on_reenviar_click(self):
         """Reenvía el token."""

@@ -13,6 +13,10 @@ from src.ui.templates.theme import (
     COMPLETADO,
     crear_fuente, NORMAL_NEGRITA, PEQUENO, MINIMO
 )
+from src.ui.templates.fuentes import crear_fuente_emoji
+
+# Texto del botón principal de login
+_TXT_INICIAR_SESION = "Iniciar Sesión"
 
 
 class LoginView(ctk.CTkFrame):
@@ -73,7 +77,7 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.card,
             text="🍅🔐",
-            font=("Segoe UI Emoji", 56),
+            font=crear_fuente_emoji(56),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=(35, 5))
 
@@ -186,7 +190,7 @@ class LoginView(ctk.CTkFrame):
         # Botón Iniciar Sesión
         self.boton_login = ctk.CTkButton(
             footer,
-            text="Iniciar Sesión",
+            text=_TXT_INICIAR_SESION,
             font=NORMAL_NEGRITA,
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
@@ -347,7 +351,7 @@ class LoginView(ctk.CTkFrame):
     def _mostrar_error(self, mensaje):
         """Muestra mensaje de error y resetea botón."""
         self.label_error.configure(text=mensaje)
-        self.boton_login.configure(state="normal", text="Iniciar Sesión")
+        self.boton_login.configure(state="normal", text=_TXT_INICIAR_SESION)
 
     # ============================================
     # REENVÍO DE CÓDIGO DE VERIFICACIÓN
@@ -363,27 +367,117 @@ class LoginView(ctk.CTkFrame):
 
         self._crear_dialogo_verificacion(dialogo)
 
-        dialogo.bind("<Destroy>", lambda e: self.boton_login.configure(state="normal", text="Iniciar Sesión"))
+        dialogo.bind("<Destroy>", lambda e: self.boton_login.configure(state="normal", text=_TXT_INICIAR_SESION))
 
-    def _crear_dialogo_verificacion(self, dialogo):
-        """Crea el contenido del diálogo de verificación."""
-        dialogo.geometry("480x420")
+    @staticmethod
+    def _enviar_codigo(email, entry_codigo, frame_codigo, btn_enviar,
+                       comando_verificar, label_error):
+        """Genera y envía el código de verificación, mostrando el campo para introducirlo."""
+        from src.auth.verificacion_email import (
+            crear_o_actualizar_verificacion,
+            enviar_token_por_email,
+        )
 
+        token = crear_o_actualizar_verificacion(email.lower())
+        enviar_token_por_email(email.lower(), token)
+
+        label_error.configure(
+            text="📧 Código enviado. Revisa tu email/consola.", text_color=COMPLETADO
+        )
+        entry_codigo.delete(0, "end")
+        frame_codigo.pack(fill="x", padx=30, pady=(10, 15))
+        entry_codigo.focus()
+        btn_enviar.configure(text="✓ Verificar Código", command=comando_verificar)
+
+    @staticmethod
+    def _crear_fila_resumen(frame_info, etiqueta, valor):
+        """Crea una fila etiqueta/valor del resumen tras verificar el email."""
+        fila = ctk.CTkFrame(frame_info, fg_color="transparent")
+        fila.pack(anchor="w", pady=4)
+        ctk.CTkLabel(
+            fila, text=f"{etiqueta}: ", font=NORMAL_NEGRITA,
+            text_color=TEXTO_SECUNDARIO,
+        ).pack(side="left")
+        ctk.CTkLabel(
+            fila, text=valor, font=crear_fuente(14), text_color=COMPLETADO,
+        ).pack(side="left")
+
+    @classmethod
+    def _crear_panel_datos_verificados(cls, dialogo, usuario, contraseña_real):
+        """Muestra los datos del usuario recién verificado con opción de copiarlos."""
+        frame_info = ctk.CTkFrame(dialogo, fg_color="transparent")
+        frame_info.pack(fill="x", padx=30, pady=15)
+
+        cls._crear_fila_resumen(frame_info, "Nombre", usuario.get('nombre', ''))
+        cls._crear_fila_resumen(frame_info, "Email", usuario.get('email', ''))
+        cls._crear_fila_resumen(frame_info, "Rol", usuario.get('rol', 'empleado'))
+        cls._crear_fila_resumen(frame_info, "Contraseña", contraseña_real)
+
+        label_copiar = ctk.CTkLabel(dialogo, text="", font=crear_fuente(12))
+        label_copiar.pack()
+
+        def copiar():
+            import pyperclip
+            texto = (
+                f"Nombre: {usuario.get('nombre', '')}\n"
+                f"Email: {usuario.get('email', '')}\n"
+                f"Contraseña: {contraseña_real}\n"
+                f"Rol: {usuario.get('rol', 'empleado')}"
+            )
+            pyperclip.copy(texto)
+            label_copiar.configure(text="✅ Copiado", text_color=COMPLETADO)
+
+        ctk.CTkButton(
+            dialogo,
+            text="📋 Copiar todo",
+            font=crear_fuente(14, "bold"),
+            fg_color=BOTON_PRIMARIO,
+            hover_color=BOTON_PRIMARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=45,
+            command=copiar,
+        ).pack(fill="x", padx=30, pady=(10, 15))
+
+    @classmethod
+    def _cargar_datos_verificados(cls, dialogo, email):
+        """Busca el usuario y monta el resumen; si falla, se omite sin romper el diálogo."""
+        from src.db.conexion import conexion_global
+        from src.seguridad.encriptacion import descifrar
+
+        usuarios = conexion_global.obtener_coleccion('usuarios')
+        usuario = usuarios.find_one({'email': email.lower()})
+
+        if not usuario:
+            return
+
+        contraseña_real = descifrar(usuario.get('contraseña_encriptada', ''))
+        cls._crear_panel_datos_verificados(dialogo, usuario, contraseña_real)
+
+    @classmethod
+    def _mostrar_resumen_verificacion(cls, dialogo, email):
+        """Muestra la pantalla de éxito e intenta cargar los datos del usuario."""
         ctk.CTkLabel(
             dialogo,
-            text="📧 Verificar tu Email",
-            font=crear_fuente(16, "bold"),
-            text_color=TEXTO_PRINCIPAL,
+            text="✅",
+            font=crear_fuente_emoji(50),
+            text_color=COMPLETADO,
         ).pack(pady=20)
 
         ctk.CTkLabel(
             dialogo,
-            text="Tu Email:",
-            font=crear_fuente(12),
-            text_color=TEXTO_SECUNDARIO,
-            anchor="w",
-        ).pack(fill="x", padx=30)
+            text="Email verificado",
+            font=crear_fuente(18, "bold"),
+            text_color=TEXTO_PRINCIPAL,
+        ).pack(pady=(0, 10))
 
+        try:
+            cls._cargar_datos_verificados(dialogo, email)
+        except Exception:  # nosec - el resumen es opcional
+            pass
+
+    @staticmethod
+    def _crear_widgets_verificacion(dialogo):
+        """Construye los widgets del diálogo y devuelve los que se necesitan después."""
         entry_email = ctk.CTkEntry(
             dialogo,
             placeholder_text="tu@email.com",
@@ -417,13 +511,12 @@ class LoginView(ctk.CTkFrame):
         )
         entry_codigo.pack(fill="x")
 
-        label_verificado = ctk.CTkLabel(
+        ctk.CTkLabel(
             dialogo,
             text="",
             font=crear_fuente(14, "bold"),
             text_color=COMPLETADO,
-        )
-        label_verificado.pack(pady=(0, 10))
+        ).pack(pady=(0, 10))
 
         btn_enviar = ctk.CTkButton(
             dialogo,
@@ -436,135 +529,116 @@ class LoginView(ctk.CTkFrame):
         )
         btn_enviar.pack(fill="x", padx=30, pady=(10, 15))
 
-        def verificar():
-            email = entry_email.get().strip()
-            if not email:
-                label_error.configure(text="El email es obligatorio")
+        return entry_email, label_error, frame_codigo, entry_codigo, btn_enviar
+
+    @staticmethod
+    def _crear_boton_ir_a_login(dialogo):
+        """Botón de cierre del diálogo una vez verificado el email."""
+        ctk.CTkButton(
+            dialogo,
+            text="Ir a Login",
+            font=crear_fuente(14),
+            fg_color=BOTON_SECUNDARIO,
+            hover_color=BOTON_SECUNDARIO_HOVER,
+            text_color=TEXTO_PRINCIPAL,
+            height=45,
+            command=dialogo.destroy,
+        ).pack(fill="x", padx=30, pady=20)
+
+    def _validar_codigo_dialogo(self, dialogo, widgets):
+        """Comprueba el código introducido y, si es válido, muestra el resumen."""
+        entry_email, label_error, _, entry_codigo, _ = widgets
+        email = entry_email.get().strip()
+        codigo = entry_codigo.get().strip()
+
+        if not email or not codigo:
+            label_error.configure(text="Completa todos los campos")
+            return
+
+        try:
+            from src.auth.verificacion_email import verificar_token_db
+
+            resultado = verificar_token_db(email.lower(), codigo)
+
+            if not resultado['valido']:
+                label_error.configure(text=resultado['mensaje'])
                 return
 
-            try:
-                from src.db.conexion import conexion_global
-                from src.auth.verificacion_email import crear_o_actualizar_verificacion, enviar_token_por_email
+            for widget in dialogo.winfo_children():
+                widget.destroy()
 
-                usuarios = conexion_global.obtener_coleccion('usuarios')
-                usuario = usuarios.find_one({'email': {'$regex': f'^{email.lower()}$', '$options': 'i'}})
+            self._mostrar_resumen_verificacion(dialogo, email)
+            self._crear_boton_ir_a_login(dialogo)
 
-                if not usuario:
-                    label_error.configure(text="Email no registrado")
-                    return
+        except Exception as e:
+            label_error.configure(text=f"Error: {str(e)}")
 
-                if usuario.get('email_verified', False):
-                    label_error.configure(text="✅ Este email ya está verificado. Ve a Login.", text_color=COMPLETADO)
-                    return
+    def _enviar_codigo_dialogo(self, dialogo, widgets):
+        """Valida el email del diálogo y solicita el envío del código de verificación."""
+        entry_email, label_error, frame_codigo, entry_codigo, btn_enviar = widgets
+        email = entry_email.get().strip()
 
-                token = crear_o_actualizar_verificacion(email.lower())
-                enviar_token_por_email(email.lower(), token)
+        if not email:
+            label_error.configure(text="El email es obligatorio")
+            return
 
-                label_error.configure(text="📧 Código enviado. Revisa tu email/consola.", text_color=COMPLETADO)
-                entry_codigo.delete(0, "end")
-                frame_codigo.pack(fill="x", padx=30, pady=(10, 15))
-                entry_codigo.focus()
-                btn_enviar.configure(text="✓ Verificar Código", command=verificar_codigo)
+        try:
+            usuario = self._buscar_usuario_por_email(email)
 
-            except Exception as e:
-                label_error.configure(text=f"Error: {str(e)}")
-
-        def verificar_codigo():
-            email = entry_email.get().strip()
-            codigo = entry_codigo.get().strip()
-
-            if not email or not codigo:
-                label_error.configure(text="Completa todos los campos")
+            if not usuario:
+                label_error.configure(text="Email no registrado")
                 return
 
-            try:
-                from src.auth.verificacion_email import verificar_token_db
+            if usuario.get('email_verificado', False):
+                label_error.configure(text="✅ Este email ya está verificado. Ve a Login.", text_color=COMPLETADO)
+                return
 
-                resultado = verificar_token_db(email.lower(), codigo)
+            self._enviar_codigo(
+                email, entry_codigo, frame_codigo, btn_enviar,
+                lambda: self._validar_codigo_dialogo(dialogo, widgets), label_error,
+            )
+        except Exception as e:
+            label_error.configure(text=f"Error: {str(e)}")
 
-                if resultado['valido']:
-                    for widget in dialogo.winfo_children():
-                        widget.destroy()
+    @staticmethod
+    def _buscar_usuario_por_email(email):
+        """Busca un usuario por email sin distinguir mayúsculas."""
+        from src.db.conexion import conexion_global
 
-                    ctk.CTkLabel(
-                        dialogo,
-                        text="✅",
-                        font=("Segoe UI Emoji", 50),
-                        text_color=COMPLETADO,
-                    ).pack(pady=20)
+        usuarios = conexion_global.obtener_coleccion('usuarios')
+        return usuarios.find_one(
+            {'email': {'$regex': f'^{email.lower()}$', '$options': 'i'}}
+        )
 
-                    ctk.CTkLabel(
-                        dialogo,
-                        text="Email verificado",
-                        font=crear_fuente(18, "bold"),
-                        text_color=TEXTO_PRINCIPAL,
-                    ).pack(pady=(0, 10))
+    def _crear_dialogo_verificacion(self, dialogo):
+        """Crea el contenido del diálogo de verificación."""
+        dialogo.geometry("480x420")
 
-                    try:
-                        from src.db.conexion import conexion_global
-                        from src.seguridad.encriptacion import descifrar
+        ctk.CTkLabel(
+            dialogo,
+            text="📧 Verificar tu Email",
+            font=crear_fuente(16, "bold"),
+            text_color=TEXTO_PRINCIPAL,
+        ).pack(pady=20)
 
-                        usuarios = conexion_global.obtener_coleccion('usuarios')
-                        usuario = usuarios.find_one({'email': email.lower()})
+        ctk.CTkLabel(
+            dialogo,
+            text="Tu Email:",
+            font=crear_fuente(12),
+            text_color=TEXTO_SECUNDARIO,
+            anchor="w",
+        ).pack(fill="x", padx=30)
 
-                        if usuario:
-                            contraseña_real = descifrar(usuario.get('contraseña_encriptada', ''))
+        widgets = self._crear_widgets_verificacion(dialogo)
+        entry_email, label_error, frame_codigo, entry_codigo, btn_enviar = widgets
 
-                            frame_info = ctk.CTkFrame(dialogo, fg_color="transparent")
-                            frame_info.pack(fill="x", padx=30, pady=15)
-
-                            def fila(label_texto, valor):
-                                f = ctk.CTkFrame(frame_info, fg_color="transparent")
-                                f.pack(anchor="w", pady=4)
-                                ctk.CTkLabel(f, text=f"{label_texto}: ", font=NORMAL_NEGRITA, text_color=TEXTO_SECUNDARIO).pack(side="left")
-                                ctk.CTkLabel(f, text=valor, font=crear_fuente(14), text_color=COMPLETADO).pack(side="left")
-
-                            fila("Nombre", usuario.get('nombre', ''))
-                            fila("Email", usuario.get('email', ''))
-                            fila("Rol", usuario.get('rol', 'empleado'))
-                            fila("Contraseña", contraseña_real)
-
-                            def copiar():
-                                import pyperclip
-                                texto = f"Nombre: {usuario.get('nombre', '')}\nEmail: {usuario.get('email', '')}\nContraseña: {contraseña_real}\nRol: {usuario.get('rol', 'empleado')}"
-                                pyperclip.copy(texto)
-                                label_copiar.configure(text="✅ Copiado", text_color=COMPLETADO)
-
-                            ctk.CTkButton(
-                                dialogo,
-                                text="📋 Copiar todo",
-                                font=crear_fuente(14, "bold"),
-                                fg_color=BOTON_PRIMARIO,
-                                hover_color=BOTON_PRIMARIO_HOVER,
-                                text_color=TEXTO_PRINCIPAL,
-                                height=45,
-                                command=copiar,
-                            ).pack(fill="x", padx=30, pady=(10, 15))
-
-                            label_copiar = ctk.CTkLabel(dialogo, text="", font=crear_fuente(12))
-                            label_copiar.pack()
-
-                    except Exception:
-                        pass
-
-                    ctk.CTkButton(
-                        dialogo,
-                        text="Ir a Login",
-                        font=crear_fuente(14),
-                        fg_color=BOTON_SECUNDARIO,
-                        hover_color=BOTON_SECUNDARIO_HOVER,
-                        text_color=TEXTO_PRINCIPAL,
-                        height=45,
-                        command=dialogo.destroy,
-                    ).pack(fill="x", padx=30, pady=20)
-
-                else:
-                    label_error.configure(text=resultado['mensaje'])
-
-            except Exception as e:
-                label_error.configure(text=f"Error: {str(e)}")
-
-        btn_enviar.configure(command=verificar)
+        btn_enviar.configure(
+            command=lambda: self._enviar_codigo_dialogo(dialogo, widgets)
+        )
+        entry_codigo.bind(
+            "<Return>",
+            lambda _e: self._validar_codigo_dialogo(dialogo, widgets),
+        )
 
         ctk.CTkButton(
             dialogo,
@@ -590,7 +664,7 @@ class LoginView(ctk.CTkFrame):
         
         self._crear_dialogo_recuperacion(dialogo)
         
-        dialogo.bind("<Destroy>", lambda e: self.boton_login.configure(state="normal", text="Iniciar Sesión"))
+        dialogo.bind("<Destroy>", lambda e: self.boton_login.configure(state="normal", text=_TXT_INICIAR_SESION))
 
     def _crear_dialogo_recuperacion(self, dialogo):
         """Crea el contenido del diálogo de recuperación."""
@@ -699,7 +773,7 @@ class LoginView(ctk.CTkFrame):
     def mostrar_error(self, mensaje):
         """Muestra mensaje de error en pantalla."""
         self.label_error.configure(text=mensaje)
-        self.boton_login.configure(state="normal", text="Iniciar Sesión")
+        self.boton_login.configure(state="normal", text=_TXT_INICIAR_SESION)
 
     def limpiar(self):
         """Limpia los campos del formulario."""

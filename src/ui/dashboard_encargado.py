@@ -4,7 +4,32 @@ Responsabilidad: Dashboard del encargado con timer + panel de equipo.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    AVISO,
+    BORDE,
+    BORDE_ACTIVO,
+    BOTON_PELIGRO,
+    BOTON_PELIGRO_HOVER,
+    BOTON_PRIMARIO,
+    BOTON_PRIMARIO_HOVER,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    COMPLETADO,
+    FONDO_CARD,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TIMER_DESCANSO_CORTO,
+    TIMER_DESCANSO_LARGO,
+    TIMER_PAUSADO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente_emoji, crear_fuente_mono
+
+# Valor por defecto cuando un documento no trae nombre
+_SIN_NOMBRE = "Sin nombre"
 
 
 class DashboardEncargado(ctk.CTkFrame):
@@ -32,13 +57,13 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header, text="🍅 PomodoroSecure",
-            font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente_mono(16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         nombre = self.usuario.get('nombre', 'Encargado')
         ctk.CTkLabel(
             header, text=f"{nombre} | Encargado",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="right", padx=20)
 
         # BODY
@@ -52,18 +77,18 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Hoy",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente_mono(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15, pady=(15, 5))
 
         self.label_ciclos = ctk.CTkLabel(
             lateral, text="Ciclos: 0/inf",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_ciclos.pack(anchor="w", padx=15)
 
         self.label_trabajado = ctk.CTkLabel(
             lateral, text="Trabajado: 0h 0m",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_trabajado.pack(anchor="w", padx=15, pady=(3, 0))
 
@@ -71,12 +96,12 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lateral, text="Pausas",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente_mono(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=15)
 
         self.label_pausas = ctk.CTkLabel(
             lateral, text="O O  (0 usadas)",
-            font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_pausas.pack(anchor="w", padx=15, pady=(5, 0))
 
@@ -93,7 +118,7 @@ class DashboardEncargado(ctk.CTkFrame):
             hover = BOTON_PELIGRO_HOVER if "Sesión" in texto else ("#D35400" if "Jornada" in texto else BOTON_SECUNDARIO_HOVER)
             ctk.CTkButton(
                 lateral, text=texto,
-                font=("JetBrains Mono", 12),
+                font=crear_fuente_mono(12),
                 fg_color=color, hover_color=hover,
                 text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
                 command=cmd,
@@ -109,13 +134,13 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.label_estado = ctk.CTkLabel(
             timer_card, text="INACTIVO",
-            font=("JetBrains Mono", 18, "bold"), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente_mono(18, "bold"), text_color=TEXTO_SECUNDARIO,
         )
         self.label_estado.pack(pady=(25, 5))
 
         self.label_countdown = ctk.CTkLabel(
             timer_card, text="25:00",
-            font=("JetBrains Mono", 56, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente_mono(56, "bold"), text_color=TEXTO_PRINCIPAL,
         )
         self.label_countdown.pack()
 
@@ -133,7 +158,7 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.boton_iniciar = ctk.CTkButton(
             botones_control, text="Iniciar Jornada",
-            font=("JetBrains Mono", 14, "bold"),
+            font=crear_fuente_mono(14, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=180, corner_radius=10,
             command=self._iniciar_ciclo,
@@ -142,7 +167,7 @@ class DashboardEncargado(ctk.CTkFrame):
 
         self.boton_pausar = ctk.CTkButton(
             botones_control, text="Pausar",
-            font=("JetBrains Mono", 13),
+            font=crear_fuente_mono(13),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=45, width=130, corner_radius=10,
             command=self._pausar_reanudar,
@@ -159,12 +184,12 @@ class DashboardEncargado(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header_equipo, text="👥 Mis Equipos",
-            font=("JetBrains Mono", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente_mono(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left")
 
         self.badge_anomalias = ctk.CTkLabel(
             header_equipo, text="",
-            font=("JetBrains Mono", 12, "bold"), text_color=PELIGRO,
+            font=crear_fuente_mono(12, "bold"), text_color=PELIGRO,
         )
         self.badge_anomalias.pack(side="right")
 
@@ -180,7 +205,7 @@ class DashboardEncargado(ctk.CTkFrame):
         self.label_vacio = ctk.CTkLabel(
             self.frame_equipos_lista,
             text="Cargando equipos...",
-            font=("JetBrains Mono", 12),
+            font=crear_fuente_mono(12),
             text_color=TEXTO_SECUNDARIO,
         )
         self.label_vacio.pack(pady=20)
@@ -311,14 +336,14 @@ class DashboardEncargado(ctk.CTkFrame):
         ctk.CTkLabel(
             dialogo,
             text="¿Finalizar jornada laboral?",
-            font=("JetBrains Mono", 16, "bold"),
+            font=crear_fuente_mono(16, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack(pady=20)
         
         ctk.CTkLabel(
             dialogo,
             text="Se generará un reporte con tu actividad\ny se reiniciarán todos los contadores.",
-            font=("JetBrains Mono", 12),
+            font=crear_fuente_mono(12),
             text_color=TEXTO_SECUNDARIO,
         ).pack(pady=10)
         
@@ -340,7 +365,7 @@ class DashboardEncargado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=mensaje,
-                    font=("JetBrains Mono", 12),
+                    font=crear_fuente_mono(12),
                     text_color="#2ECC71",
                 ).pack(pady=20)
                 
@@ -350,13 +375,13 @@ class DashboardEncargado(ctk.CTkFrame):
                 ctk.CTkLabel(
                     dialogo,
                     text=f"Error: {resultado.get('error', 'Desconocido')}",
-                    font=("JetBrains Mono", 12),
+                    font=crear_fuente_mono(12),
                     text_color=PELIGRO,
                 ).pack(pady=20)
         
         ctk.CTkButton(
             botones, text="Confirmar",
-            font=("JetBrains Mono", 12),
+            font=crear_fuente_mono(12),
             fg_color="#27AE60", hover_color="#219A52",
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=confirmar,
@@ -365,7 +390,7 @@ class DashboardEncargado(ctk.CTkFrame):
         
         ctk.CTkButton(
             botones, text="Cancelar",
-            font=("JetBrains Mono", 12),
+            font=crear_fuente_mono(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
             command=dialogo.destroy,
@@ -398,12 +423,12 @@ class DashboardEncargado(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.frame_equipos_lista,
                 text="No tienes equipos asignados.",
-                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
             ).pack(pady=20)
             return
 
         for equipo in self._equipos_cache:
-            nombre = equipo.get('nombre', 'Sin nombre')
+            nombre = equipo.get('nombre', _SIN_NOMBRE)
             n_miembros = len(equipo.get('miembros', []))
 
             fila = ctk.CTkFrame(self.frame_equipos_lista, fg_color=FONDO_SECUNDARIO, corner_radius=8)
@@ -411,17 +436,17 @@ class DashboardEncargado(ctk.CTkFrame):
 
             ctk.CTkLabel(
                 fila, text=f"📁 {nombre}",
-                font=("JetBrains Mono", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+                font=crear_fuente_mono(12, "bold"), text_color=TEXTO_PRINCIPAL,
             ).pack(side="left", padx=12, pady=10)
 
             ctk.CTkLabel(
                 fila, text=f"{n_miembros} miembro{'s' if n_miembros != 1 else ''}",
-                font=("JetBrains Mono", 10), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente_mono(10), text_color=TEXTO_SECUNDARIO,
             ).pack(side="left", padx=(0, 10))
 
             ctk.CTkButton(
                 fila, text="👁  Ver",
-                font=("JetBrains Mono", 11, "bold"),
+                font=crear_fuente_mono(11, "bold"),
                 fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
                 text_color=TEXTO_PRINCIPAL, width=70, height=30, corner_radius=8,
                 command=lambda e=equipo: self._ver_miembros_equipo(e),
@@ -495,11 +520,11 @@ class DashboardEncargado(ctk.CTkFrame):
             header.pack_propagate(False)
             ctk.CTkLabel(
                 header, text=f"📁 {nombre_equipo}",
-                font=("JetBrains Mono", 15, "bold"), text_color=TEXTO_PRINCIPAL,
+                font=crear_fuente_mono(15, "bold"), text_color=TEXTO_PRINCIPAL,
             ).pack(side="left", padx=20, pady=12)
             ctk.CTkLabel(
                 header, text=f"{len(miembros)} miembro{'s' if len(miembros) != 1 else ''}",
-                font=("JetBrains Mono", 11), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente_mono(11), text_color=TEXTO_SECUNDARIO,
             ).pack(side="right", padx=20)
 
             # Lista de miembros
@@ -513,7 +538,7 @@ class DashboardEncargado(ctk.CTkFrame):
             if not miembros:
                 ctk.CTkLabel(
                     lista, text="Este equipo no tiene miembros aún.",
-                    font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                    font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
                 ).pack(pady=30)
             else:
                 for miembro in miembros:
@@ -525,28 +550,28 @@ class DashboardEncargado(ctk.CTkFrame):
 
                     ctk.CTkLabel(
                         fila, text=estado_icono,
-                        font=("Segoe UI Emoji", 18), text_color=color,
+                        font=crear_fuente_emoji(18), text_color=color,
                     ).pack(side="left", padx=(12, 6), pady=10)
 
                     info = ctk.CTkFrame(fila, fg_color="transparent")
                     info.pack(side="left", fill="x", expand=True, pady=10)
 
                     ctk.CTkLabel(
-                        info, text=miembro.get('nombre', 'Sin nombre'),
-                        font=("JetBrains Mono", 12, "bold"), text_color=TEXTO_PRINCIPAL,
+                        info, text=miembro.get('nombre', _SIN_NOMBRE),
+                        font=crear_fuente_mono(12, "bold"), text_color=TEXTO_PRINCIPAL,
                         anchor="w",
                     ).pack(fill="x")
                     ctk.CTkLabel(
                         info,
                         text=f"{miembro.get('rol', 'empleado').title()} — {texto_estado}",
-                        font=("JetBrains Mono", 10), text_color=color,
+                        font=crear_fuente_mono(10), text_color=color,
                         anchor="w",
                     ).pack(fill="x")
 
             # Botón cerrar
             ctk.CTkButton(
                 ventana, text="Cerrar",
-                font=("JetBrains Mono", 12),
+                font=crear_fuente_mono(12),
                 fg_color=FONDO_SECUNDARIO, hover_color=BORDE_ACTIVO,
                 text_color=TEXTO_PRINCIPAL, width=100, height=34, corner_radius=8,
                 command=ventana.destroy,
@@ -574,10 +599,6 @@ class DashboardEncargado(ctk.CTkFrame):
         """Muestra un panel flotante con el detalle del miembro."""
         try:
             import customtkinter as ctk
-            from src.config.colores import (
-                FONDO_PRINCIPAL, FONDO_CARD, FONDO_SECUNDARIO,
-                TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, COMPLETADO, AVISO, PELIGRO,
-            )
             from src.db.conexion import conexion_global
 
             ventana = ctk.CTkToplevel(self)
@@ -594,18 +615,18 @@ class DashboardEncargado(ctk.CTkFrame):
             card.pack(fill="both", expand=True, padx=20, pady=20)
 
             ctk.CTkLabel(
-                card, text=miembro.get('nombre', 'Sin nombre'),
-                font=("JetBrains Mono", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+                card, text=miembro.get('nombre', _SIN_NOMBRE),
+                font=crear_fuente_mono(16, "bold"), text_color=TEXTO_PRINCIPAL,
             ).pack(pady=(20, 5))
 
             ctk.CTkLabel(
                 card, text=f"Rol: {miembro.get('rol', 'empleado').title()}",
-                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
             ).pack()
 
             ctk.CTkLabel(
                 card, text=f"Email: {miembro.get('email', 'Sin email')}",
-                font=("JetBrains Mono", 12), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente_mono(12), text_color=TEXTO_SECUNDARIO,
             ).pack(pady=(5, 0))
 
             # Ciclos hoy
@@ -620,14 +641,14 @@ class DashboardEncargado(ctk.CTkFrame):
                 })
                 ctk.CTkLabel(
                     card, text=f"Ciclos hoy: {ciclos_hoy}",
-                    font=("JetBrains Mono", 12), text_color=COMPLETADO,
+                    font=crear_fuente_mono(12), text_color=COMPLETADO,
                 ).pack(pady=(10, 0))
             except Exception:  # nosec
                 pass
 
             ctk.CTkButton(
                 card, text="Cerrar",
-                font=("JetBrains Mono", 12),
+                font=crear_fuente_mono(12),
                 fg_color=FONDO_SECUNDARIO, hover_color=BORDE_ACTIVO,
                 text_color=TEXTO_PRINCIPAL, width=100, height=34, corner_radius=8,
                 command=ventana.destroy,

@@ -7,6 +7,50 @@ Responsabilidad: Validar que la contraseña tenga al menos
 import secrets
 import string
 
+# Caracteres visualmente ambiguos (0/O, l/1/I)
+_AMBIGUOS = "0Ol1I"
+
+# Parámetros que indican si se debe garantizar cada tipo de carácter
+_FLAGS_TIPO = {
+    "mayusculas": "usar_mayusculas",
+    "numeros": "usar_numeros",
+    "simbolos": "usar_simbolos",
+}
+
+
+def _elegir_mayuscula(excluidos: str) -> str:
+    """Elige una mayúscula evitando los caracteres ambiguos."""
+    mayusculas = [c for c in string.ascii_uppercase if c not in excluidos]
+    return secrets.choice(mayusculas)
+
+
+def _elegir_numero(excluidos: str) -> str:
+    """Elige un número evitando los caracteres ambiguos."""
+    numeros = [c for c in string.digits if c not in excluidos]
+    return secrets.choice(numeros) if numeros else secrets.choice(string.digits)
+
+
+def _posicion_disponible(longitud: int, preferida: int) -> int:
+    """Devuelve la posición a usar, recortando al final si no cabe la preferida."""
+    return min(preferida, longitud - 1)
+
+
+def _garantizar_mayusculas(contraseña: list, excluidos: str) -> None:
+    """Coloca una mayúscula en la posición 0."""
+    contraseña[0] = _elegir_mayuscula(excluidos)
+
+
+def _garantizar_numero(contraseña: list, excluidos: str) -> None:
+    """Coloca un número en la posición 1, o al final si la contraseña es más corta."""
+    posicion = _posicion_disponible(len(contraseña), 1)
+    contraseña[posicion] = _elegir_numero(excluidos)
+
+
+def _garantizar_simbolo(contraseña: list) -> None:
+    """Coloca un símbolo en la posición 2, o al final si la contraseña es más corta."""
+    posicion = _posicion_disponible(len(contraseña), 2)
+    contraseña[posicion] = secrets.choice(string.punctuation)
+
 
 def asegurar_tipos_caracteres(contraseña: list, parametros: dict) -> list:
     """
@@ -31,57 +75,27 @@ def asegurar_tipos_caracteres(contraseña: list, parametros: dict) -> list:
         raise TypeError("La contraseña debe ser una lista de caracteres")
     
     # Contar cuántos tipos son requeridos
-    tipos_requeridos = sum([
-        parametros.get("usar_mayusculas", False),
-        parametros.get("usar_numeros", False),
-        parametros.get("usar_simbolos", False)
-    ])
-    
+    tipos_requeridos = sum(
+        1 for flag in _FLAGS_TIPO.values() if parametros.get(flag, False)
+    )
+
     # Validar que hay espacio suficiente
     if tipos_requeridos > len(contraseña):
         raise ValueError(
             f"Longitud insuficiente ({len(contraseña)}) "
             f"para garantizar {tipos_requeridos} tipos de caracteres"
         )
-    
-    # Determinar caracteres excluidos si aplica
-    caracteres_excluidos = "0Ol1I" if parametros.get("excluir_ambiguos", False) else ""
-    
-    # Función auxiliar para seleccionar carácter de un tipo sin excluidos
-    def elegir_mayuscula():
-        """Elige una mayúscula sin caracteres ambiguos"""
-        mayusculas = [c for c in string.ascii_uppercase 
-                     if c not in caracteres_excluidos]
-        return secrets.choice(mayusculas)
-    
-    def elegir_numero():
-        """Elige un número sin caracteres ambiguos"""
-        numeros = [c for c in string.digits 
-                  if c not in caracteres_excluidos]
-        return secrets.choice(numeros) if numeros else secrets.choice(string.digits)
-    
-    # Asegurar mayúsculas en posición 0
-    if parametros.get("usar_mayusculas", False) and len(contraseña) > 0:
-        if len(contraseña) >= 1:
-            contraseña[0] = elegir_mayuscula()
-    
-    # Asegurar números en posición 1 (si existe espacio)
-    if parametros.get("usar_numeros", False):
-        if len(contraseña) > 1:
-            contraseña[1] = elegir_numero()
-        elif len(contraseña) == 1:
-            # Si solo hay 1 espacio y se requiere número, sobrescribir
-            contraseña[0] = elegir_numero()
-    
-    # Asegurar símbolos en posición 2 (si existe espacio)
-    if parametros.get("usar_simbolos", False):
-        if len(contraseña) > 2:
-            contraseña[2] = secrets.choice(string.punctuation)
-        elif len(contraseña) == 2:
-            # Si solo hay 2 espacios y se requiere símbolo, usar posición 1
-            contraseña[1] = secrets.choice(string.punctuation)
-        elif len(contraseña) == 1:
-            # Si solo hay 1 espacio, sobrescribir
-            contraseña[0] = secrets.choice(string.punctuation)
-    
+
+    excluidos = _AMBIGUOS if parametros.get("excluir_ambiguos", False) else ""
+
+    garantizadores = {
+        _FLAGS_TIPO["mayusculas"]: lambda: _garantizar_mayusculas(contraseña, excluidos),
+        _FLAGS_TIPO["numeros"]: lambda: _garantizar_numero(contraseña, excluidos),
+        _FLAGS_TIPO["simbolos"]: lambda: _garantizar_simbolo(contraseña),
+    }
+
+    for flag, garantizar in garantizadores.items():
+        if parametros.get(flag, False):
+            garantizar()
+
     return contraseña

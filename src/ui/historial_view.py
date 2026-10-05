@@ -4,7 +4,24 @@ Responsabilidad: Vista de historial de sesiones Pomodoro.
 """
 
 import customtkinter as ctk
-from src.config.colores import *
+from src.config.colores import (
+    BORDE,
+    BOTON_SECUNDARIO,
+    BOTON_SECUNDARIO_HOVER,
+    FONDO_CARD,
+    FONDO_PRINCIPAL,
+    FONDO_SECUNDARIO,
+    PELIGRO,
+    TEXTO_PRINCIPAL,
+    TEXTO_SECUNDARIO,
+    TIMER_DESCANSO_CORTO,
+    TIMER_PAUSADO,
+    TRABAJO_ACTIVO,
+)
+from src.ui.templates.fuentes import crear_fuente, crear_fuente_emoji
+
+# Formato de fecha/hora usado en todas las filas del historial
+_FORMATO_FECHA = "%d/%m/%Y %H:%M"
 
 
 class HistorialView(ctk.CTkFrame):
@@ -26,7 +43,7 @@ class HistorialView(ctk.CTkFrame):
 
         ctk.CTkButton(
             header, text="← Volver",
-            font=("Comic Sans MS", 12),
+            font=crear_fuente(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=100, height=36, corner_radius=8,
             command=self.on_volver,
@@ -35,7 +52,7 @@ class HistorialView(ctk.CTkFrame):
         titulo = "📋 Historial de Sesiones" if not self.es_supervisor else "📋 Historial del Equipo"
         ctk.CTkLabel(
             header, text=titulo,
-            font=("Comic Sans MS", 16, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(16, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(side="left", padx=20)
 
         # Contenido
@@ -48,12 +65,12 @@ class HistorialView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.card_resumen, text="📊 Resumen",
-            font=("Comic Sans MS", 14, "bold"), text_color=TEXTO_PRINCIPAL,
+            font=crear_fuente(14, "bold"), text_color=TEXTO_PRINCIPAL,
         ).pack(anchor="w", padx=20, pady=(15, 5))
 
         self.label_resumen = ctk.CTkLabel(
             self.card_resumen, text="Cargando...",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         )
         self.label_resumen.pack(anchor="w", padx=20, pady=(0, 15))
 
@@ -79,7 +96,7 @@ class HistorialView(ctk.CTkFrame):
         else:
             ctk.CTkLabel(
                 contenido, text="Sesiones recientes",
-                font=("Comic Sans MS", 13, "bold"), text_color=TEXTO_PRINCIPAL,
+                font=crear_fuente(13, "bold"), text_color=TEXTO_PRINCIPAL,
             ).pack(anchor="w", pady=(0, 5))
 
             self.frame_sesiones = ctk.CTkScrollableFrame(
@@ -161,7 +178,7 @@ class HistorialView(ctk.CTkFrame):
                 frame = ctk.CTkFrame(self.frame_sesiones, fg_color=FONDO_SECUNDARIO, corner_radius=6)
                 frame.pack(fill="x", pady=2)
                 
-                ctk.CTkLabel(frame, text=emoji, font=("Segoe UI Emoji", 16), text_color=color).pack(side="left", padx=(10, 5), pady=6)
+                ctk.CTkLabel(frame, text=emoji, font=crear_fuente_emoji(16), text_color=color).pack(side="left", padx=(10, 5), pady=6)
                 
                 info = ctk.CTkFrame(frame, fg_color="transparent")
                 info.pack(side="left", fill="x", expand=True, pady=6)
@@ -170,14 +187,14 @@ class HistorialView(ctk.CTkFrame):
                 ciclo = sesion.get('numero_ciclo', '?')
                 pom = sesion.get('pomodoro_numero', '?')
                 
-                ctk.CTkLabel(info, text=f"{nombre} - Ciclo {ciclo} - Pom {pom} - {duracion_min} min", font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL, anchor="w").pack(fill="x")
+                ctk.CTkLabel(info, text=f"{nombre} - Ciclo {ciclo} - Pom {pom} - {duracion_min} min", font=crear_fuente(11), text_color=TEXTO_PRINCIPAL, anchor="w").pack(fill="x")
                 
                 inicio = sesion.get('inicio', '')
                 if hasattr(inicio, 'strftime'):
-                    fecha = inicio.strftime("%d/%m/%Y %H:%M")
+                    fecha = inicio.strftime(_FORMATO_FECHA)
                 else:
                     fecha = str(inicio)[:16]
-                ctk.CTkLabel(info, text=fecha, font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO, anchor="w").pack(fill="x")
+                ctk.CTkLabel(info, text=fecha, font=crear_fuente(10), text_color=TEXTO_SECUNDARIO, anchor="w").pack(fill="x")
             
             # Cargar pausas
             self._cargar_pausas_historial(usuarios_map)
@@ -197,7 +214,7 @@ class HistorialView(ctk.CTkFrame):
                 widget.destroy()
             
             if not pausas:
-                ctk.CTkLabel(self.frame_pausas, text="No hay pausas registradas", font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO).pack(pady=30)
+                ctk.CTkLabel(self.frame_pausas, text="No hay pausas registradas", font=crear_fuente(12), text_color=TEXTO_SECUNDARIO).pack(pady=30)
                 return
             
             for pausa in pausas:
@@ -211,19 +228,19 @@ class HistorialView(ctk.CTkFrame):
                 emoji = "⏸️" if not excedida else "⚠️"
                 color = TIMER_PAUSADO if not excedida else PELIGRO
                 
-                ctk.CTkLabel(frame, text=emoji, font=("Segoe UI Emoji", 16), text_color=color).pack(side="left", padx=(10, 5), pady=6)
+                ctk.CTkLabel(frame, text=emoji, font=crear_fuente_emoji(16), text_color=color).pack(side="left", padx=(10, 5), pady=6)
                 
                 info = ctk.CTkFrame(frame, fg_color="transparent")
                 info.pack(side="left", fill="x", expand=True, pady=6)
                 
-                ctk.CTkLabel(info, text=f"{usuario_nombre} - {duracion} min{' (EXCEDIDA)' if excedida else ''}", font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL, anchor="w").pack(fill="x")
+                ctk.CTkLabel(info, text=f"{usuario_nombre} - {duracion} min{' (EXCEDIDA)' if excedida else ''}", font=crear_fuente(11), text_color=TEXTO_PRINCIPAL, anchor="w").pack(fill="x")
                 
                 inicio = pausa.get('inicio', '')
                 if hasattr(inicio, 'strftime'):
-                    fecha = inicio.strftime("%d/%m/%Y %H:%M")
+                    fecha = inicio.strftime(_FORMATO_FECHA)
                 else:
                     fecha = str(inicio)[:16]
-                ctk.CTkLabel(info, text=fecha, font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO, anchor="w").pack(fill="x")
+                ctk.CTkLabel(info, text=fecha, font=crear_fuente(10), text_color=TEXTO_SECUNDARIO, anchor="w").pack(fill="x")
         
         except Exception as e:
             print(f"Error cargando pausas: {e}")
@@ -252,7 +269,7 @@ class HistorialView(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.frame_sesiones,
                 text="No hay sesiones registradas",
-                font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
             ).pack(pady=30)
             return
 
@@ -267,7 +284,7 @@ class HistorialView(ctk.CTkFrame):
 
             ctk.CTkLabel(
                 frame, text=emoji,
-                font=("Segoe UI Emoji", 16), text_color=color,
+                font=crear_fuente_emoji(16), text_color=color,
             ).pack(side="left", padx=(10, 5), pady=6)
 
             # Info
@@ -281,18 +298,18 @@ class HistorialView(ctk.CTkFrame):
             ctk.CTkLabel(
                 info,
                 text=f"Ciclo {ciclo} — Pomodoro {pom} — {duracion_min} min",
-                font=("Comic Sans MS", 11), text_color=TEXTO_PRINCIPAL,
+                font=crear_fuente(11), text_color=TEXTO_PRINCIPAL,
                 anchor="w",
             ).pack(fill="x")
 
             inicio = sesion.get('inicio', '')
             if hasattr(inicio, 'strftime'):
-                fecha = inicio.strftime("%d/%m/%Y %H:%M")
+                fecha = inicio.strftime(_FORMATO_FECHA)
             else:
                 fecha = str(inicio)[:16]
             ctk.CTkLabel(
                 info, text=fecha,
-                font=("Comic Sans MS", 10), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente(10), text_color=TEXTO_SECUNDARIO,
                 anchor="w",
             ).pack(fill="x")
 

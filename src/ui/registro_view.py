@@ -13,6 +13,14 @@ from src.ui.templates import (
     BOTON_PRIMARIO, BOTON_PRIMARIO_HOVER, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER,
     TRABAJO_ACTIVO, BORDE, COMPLETADO,
 )
+from src.ui.templates.fuentes import crear_fuente, crear_fuente_emoji
+
+# Clave del resultado de registro que contiene la contraseña generada
+_CLAVE_CONTRASENA = "contraseña_generada"
+
+# Longitud mínima y máxima permitida para el TLD del dominio
+_TLD_MINIMO = 2
+_TLD_MAXIMO = 10
 
 
 class RegistroView(ctk.CTkFrame):
@@ -73,7 +81,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_paso = ctk.CTkLabel(
             self.header,
             text="Paso 1 de 3 — Datos personales",
-            font=("Comic Sans MS", 20, "bold"),
+            font=crear_fuente(20, "bold"),
             text_color=TEXTO_PRINCIPAL,
         )
         self.label_paso.pack()
@@ -97,7 +105,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_error = ctk.CTkLabel(
             self.card,
             text="",
-            font=("Comic Sans MS", 14),
+            font=crear_fuente(14),
             text_color=PELIGRO,
         )
         self.label_error.pack(pady=(0, 5))
@@ -111,7 +119,7 @@ class RegistroView(ctk.CTkFrame):
         self.boton_atras = ctk.CTkButton(
             self.botones,
             text="← Atrás",
-            font=("Comic Sans MS", 14),
+            font=crear_fuente(14),
             fg_color=BOTON_SECUNDARIO,
             hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -125,7 +133,7 @@ class RegistroView(ctk.CTkFrame):
         self.boton_siguiente = ctk.CTkButton(
             self.botones,
             text="Siguiente →",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -141,7 +149,7 @@ class RegistroView(ctk.CTkFrame):
         self.link_login = ctk.CTkLabel(
             self.card,
             text="¿Ya tienes cuenta? Inicia sesión",
-            font=("Comic Sans MS", 14, "underline"),
+            font=crear_fuente(14, "underline"),
             text_color=INFORMACION,
             cursor="hand2",
         )
@@ -216,7 +224,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="Configuraremos tu contraseña segura",
-            font=("Comic Sans MS", 15),
+            font=crear_fuente(15),
             text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 15))
 
@@ -238,7 +246,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkButton(
             frame_botones,
             text="📧 Verificar Email",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -254,14 +262,14 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido,
             text="✅",
-            font=("Segoe UI Emoji", 60),
+            font=crear_fuente_emoji(60),
             text_color=COMPLETADO,
         ).pack(pady=(15, 5))
 
         ctk.CTkLabel(
             self.contenido,
             text="Registro completado",
-            font=("Comic Sans MS", 22, "bold"),
+            font=crear_fuente(22, "bold"),
             text_color=TEXTO_PRINCIPAL,
         ).pack()
 
@@ -287,7 +295,7 @@ class RegistroView(ctk.CTkFrame):
         if usuario:
             self.resultado_registro = {
                 'usuario': usuario,
-                'contraseña_generada': '••••••••••••••••'
+                _CLAVE_CONTRASENA: '••••••••••••••••'
             }
             self.datos_paso_1 = {
                 'nombre': usuario.get('nombre', ''),
@@ -305,12 +313,12 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.contenido, 
             text="Nombre completo (mín 2 caracteres, al menos 1 letra)",
-            font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(10, 0))
 
         self.entry_nombre = ctk.CTkEntry(
             self.contenido, placeholder_text="Tu nombre",
-            font=("Comic Sans MS", 15), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(15), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8,
         )
         self.entry_nombre.pack(fill="x", pady=(3, 10))
@@ -321,12 +329,12 @@ class RegistroView(ctk.CTkFrame):
         """Crea el campo de email."""
         ctk.CTkLabel(
             self.contenido, text="Email",
-            font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.entry_email = ctk.CTkEntry(
             self.contenido, placeholder_text="usuario@empresa.com",
-            font=("Comic Sans MS", 15), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(15), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8,
         )
         self.entry_email.pack(fill="x", pady=(3, 10))
@@ -337,7 +345,7 @@ class RegistroView(ctk.CTkFrame):
         """Crea el selector de rol."""
         ctk.CTkLabel(
             self.contenido, text="Rol",
-            font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         es_primer_usuario = self._verificar_primer_usuario()
@@ -347,21 +355,21 @@ class RegistroView(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.contenido,
                 text="✅ Primer usuario. Selecciona tu rol.",
-                font=("Comic Sans MS", 12), text_color=COMPLETADO,
+                font=crear_fuente(12), text_color=COMPLETADO,
             ).pack(anchor="w", pady=(3, 5))
         else:
             roles_disponibles = ["empleado"]
             ctk.CTkLabel(
                 self.contenido,
                 text="Un supervisor puede cambiarte el rol después",
-                font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
             ).pack(anchor="w", pady=(3, 5))
 
         estado_combo = "normal" if es_primer_usuario else "readonly"
         self.combo_rol = ctk.CTkComboBox(
             self.contenido,
             values=roles_disponibles,
-            font=("Comic Sans MS", 15),
+            font=crear_fuente(15),
             fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL,
             button_color=BOTON_PRIMARIO,
@@ -380,7 +388,7 @@ class RegistroView(ctk.CTkFrame):
         """Crea el slider de longitud."""
         ctk.CTkLabel(
             self.contenido, text="Longitud de la contraseña",
-            font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(14), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.slider_longitud = ctk.CTkSlider(
@@ -396,7 +404,7 @@ class RegistroView(ctk.CTkFrame):
 
         self.label_longitud = ctk.CTkLabel(
             self.contenido, text="24 caracteres",
-            font=("Comic Sans MS", 14), text_color=TRABAJO_ACTIVO,
+            font=crear_fuente(14), text_color=TRABAJO_ACTIVO,
         )
         self.label_longitud.pack(anchor="e")
 
@@ -420,7 +428,7 @@ class RegistroView(ctk.CTkFrame):
         ]:
             ctk.CTkCheckBox(
                 self.contenido, text=texto, variable=var,
-                font=("Comic Sans MS", 14), text_color=TEXTO_SECUNDARIO,
+                font=crear_fuente(14), text_color=TEXTO_SECUNDARIO,
                 fg_color=FONDO_SECUNDARIO, checkmark_color=TEXTO_PRINCIPAL,
             ).pack(anchor="w", pady=(8, 0))
 
@@ -433,7 +441,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkRadioButton(
             self.contenido, text="Generada por el sistema (recomendado)",
             variable=self.tipo_contraseña, value="sistema",
-            font=("Comic Sans MS", 13), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(13), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
             command=self._toggle_tipo_contraseña,
         ).pack(anchor="w")
@@ -441,7 +449,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkRadioButton(
             self.contenido, text="Mi propia contraseña",
             variable=self.tipo_contraseña, value="personalizada",
-            font=("Comic Sans MS", 13), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(13), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
             command=self._toggle_tipo_contraseña,
         ).pack(anchor="w", pady=(2, 5))
@@ -458,20 +466,20 @@ class RegistroView(ctk.CTkFrame):
         
         ctk.CTkLabel(
             row_pass, text="Contraseña:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(side="left")
 
         self.mostrar_pass = ctk.BooleanVar(value=False)
         ctk.CTkCheckBox(
             row_pass, text="👁", variable=self.mostrar_pass,
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
             command=self._toggle_mostrar_pass,
         ).pack(side="right")
 
         self.entry_pass = ctk.CTkEntry(
             self.frame_pass,
             placeholder_text="Tu contraseña segura",
-            font=("Comic Sans MS", 15), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(15), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8, show="•",
         )
         self.entry_pass.pack(fill="x")
@@ -480,18 +488,18 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.frame_pass,
             text="Mín: 5 chars, 1 min, 1 may, 1 símbolo",
-            font=("Comic Sans MS", 11), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(11), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w", pady=(2, 0))
 
         ctk.CTkLabel(
             self.frame_pass, text="Confirmar:",
-            font=("Comic Sans MS", 12), text_color=TEXTO_SECUNDARIO,
+            font=crear_fuente(12), text_color=TEXTO_SECUNDARIO,
         ).pack(anchor="w")
 
         self.entry_pass2 = ctk.CTkEntry(
             self.frame_pass,
             placeholder_text="Repite la contraseña",
-            font=("Comic Sans MS", 15), fg_color=FONDO_SECUNDARIO,
+            font=crear_fuente(15), fg_color=FONDO_SECUNDARIO,
             text_color=TEXTO_PRINCIPAL, height=44, corner_radius=8, show="•",
         )
         self.entry_pass2.pack(fill="x")
@@ -512,7 +520,7 @@ class RegistroView(ctk.CTkFrame):
         email = usuario.get('email', '')
         nombre = usuario.get('nombre', '')
         rol = usuario.get('rol', 'empleado')
-        contrasena = self.resultado_registro.get('contraseña_generada', '')
+        contrasena = self.resultado_registro.get(_CLAVE_CONTRASENA, '')
 
         frame_info = ctk.CTkFrame(self.contenido, fg_color="transparent")
         frame_info.pack(fill="x", padx=30, pady=10)
@@ -524,14 +532,14 @@ class RegistroView(ctk.CTkFrame):
             ctk.CTkLabel(
                 fila,
                 text=f"{label_texto}: ",
-                font=("Comic Sans MS", 14, "bold"),
+                font=crear_fuente(14, "bold"),
                 text_color=TEXTO_SECUNDARIO,
             ).pack(side="left")
 
             ctk.CTkLabel(
                 fila,
                 text=valor,
-                font=("Comic Sans MS", 14),
+                font=crear_fuente(14),
                 text_color=color_valor,
             ).pack(side="left")
 
@@ -544,7 +552,7 @@ class RegistroView(ctk.CTkFrame):
         ctk.CTkButton(
             self.contenido,
             text="📋 Copiar todo",
-            font=("Comic Sans MS", 14, "bold"),
+            font=crear_fuente(14, "bold"),
             fg_color=BOTON_PRIMARIO,
             hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL,
@@ -555,7 +563,7 @@ class RegistroView(ctk.CTkFrame):
     def _copiar_todo_registro(self):
         """Copia toda la información al portapapeles."""
         usuario = self.resultado_registro.get('usuario', {})
-        contrasena = self.resultado_registro.get('contraseña_generada', '')
+        contrasena = self.resultado_registro.get(_CLAVE_CONTRASENA, '')
         rol = usuario.get('rol', 'empleado')
         
         texto = f"Nombre: {usuario.get('nombre', '')}\nEmail: {usuario.get('email', '')}\nContraseña: {contrasena}\nRol: {rol}"
@@ -627,19 +635,9 @@ class RegistroView(ctk.CTkFrame):
     # VALIDACIÓN CENTRALIZADA EMAIL
     # ============================================
 
-    def _validar_email(self, email: str):
-        """Valida el email de forma centralizada."""
-        email = email.strip().lower()
-
-        if not email or "@" not in email:
-            return False, "El email debe contener @"
-
-        partes = email.split("@")
-        if len(partes) != 2 or not partes[0] or not partes[1]:
-            return False, "El formato del email es inválido"
-
-        local, dominio = partes
-
+    @staticmethod
+    def _validar_local_email(local: str):
+        """Valida la parte previa al @ del email."""
         if local.startswith(".") or local.endswith("."):
             return False, "El email no puede empezar o terminar con punto"
 
@@ -649,6 +647,25 @@ class RegistroView(ctk.CTkFrame):
         if not re.match(r"^[a-zA-Z0-9._+-]+$", local):
             return False, "El email contiene caracteres inválidos"
 
+        return True, ""
+
+    @staticmethod
+    def _validar_tld_email(tld: str):
+        """Valida el TLD del dominio."""
+        if len(tld) < _TLD_MINIMO:
+            return False, "El TLD debe tener mínimo 2 caracteres"
+
+        if len(tld) > _TLD_MAXIMO:
+            return False, "El TLD debe tener máximo 10 caracteres"
+
+        if not tld.isalpha():
+            return False, "El TLD solo puede contener letras"
+
+        return True, ""
+
+    @staticmethod
+    def _validar_dominio_email(dominio: str):
+        """Valida el dominio del email y su TLD."""
         if "." not in dominio:
             return False, "El dominio debe tener un punto"
 
@@ -662,18 +679,26 @@ class RegistroView(ctk.CTkFrame):
         if len(dominio_partes) != 2 or not dominio_partes[0]:
             return False, "El dominio debe tener un TLD válido"
 
-        tld = dominio_partes[1]
+        return RegistroView._validar_tld_email(dominio_partes[1])
 
-        if len(tld) < 2:
-            return False, "El TLD debe tener mínimo 2 caracteres"
+    def _validar_email(self, email: str):
+        """Valida el email de forma centralizada."""
+        email = email.strip().lower()
 
-        if len(tld) > 10:
-            return False, "El TLD debe tener máximo 10 caracteres"
+        if not email or "@" not in email:
+            return False, "El email debe contener @"
 
-        if not tld.isalpha():
-            return False, "El TLD solo puede contener letras"
+        partes = email.split("@")
+        if len(partes) != 2 or not partes[0] or not partes[1]:
+            return False, "El formato del email es inválido"
 
-        return True, ""
+        local, dominio = partes
+
+        valido, error = self._validar_local_email(local)
+        if not valido:
+            return valido, error
+
+        return self._validar_dominio_email(dominio)
 
     # ============================================
     # EVENTOS
