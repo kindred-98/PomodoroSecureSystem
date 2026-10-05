@@ -23,16 +23,16 @@ class TestFortalezaPatron:
     
     def test_repeticin_reduce_fortaleza(self):
         """Test: Repeticiones reducen fortaleza"""
-        sin_patrón = detectar_patrones("abcXYZ123")
-        con_repetición = detectar_patrones("aaabcXYZ")
-        assert con_repetición['fortaleza_patron'] < sin_patrón['fortaleza_patron']
+        sin_patron = detectar_patrones("abcXYZ123")
+        con_repeticion = detectar_patrones("aaabcXYZ")
+        assert con_repeticion['fortaleza_patron'] < sin_patron['fortaleza_patron']
     
     def test_multiples_patrones_muy_debil(self):
         """Test: Múltiples patrones resulta en fortaleza muy baja"""
         resultado = detectar_patrones("abc123aaaqwerty")
         assert resultado['fortaleza_patron'] < 0.6
     
-    def test_contraseña_fuerte(self):
+    def test_contrasena_fuerte(self):
         """Test: Contraseña fuerte típica tiene alta fortaleza"""
         resultado = detectar_patrones("P@ssw0rd7Kqx!")
         # A menos que tenga patrones, debería tener buena fortaleza
@@ -64,7 +64,7 @@ class TestTecladoAdyacente:
 class TestCorrectoMultiplesDetecciones:
     """Tests de detección correcta en contraseñas compleja"""
     
-    def test_contraseña_con_todo(self):
+    def test_contrasena_con_todo(self):
         """Test: Detecta múltiples tipos en una sola contraseña"""
         resultado = detectar_patrones("abc123aaaqwerty")
         # Debería detectar:

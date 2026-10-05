@@ -52,7 +52,7 @@ class VerificarEmailView(ctk.CTkFrame):
         # Email
         ctk.CTkLabel(
             self.card,
-            text=f"Enviamos un código a:",
+               text="Enviamos un código a:",
             font=PEQUENO,
             text_color=TEXTO_SECUNDARIO,
         ).pack()

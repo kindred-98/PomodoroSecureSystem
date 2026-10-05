@@ -33,7 +33,7 @@ class TestSecuenciaConsecutiva:
         resultado = detectar_patrones("aXbY1Z2")
         assert not resultado['tiene_secuencias_consecutivas']
     
-    def test_contraseña_fuerte_sin_secuencias(self):
+    def test_contrasena_fuerte_sin_secuencias(self):
         """Test: Contraseña fuerte obtiene alta fortaleza"""
         resultado = detectar_patrones("Xy9!Zw8@Vb7#")
         assert resultado['fortaleza_patron'] >= 0.9

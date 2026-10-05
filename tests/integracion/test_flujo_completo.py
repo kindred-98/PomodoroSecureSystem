@@ -11,7 +11,7 @@ from src.excepciones import ErrorAutenticacion
 class TestFlujoCompletoRegistroLogin:
     """Tests del flujo completo desde registro hasta login."""
 
-    def test_registro_genera_contraseña(self, mock_conexion_global, fernet_key_env):
+    def test_registro_genera_contrasena(self, mock_conexion_global, fernet_key_env):
         """El registro debe generar una contraseña válida."""
         from src.auth.registro import registrar_usuario
 
@@ -171,7 +171,7 @@ class TestFlujoVerificacionEmail:
 class TestFlujoRecuperacion:
     """Tests del flujo de recuperación de contraseña."""
 
-    def test_contraseña_se_guarda_encriptada(self, mock_conexion_global, fernet_key_env):
+    def test_contrasena_se_guarda_encriptada(self, mock_conexion_global, fernet_key_env):
         """La contraseña debe guardarse encriptada."""
         from src.auth.registro import registrar_usuario
         from src.seguridad.encriptacion import descifrar
@@ -183,9 +183,9 @@ class TestFlujoRecuperacion:
             {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
         )
 
-        contraseña_original = resultado["contraseña_generada"]
+        contrasena_original = resultado["contraseña_generada"]
         contrasena_encriptada = resultado["usuario"]["contraseña_encriptada"]
 
-        contraseña_descifrada = descifrar(contrasena_encriptada)
+        contrasena_descifrada = descifrar(contrasena_encriptada)
 
-        assert contraseña_descifrada == contraseña_original
+        assert contrasena_descifrada == contrasena_original

@@ -4,12 +4,12 @@ Responsabilidad: Regenerar la contraseña de un usuario con nuevos parámetros.
 """
 
 from src.db.conexion import conexion_global
-from src.seguridad.encriptacion import hashear_contraseña, cifrar
-from src.generador import generar_contraseña
+from src.seguridad.encriptacion import hashear_contrasena, cifrar
+from src.generador import generar_contrasena
 from src.excepciones import ErrorRecursoNoEncontrado
 
 
-def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:
+def regenerar_contrasena(usuario_id: str, nuevos_parametros: dict) -> dict:
     """
     Regenera la contraseña de un usuario con nuevos parámetros.
     
@@ -57,10 +57,10 @@ def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:
         raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Generar nueva contraseña
-    nueva_contrasena = generar_contraseña(nuevos_parametros)
+    nueva_contrasena = generar_contrasena(nuevos_parametros)
     
     # Crear nuevo hash y encriptación
-    nuevo_hash = hashear_contraseña(nueva_contrasena)
+    nuevo_hash = hashear_contrasena(nueva_contrasena)
     nueva_encriptada = cifrar(nueva_contrasena)
     
     # Actualizar en base de datos

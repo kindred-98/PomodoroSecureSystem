@@ -19,7 +19,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install Bandit
-        run: pip install bandit
+        run: "pip install --only-binary=:all: bandit==1.9.4"
 
       - name: Run Bandit Security Scan
         run: bandit -r src -f txt -o bandit_report.txt -x tests,.venv,venv || true
@@ -72,7 +72,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install safety
-        run: pip install safety
+        run: "pip install --only-binary=:all: safety==3.7.0"
 
       - name: Check dependencies
         run: safety check --json --output safety_report.json || true

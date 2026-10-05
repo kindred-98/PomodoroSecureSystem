@@ -4,7 +4,7 @@ Tests de aleatoriedad y stress para generar_contraseña()
 """
 
 import pytest
-from src.generador import generar_contraseña
+from src.generador import generar_contrasena
 
 
 class TestAleatoriedad:
@@ -12,10 +12,10 @@ class TestAleatoriedad:
     
     def test_determinismo_no_existe(self, parametros_generador_defecto):
         """Test: Genera contraseñas distintas cada vez (aleatoriedad)"""
-        contraseña1 = generar_contraseña(parametros_generador_defecto)
-        contrasena2 = generar_contraseña(parametros_generador_defecto)
+        contrasena1 = generar_contrasena(parametros_generador_defecto)
+        contrasena2 = generar_contrasena(parametros_generador_defecto)
         # Muy improbable que genere dos iguales (1 entre 62^12)
-        assert contraseña1 != contrasena2
+        assert contrasena1 != contrasena2
     
     def test_distribucion_aleatoria_basica(self):
         """Test: Genera variedad en las contraseñas"""
@@ -26,21 +26,21 @@ class TestAleatoriedad:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseñas = [generar_contraseña(parametros) for _ in range(10)]
+        contrasenas = [generar_contrasena(parametros) for _ in range(10)]
         # Las 10 contraseñas deberían ser diferentes
-        assert len(set(contraseñas)) >= 9  # Al menos 9 únicas de 10
+        assert len(set(contrasenas)) >= 9  # Al menos 9 únicas de 10
 
 
 class TestStress:
     """Tests de carga/stress para validar robustez"""
     
-    def test_genera_50_contraseñas_sin_error(self, parametros_generador_defecto):
+    def test_genera_50_contrasenas_sin_error(self, parametros_generador_defecto):
         """Test: Puede generar 50 contraseñas sin errores"""
         for _ in range(50):
-            contrasena = generar_contraseña(parametros_generador_defecto)
+            contrasena = generar_contrasena(parametros_generador_defecto)
             assert len(contrasena) == 12
     
-    def test_genera_100_contraseñas_sin_error(self):
+    def test_genera_100_contrasenas_sin_error(self):
         """Test: Puede generar 100 contraseñas sin errores"""
         parametros = {
             "longitud": 10,
@@ -50,13 +50,13 @@ class TestStress:
             "excluir_ambiguos": False
         }
         for _ in range(100):
-            contrasena = generar_contraseña(parametros)
+            contrasena = generar_contrasena(parametros)
             assert len(contrasena) == 10
     
     def test_todas_unicas_en_100_generaciones(self, parametros_generador_defecto):
         """Test: 100 generaciones produce contraseñas prácticamente todas únicas"""
-        contraseñas = [generar_contraseña(parametros_generador_defecto) for _ in range(100)]
-        unicidades = len(set(contraseñas))
+        contrasenas = [generar_contrasena(parametros_generador_defecto) for _ in range(100)]
+        unicidades = len(set(contrasenas))
         # Debería haber al menos 99 únicas de 100 (muy improbable colisión)
         assert unicidades >= 99
     
@@ -70,7 +70,7 @@ class TestStress:
                 "usar_simbolos": True,
                 "excluir_ambiguos": False
             }
-            contrasena = generar_contraseña(parametros)
+            contrasena = generar_contrasena(parametros)
             assert len(contrasena) == longitud
     
     def test_stress_combinaciones_parametros(self):
@@ -86,11 +86,11 @@ class TestStress:
              "usar_simbolos": True, "excluir_ambiguos": True},
         ]
         for parametros in combinaciones:
-            contrasena = generar_contraseña(parametros)
+            contrasena = generar_contrasena(parametros)
             assert len(contrasena) == parametros["longitud"]
     
     def test_genera_correctamente_es_string(self, parametros_generador_defecto):
         """Test: El resultado es siempre string"""
         for _ in range(20):
-            contrasena = generar_contraseña(parametros_generador_defecto)
+            contrasena = generar_contrasena(parametros_generador_defecto)
             assert isinstance(contrasena, str)

@@ -20,7 +20,7 @@ class TestCrearUsuarioValidacionTipos:
         with pytest.raises(TypeError, match="Nombre debe ser string"):
             crear_usuario('test@example.com', 123, 'hash', 'empleado')
     
-    def test_contraseña_hash_no_string(self, mock_conexion_global):
+    def test_contrasena_hash_no_string(self, mock_conexion_global):
         """Debe fallar si contraseña_hash no es string"""
         with pytest.raises(TypeError, match="Contraseña_hash debe ser string"):
             crear_usuario('test@example.com', 'Test', 123, 'empleado')

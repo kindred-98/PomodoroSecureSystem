@@ -8,7 +8,7 @@ from src.db.conexion import conexion_global
 from src.excepciones import ErrorRecursoNoEncontrado, ErrorValidacion
 
 
-def añadir_miembro(equipo_id: str, usuario_id: str) -> dict:
+def anadir_miembro(equipo_id: str, usuario_id: str) -> dict:
     """
     Agrega un usuario como miembro de un equipo.
     

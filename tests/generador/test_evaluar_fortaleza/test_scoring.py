@@ -95,7 +95,7 @@ class TestMinimaFortaleza:
         # Solo minúsculas + repeticiones = débil
         assert resultado['puntuacion'] < 40
     
-    def test_contraseña_random_bien(self):
+    def test_contrasena_random_bien(self):
         """Test: Contraseña aleatoria bien formada obtiene >70"""
         resultado = evaluar_fortaleza("K#mW7$hPq9xN2zB!")
         assert resultado['puntuacion'] >= 60

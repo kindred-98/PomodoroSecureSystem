@@ -137,10 +137,11 @@ class HistorialView(ctk.CTkFrame):
             equipos = listar_todos()
             
             # Recolectar todos los usuario_ids de los equipos
-            todos_usuarios = set()
-            for eq in equipos:
-                for miembros in eq.get('miembros', []):
-                    todos_usuarios.add(miembros)
+            todos_usuarios = {
+                miembro
+                for eq in equipos
+                for miembro in eq.get('miembros', [])
+            }
             
             # Cargar sesiones de todos los usuarios
             coleccion_sesiones = conexion_global.obtener_coleccion('sesiones')
@@ -157,7 +158,7 @@ class HistorialView(ctk.CTkFrame):
             # Resumen
             total_pomodoros = sum(1 for s in sesiones if s.get('tipo_sesion') == 'pomodoro')
             total_segundos = sum(s.get('duracion_segundos', 0) for s in sesiones)
-            total_usuarios = len(set(s.get('usuario_id') for s in sesiones))
+            total_usuarios = len({s.get('usuario_id') for s in sesiones})
             
             self.label_resumen.configure(
                 text=f"Usuarios: {total_usuarios} | Pomodoros: {total_pomodoros} | Tiempo: {total_segundos//3600}h"

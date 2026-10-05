@@ -98,7 +98,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
             font=crear_fuente(11, "bold"),
             fg_color=BOTON_EXITO, hover_color=BOTON_EXITO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=70, height=32, corner_radius=6,
-            command=self._añadir_descanso,
+            command=self._anadir_descanso,
         ).pack(side="right")
 
     def _cargar_descansos(self):
@@ -166,7 +166,7 @@ class ConfigDescansosView(ctk.CTkToplevel):
                 font=crear_fuente(12), text_color=PELIGRO,
             ).pack(pady=20)
 
-    def _añadir_descanso(self):
+    def _anadir_descanso(self):
         """Añade un nuevo descanso fijo al equipo."""
         nombre = self.entry_nombre.get().strip()
         hora = self.entry_hora.get().strip()

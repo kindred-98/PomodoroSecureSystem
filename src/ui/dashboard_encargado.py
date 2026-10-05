@@ -31,6 +31,10 @@ from src.ui.templates.fuentes import crear_fuente_emoji, crear_fuente_mono
 # Valor por defecto cuando un documento no trae nombre
 _SIN_NOMBRE = "Sin nombre"
 
+# Colores del botón de fin de jornada en la barra lateral
+COLOR_FIN_JORNADA = "#E67E22"
+HOVER_FIN_JORNADA = "#D35400"
+
 
 class DashboardEncargado(ctk.CTkFrame):
     """Dashboard del encargado: timer personal + supervisión de equipo."""
@@ -108,14 +112,12 @@ class DashboardEncargado(ctk.CTkFrame):
         ctk.CTkFrame(lateral, fg_color=BORDE, height=1).pack(fill="x", padx=15, pady=15)
 
         botones_lateral = [
-            ("🔑 Contraseña", self.on_ver_contrasena),
-            ("📋 Historial", self.on_ver_historial),
-            ("Fin de Jornada", self._fin_jornada_click),
-            ("🚪 Cerrar Sesión", self._on_logout_click),
+            ("🔑 Contraseña", self.on_ver_contrasena, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER),
+            ("📋 Historial", self.on_ver_historial, BOTON_SECUNDARIO, BOTON_SECUNDARIO_HOVER),
+            ("Fin de Jornada", self._fin_jornada_click, COLOR_FIN_JORNADA, HOVER_FIN_JORNADA),
+            ("🚪 Cerrar Sesión", self._on_logout_click, BOTON_PELIGRO, BOTON_PELIGRO_HOVER),
         ]
-        for texto, cmd in botones_lateral:
-            color = BOTON_PELIGRO if "Sesión" in texto else ("#E67E22" if "Jornada" in texto else BOTON_SECUNDARIO)
-            hover = BOTON_PELIGRO_HOVER if "Sesión" in texto else ("#D35400" if "Jornada" in texto else BOTON_SECUNDARIO_HOVER)
+        for texto, cmd, color, hover in botones_lateral:
             ctk.CTkButton(
                 lateral, text=texto,
                 font=crear_fuente_mono(12),

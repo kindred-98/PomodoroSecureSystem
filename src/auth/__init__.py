@@ -7,10 +7,10 @@ from src.auth.registro import registrar_usuario
 from src.auth.login import iniciar_sesion
 from src.auth.logout import cerrar_sesion
 from src.auth.sesion import crear_sesion, verificar_sesion, cerrar_sesion_por_token
-from src.auth.ver_contraseña import ver_contraseña
-from src.auth.regenerar_contraseña import regenerar_contraseña
-from src.auth.cambiar_contraseña import cambiar_contraseña
-from src.auth.exportar_contraseña import exportar_contraseña
+from src.auth.ver_contrasena import ver_contrasena
+from src.auth.regenerar_contrasena import regenerar_contrasena
+from src.auth.cambiar_contrasena import cambiar_contrasena
+from src.auth.exportar_contrasena import exportar_contrasena
 from src.auth.verificacion_email import (
     crear_token_verificacion,
     verificar_token_legacy as verificar_token,
@@ -24,7 +24,7 @@ from src.auth.verificacion_email import (
 from src.excepciones import ErrorRecursoNoEncontrado
 
 
-def obtener_contraseña(usuario_id: str) -> str:
+def obtener_contrasena(usuario_id: str) -> str:
     """
     Obtiene la contraseña desencriptada del usuario.
     Sin verificación (el usuario ya está autenticado).
@@ -53,11 +53,11 @@ __all__ = [
     "crear_sesion",
     "verificar_sesion",
     "cerrar_sesion_por_token",
-    "ver_contraseña",
-    "regenerar_contraseña",
-    "cambiar_contraseña",
-    "exportar_contraseña",
-    "obtener_contraseña",
+    "ver_contrasena",
+    "regenerar_contrasena",
+    "cambiar_contrasena",
+    "exportar_contrasena",
+    "obtener_contrasena",
     "crear_token_verificacion",
     "crear_o_actualizar_verificacion",
     "verificar_token",

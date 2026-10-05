@@ -36,34 +36,34 @@ class TestAuthInit:
         from src.auth import cerrar_sesion_por_token
         assert callable(cerrar_sesion_por_token)
 
-    def test_tiene_ver_contraseña(self):
+    def test_tiene_ver_contrasena(self):
         """ver_contraseña existe."""
-        from src.auth import ver_contraseña
-        assert callable(ver_contraseña)
+        from src.auth import ver_contrasena
+        assert callable(ver_contrasena)
 
-    def test_tiene_regenerar_contraseña(self):
+    def test_tiene_regenerar_contrasena(self):
         """regenerar_contraseña existe."""
-        from src.auth import regenerar_contraseña
-        assert callable(regenerar_contraseña)
+        from src.auth import regenerar_contrasena
+        assert callable(regenerar_contrasena)
 
-    def test_tiene_cambiar_contraseña(self):
+    def test_tiene_cambiar_contrasena(self):
         """cambiar_contraseña existe."""
-        from src.auth import cambiar_contraseña
-        assert callable(cambiar_contraseña)
+        from src.auth import cambiar_contrasena
+        assert callable(cambiar_contrasena)
 
-    def test_tiene_exportar_contraseña(self):
+    def test_tiene_exportar_contrasena(self):
         """exportar_contraseña existe."""
-        from src.auth import exportar_contraseña
-        assert callable(exportar_contraseña)
+        from src.auth import exportar_contrasena
+        assert callable(exportar_contrasena)
 
-    def test_tiene_obtener_contraseña(self):
+    def test_tiene_obtener_contrasena(self):
         """obtener_contraseña existe."""
-        from src.auth import obtener_contraseña
-        assert callable(obtener_contraseña)
+        from src.auth import obtener_contrasena
+        assert callable(obtener_contrasena)
 
-    def test_tiene_obtener_contraseña_tipo(self):
+    def test_tiene_obtener_contrasena_tipo(self):
         """obtener_contraseña requiere string."""
-        from src.auth import obtener_contraseña
+        from src.auth import obtener_contrasena
         
         with pytest.raises(ValueError):
-            obtener_contraseña("invalid")
+            obtener_contrasena("invalid")

@@ -88,7 +88,7 @@ class PasswordView(ctk.CTkFrame):
             font=crear_fuente(12, "bold"),
             fg_color=BOTON_PRIMARIO, hover_color=BOTON_PRIMARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, width=80, height=40, corner_radius=8,
-            command=self._ver_contraseña,
+            command=self._ver_contrasena,
         ).pack(side="right")
 
         self.label_ver_resultado = ctk.CTkLabel(
@@ -411,7 +411,7 @@ class PasswordView(ctk.CTkFrame):
         )
         self.label_export_resultado.pack(anchor="w", padx=20, pady=(0, 15))
 
-    def _ver_contraseña(self):
+    def _ver_contrasena(self):
         pin = self.entry_ver.get().strip()
         if not pin:
             self.label_ver_resultado.configure(text="Introduce tu PIN", text_color=PELIGRO)
@@ -483,13 +483,13 @@ class PasswordView(ctk.CTkFrame):
 
     def _regenerar(self):
         try:
-            from src.auth import regenerar_contraseña
+            from src.auth import regenerar_contrasena
             params = self.usuario.get('parametros_contraseña', {
                 "longitud": 20, "usar_mayusculas": True,
                 "usar_numeros": True, "usar_simbolos": True,
                 "excluir_ambiguos": False,
             })
-            resultado = regenerar_contraseña(str(self.usuario['_id']), params)
+            resultado = regenerar_contrasena(str(self.usuario['_id']), params)
             self.label_reg_resultado.configure(
                 text=f"Nueva contraseña: {resultado['nueva_contraseña']}",
                 text_color=COMPLETADO,
@@ -506,12 +506,12 @@ class PasswordView(ctk.CTkFrame):
             )
             return
         try:
-            from src.generador import generar_contraseña_personalizada
-            from src.seguridad.encriptacion import hashear_contraseña, cifrar
+            from src.generador import generar_contrasena_personalizada
+            from src.seguridad.encriptacion import hashear_contrasena, cifrar
             from src.db.conexion import conexion_global
 
-            pw = generar_contraseña_personalizada(semilla)
-            nuevo_hash = hashear_contraseña(pw)
+            pw = generar_contrasena_personalizada(semilla)
+            nuevo_hash = hashear_contrasena(pw)
             nueva_enc = cifrar(pw)
 
             coleccion = conexion_global.obtener_coleccion('usuarios')
@@ -548,21 +548,21 @@ class PasswordView(ctk.CTkFrame):
 
         try:
             # Verificar contraseña actual
-            from src.seguridad.encriptacion import verificar_contraseña
+            from src.seguridad.encriptacion import verificar_contrasena
             from src.db.conexion import conexion_global
 
             coleccion = conexion_global.obtener_coleccion('usuarios')
             usuario = coleccion.find_one({'_id': self.usuario['_id']})
 
-            if not verificar_contraseña(pw_actual, usuario.get('contraseña_hash', '')):
+            if not verificar_contrasena(pw_actual, usuario.get('contraseña_hash', '')):
                 self.label_manual_resultado.configure(
                     text="Contrasena actual incorrecta", text_color=PELIGRO
                 )
                 return
 
             # Contraseña actual correcta, cambiar a la nueva
-            from src.auth import cambiar_contraseña
-            resultado = cambiar_contraseña(str(self.usuario['_id']), pw_nueva)
+            from src.auth import cambiar_contrasena
+            resultado = cambiar_contrasena(str(self.usuario['_id']), pw_nueva)
             self.label_manual_resultado.configure(
                 text=resultado['mensaje'], text_color=COMPLETADO
             )
@@ -573,7 +573,7 @@ class PasswordView(ctk.CTkFrame):
 
     def _exportar(self):
         try:
-            from src.auth import exportar_contraseña
+            from src.auth import exportar_contrasena
             from tkinter import filedialog
             ruta = filedialog.asksaveasfilename(
                 defaultextension=".enc",
@@ -581,7 +581,7 @@ class PasswordView(ctk.CTkFrame):
                 title="Guardar contraseña",
             )
             if ruta:
-                exportar_contraseña(str(self.usuario['_id']), ruta)
+                exportar_contrasena(str(self.usuario['_id']), ruta)
                 self.label_export_resultado.configure(
                     text=f"Exportado: {ruta}", text_color=COMPLETADO
                 )
@@ -647,7 +647,7 @@ class PasswordView(ctk.CTkFrame):
 
     def _exportar_txt(self):
         try:
-            from src.auth import obtener_contraseña
+            from src.auth import obtener_contrasena
             from tkinter import filedialog
             from datetime import datetime
 
@@ -659,7 +659,7 @@ class PasswordView(ctk.CTkFrame):
             if not ruta:
                 return
 
-            pw = obtener_contraseña(str(self.usuario['_id']))
+            pw = obtener_contrasena(str(self.usuario['_id']))
             email = self.usuario.get('email', 'N/A')
             fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
             frase_info = self._info_frase_texto()
@@ -679,7 +679,7 @@ class PasswordView(ctk.CTkFrame):
 
     def _exportar_json(self):
         try:
-            from src.auth import obtener_contraseña
+            from src.auth import obtener_contrasena
             from tkinter import filedialog
             from datetime import datetime
             import json
@@ -692,7 +692,7 @@ class PasswordView(ctk.CTkFrame):
             if not ruta:
                 return
 
-            pw = obtener_contraseña(str(self.usuario['_id']))
+            pw = obtener_contrasena(str(self.usuario['_id']))
             email = self.usuario.get('email', 'N/A')
             fecha = datetime.now().strftime('%Y-%m-%d %H:%M')
 

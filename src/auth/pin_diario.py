@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from bson.errors import InvalidId
 
-from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseña
+from src.seguridad.encriptacion import hashear_contrasena, verificar_contrasena
 from src.db.conexion import conexion_global
 
 
@@ -75,7 +75,7 @@ def generar_pin_diario(usuario_id: str) -> str | None:
 
     # Generar PIN de 6 dígitos
     pin = str(secrets.randbelow(900000) + 100000)
-    pin_hash = hashear_contraseña(pin)
+    pin_hash = hashear_contrasena(pin)
 
     ahora = datetime.now(timezone.utc)
     coleccion.insert_one({
@@ -143,7 +143,7 @@ def verificar_pin_diario(usuario_id: str, pin_introducido: str) -> bool:
     if registro is None:
         return False
 
-    correcto = verificar_contraseña(pin_introducido, registro['pin_hash'])
+    correcto = verificar_contrasena(pin_introducido, registro['pin_hash'])
 
     if not correcto:
         coleccion.update_one(

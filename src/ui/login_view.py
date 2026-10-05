@@ -98,7 +98,7 @@ class LoginView(ctk.CTkFrame):
         # Email
         self._crear_campo_email()
         # Contraseña
-        self._crear_campo_contraseña()
+        self._crear_campo_contrasena()
 
     def _crear_campo_email(self):
         """Crea el campo de email."""
@@ -122,7 +122,7 @@ class LoginView(ctk.CTkFrame):
         )
         self.entry_email.pack(fill="x", padx=45, pady=(5, 15))
 
-    def _crear_campo_contraseña(self):
+    def _crear_campo_contrasena(self):
         """Crea el campo de contraseña."""
         ctk.CTkLabel(
             self.card,
@@ -132,7 +132,7 @@ class LoginView(ctk.CTkFrame):
             anchor="w",
         ).pack(fill="x", padx=45)
 
-        self.entry_contraseña = ctk.CTkEntry(
+        self.entry_contrasena = ctk.CTkEntry(
             self.card,
             placeholder_text="••••••••",
             show="•",
@@ -143,7 +143,7 @@ class LoginView(ctk.CTkFrame):
             height=48,
             corner_radius=8,
         )
-        self.entry_contraseña.pack(fill="x", padx=45, pady=(5, 5))
+        self.entry_contrasena.pack(fill="x", padx=45, pady=(5, 5))
 
     # --------------------------------------------
     # Checkbox mostrar contraseña
@@ -156,7 +156,7 @@ class LoginView(ctk.CTkFrame):
             self.card,
             text="Mostrar contraseña",
             variable=self.mostrar_pw,
-            command=self._toggle_contraseña,
+            command=self._toggle_contrasena,
             font=PEQUENO,
             text_color=TEXTO_SECUNDARIO,
             fg_color=FONDO_SECUNDARIO,
@@ -224,7 +224,7 @@ class LoginView(ctk.CTkFrame):
             text_color=TEXTO_PRINCIPAL,
             height=45,
             corner_radius=8,
-            command=self._recuperar_contraseña,
+            command=self._recuperar_contrasena,
         ).pack(fill="x", pady=(0, 10))
 
         # Botón Verificar Email
@@ -311,16 +311,16 @@ class LoginView(ctk.CTkFrame):
     # EVENTOS
     # ============================================
 
-    def _toggle_contraseña(self):
+    def _toggle_contrasena(self):
         """Alterna mostrar/ocultar contraseña."""
-        self.entry_contraseña.configure(
+        self.entry_contrasena.configure(
             show="" if self.mostrar_pw.get() else "•"
         )
 
     def _on_login_click(self):
         """Procesa el intento de login."""
         email = self.entry_email.get().strip()
-        contrasena = self.entry_contraseña.get()
+        contrasena = self.entry_contrasena.get()
 
         # Validaciones
         if not email:
@@ -654,7 +654,7 @@ class LoginView(ctk.CTkFrame):
     # RECUPERACIÓN DE CONTRASEÑA
     # ============================================
 
-    def _recuperar_contraseña(self):
+    def _recuperar_contrasena(self):
         """Abre diálogo de recuperación con frase semilla."""
         dialogo = ctk.CTkToplevel(self)
         dialogo.title("🔑 Recuperar Cuenta")
@@ -778,5 +778,5 @@ class LoginView(ctk.CTkFrame):
     def limpiar(self):
         """Limpia los campos del formulario."""
         self.entry_email.delete(0, "end")
-        self.entry_contraseña.delete(0, "end")
+        self.entry_contrasena.delete(0, "end")
         self.label_error.configure(text="")

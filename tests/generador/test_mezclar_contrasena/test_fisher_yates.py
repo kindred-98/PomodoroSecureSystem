@@ -4,7 +4,7 @@ Tests del algoritmo Fisher-Yates shuffle
 """
 
 import pytest
-from src.generador import mezclar_contraseña
+from src.generador import mezclar_contrasena
 
 
 class TestFisherYatesShuffle:
@@ -14,7 +14,7 @@ class TestFisherYatesShuffle:
         """Test: El shuffle produce una permutación válida"""
         original = "abcdefghij"
         for _ in range(10):
-            mezclada = mezclar_contraseña(original)
+            mezclada = mezclar_contrasena(original)
             assert sorted(original) == sorted(mezclada)
             assert len(original) == len(mezclada)
     
@@ -23,7 +23,7 @@ class TestFisherYatesShuffle:
         original = "aaaaabbbbb"
         resultados = set()
         for _ in range(50):
-            resultado = mezclar_contraseña(original)
+            resultado = mezclar_contrasena(original)
             resultados.add(resultado)
         # Con 50 iteraciones, probablemente vea cambios
         assert len(resultados) > 1
@@ -33,7 +33,7 @@ class TestFisherYatesShuffle:
         original = "abcdefghij"
         ultimos = []
         for _ in range(30):
-            resultado = mezclar_contraseña(original)
+            resultado = mezclar_contrasena(original)
             ultimos.append(resultado[-1])
         # El último elemento no siempre debe ser 'j'
         assert 'j' not in ultimos or len(set(ultimos)) > 1
@@ -45,13 +45,13 @@ class TestCaracteresUnicos:
     def test_todos_unicos(self):
         """Test: Shuffle de caracteres únicos"""
         original = "abcdefghij"
-        resultado = mezclar_contraseña(original)
+        resultado = mezclar_contrasena(original)
         assert len(set(resultado)) == len(set(original))
     
     def test_algunos_repetidos(self):
         """Test: Shuffle conserva repeticiones"""
         original = "aaabbbcccddd"
-        resultado = mezclar_contraseña(original)
+        resultado = mezclar_contrasena(original)
         assert resultado.count('a') == 3
         assert resultado.count('b') == 3
         assert resultado.count('c') == 3
@@ -60,7 +60,7 @@ class TestCaracteresUnicos:
     def test_todos_iguales(self):
         """Test: Shuffle de todos caracteres iguales retorna lo mismo"""
         original = "aaaaaaaaaa"
-        resultado = mezclar_contraseña(original)
+        resultado = mezclar_contrasena(original)
         assert resultado == original
 
 
@@ -71,5 +71,5 @@ class TestLargoDelResultado:
     def test_longitud_conservada(self, longitud):
         """Test: Longitud se conserva para diferentes tamaños"""
         original = "a" * longitud
-        resultado = mezclar_contraseña(original)
+        resultado = mezclar_contrasena(original)
         assert len(resultado) == longitud

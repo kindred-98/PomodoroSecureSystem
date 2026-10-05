@@ -15,14 +15,14 @@ from src.generador.calcular_puntuacion import (
 class TestCalcularPuntuacion:
     """Tests para la función calcular_puntuacion"""
 
-    def test_contraseña_debil_retorna_baja_puntuacion(self):
+    def test_contrasena_debil_retorna_baja_puntuacion(self):
         """Verifica que contraseñas debiles tengan baja puntuación"""
         resultado = calcular_puntuacion("abc")
         
         assert resultado['puntuacion'] < 70
         assert resultado['es_segura'] is False
 
-    def test_contraseña_fuerte_retorna_alta_puntuacion(self):
+    def test_contrasena_fuerte_retorna_alta_puntuacion(self):
         """Verifica que contraseñas fuertes tengan alta puntuación"""
         resultado = calcular_puntuacion("Kx9#mP2$vL5@nQ8!")
         
@@ -52,7 +52,7 @@ class TestCalcularPuntuacion:
         assert isinstance(resultado['nivel'], str)
         assert resultado['nivel'] in ['debil', 'normal', 'fuerte', 'muy_fuerte', 'Débil', 'Normal', 'Fuerte', 'Muy fuerte']
 
-    def test_tiempo_crack_mas_largo_para_contraseñas_largas(self):
+    def test_tiempo_crack_mas_largo_para_contrasenas_largas(self):
         """Verifica que contraseñas más largas tengan mayor tiempo de crack"""
         corta = calcular_puntuacion("Abc1!")
         larga = calcular_puntuacion("Abc1!XyZ2@Wv3#Qm5$")
@@ -71,22 +71,22 @@ class TestCalcularPuntuacion:
         
         assert 'analisis_patrones' in resultado
 
-    def test_contraseña_no_string_lanza_typeerror(self):
+    def test_contrasena_no_string_lanza_typeerror(self):
         """Verifica que se rechace contraseña no string"""
         with pytest.raises(TypeError):
             calcular_puntuacion(123)
 
-    def test_contraseña_none_lanza_typeerror(self):
+    def test_contrasena_none_lanza_typeerror(self):
         """Verifica que se rechace contraseña None"""
         with pytest.raises(TypeError):
             calcular_puntuacion(None)
 
-    def test_contraseña_vacia_lanza_valueerror(self):
+    def test_contrasena_vacia_lanza_valueerror(self):
         """Verifica que se rechace contraseña vacía"""
         with pytest.raises(ValueError):
             calcular_puntuacion("")
 
-    def test_contraseña_lista_lanza_typeerror(self):
+    def test_contrasena_lista_lanza_typeerror(self):
         """Verifica que se rechace contraseña tipo lista"""
         with pytest.raises(TypeError):
             calcular_puntuacion(["a", "b", "c"])
@@ -98,7 +98,7 @@ class TestCalcularPuntuacion:
         assert isinstance(resultado['tiempo_crack_estimado'], str)
         assert len(resultado['tiempo_crack_estimado']) > 0
 
-    def test_contraseñas_similares_puntuacion_diferente_por_longitud(self):
+    def test_contrasenas_similares_puntuacion_diferente_por_longitud(self):
         """Verifica que longitud diferente afecte puntuación"""
         corta = calcular_puntuacion("Aa1!")
         larga = calcular_puntuacion("Aa1!Bb2Cc3Dd4")
@@ -124,7 +124,7 @@ class TestCalcularPuntuacion:
 class TestGenerarYEvaluar:
     """Tests para la función generar_y_evaluar"""
 
-    def test_genera_contraseña_valida(self):
+    def test_genera_contrasena_valida(self):
         """Verifica que genere una contraseña"""
         parametros = {
             "longitud": 16,
@@ -184,7 +184,7 @@ class TestGenerarYEvaluar:
         assert 'es_segura' in resultado
         assert isinstance(resultado['es_segura'], bool)
 
-    def test_con_mezclar_cambia_contraseña(self):
+    def test_con_mezclar_cambia_contrasena(self):
         """Verifica que mezclar_resultado=True mezcle la contraseña"""
         parametros = {
             "longitud": 16,
@@ -229,7 +229,7 @@ class TestGenerarYEvaluar:
         
         assert len(resultado['contraseña']) == longitud
 
-    def test_genera_contraseña_fuerte_por_defecto(self):
+    def test_genera_contrasena_fuerte_por_defecto(self):
         """Verifica que genere contraseñas seguras por defecto"""
         parametros = {
             "longitud": 16,

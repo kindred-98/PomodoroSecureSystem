@@ -4,7 +4,7 @@ Tests de validación de entrada para generar_contraseña()
 """
 
 import pytest
-from src.generador import generar_contraseña
+from src.generador import generar_contrasena
 
 
 class TestValidacionEntrada:
@@ -13,23 +13,23 @@ class TestValidacionEntrada:
     def test_rechaza_parametros_no_dict(self):
         """Test: Rechaza entrada que no es dict"""
         with pytest.raises(TypeError):
-            generar_contraseña("no es dict")
+            generar_contrasena("no es dict")
     
     def test_rechaza_parametros_lista(self):
         """Test: Rechaza lista como parámetros"""
         with pytest.raises(TypeError):
-            generar_contraseña([12, True, True, True, False])
+            generar_contrasena([12, True, True, True, False])
     
     def test_rechaza_parametros_none(self):
         """Test: Rechaza None como parámetros"""
         with pytest.raises(TypeError):
-            generar_contraseña(None)
+            generar_contrasena(None)
     
     def test_rechaza_parametros_faltantes(self):
         """Test: Rechaza si faltan claves en dict"""
         parametros = {"longitud": 12}  # Faltan muchas claves
         with pytest.raises(ValueError):
-            generar_contraseña(parametros)
+            generar_contrasena(parametros)
     
     def test_rechaza_dict_con_claves_equivocadas(self):
         """Test: Rechaza dict con claves incorrectas"""
@@ -41,7 +41,7 @@ class TestValidacionEntrada:
             "ambiguos": False
         }
         with pytest.raises(ValueError):
-            generar_contraseña(parametros)
+            generar_contrasena(parametros)
     
     def test_rechaza_longitud_no_entero(self):
         """Test: Rechaza longitud que no es entero"""
@@ -53,7 +53,7 @@ class TestValidacionEntrada:
             "excluir_ambiguos": False
         }
         with pytest.raises(ValueError):
-            generar_contraseña(parametros)
+            generar_contrasena(parametros)
     
     def test_rechaza_longitud_float(self):
         """Test: Rechaza longitud como float"""
@@ -65,12 +65,12 @@ class TestValidacionEntrada:
             "excluir_ambiguos": False
         }
         with pytest.raises(ValueError):
-            generar_contraseña(parametros)
+            generar_contrasena(parametros)
     
     def test_dict_vacio(self):
         """Test: Rechaza dict vacío"""
         with pytest.raises(ValueError):
-            generar_contraseña({})
+            generar_contrasena({})
     
     def test_genera_correctamente_con_todos_los_parametros(self):
         """Test: Genera correctamente cuando todos los parámetros son válidos"""
@@ -81,6 +81,6 @@ class TestValidacionEntrada:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert isinstance(contrasena, str)
         assert len(contrasena) == 12

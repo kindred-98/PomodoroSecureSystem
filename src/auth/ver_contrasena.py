@@ -5,11 +5,11 @@ Requiere validación de identidad (contraseña de login).
 """
 
 from src.db.conexion import conexion_global
-from src.seguridad.encriptacion import verificar_contraseña, descifrar
+from src.seguridad.encriptacion import verificar_contrasena, descifrar
 from src.excepciones import ErrorAutenticacion, ErrorRecursoNoEncontrado, ErrorValidacion
 
 
-def ver_contraseña(usuario_id: str, contrasena_login: str) -> str:
+def ver_contrasena(usuario_id: str, contrasena_login: str) -> str:
     """
     Muestra la contraseña encriptada del usuario tras validación.
     
@@ -52,7 +52,7 @@ def ver_contraseña(usuario_id: str, contrasena_login: str) -> str:
     
     # Verificar identidad con contraseña de login
     hash_almacenado = usuario.get('contraseña_hash', '')
-    if not verificar_contraseña(contrasena_login, hash_almacenado):
+    if not verificar_contrasena(contrasena_login, hash_almacenado):
         raise ErrorAutenticacion("Contraseña de verificación incorrecta")
     
     # Desencriptar y retornar

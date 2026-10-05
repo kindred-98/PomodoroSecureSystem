@@ -9,7 +9,7 @@ import string
 from src.generador.asegurar_tipos_caracteres import asegurar_tipos_caracteres
 
 
-def generar_contraseña(parametros: dict) -> str:
+def generar_contrasena(parametros: dict) -> str:
     """
     Genera una contraseña segura basada en parámetros especificados.
     
@@ -69,7 +69,7 @@ def generar_contraseña(parametros: dict) -> str:
     return "".join(contrasena)
 
 
-def generar_contraseña_segura(longitud: int = 16) -> str:
+def generar_contrasena_segura(longitud: int = 16) -> str:
     """
     Genera una contraseña segura automáticamente.
     
@@ -86,10 +86,10 @@ def generar_contraseña_segura(longitud: int = 16) -> str:
         'usar_simbolos': True,
         'excluir_ambiguos': True,
     }
-    return generar_contraseña(parametros)
+    return generar_contrasena(parametros)
 
 
-def generar_contraseña_personalizada(semilla: str, longitud: int = 0) -> str:
+def generar_contrasena_personalizada(semilla: str, longitud: int = 0) -> str:
     """
     Genera una contraseña fuerte usando 4 letras y 4 números de la semilla.
     

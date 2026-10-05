@@ -39,8 +39,8 @@ class TestNiveles:
     def test_niveles_validos(self):
         """Test: Nivel siempre es uno de los esperados"""
         niveles_validos = {"Débil", "Normal", "Fuerte", "Muy Fuerte"}
-        contraseñas = ["a", "abc", "abcdef123", "MyPass123@", "X7$mK#pQw9&bZ2L!"]
-        for contrasena in contraseñas:
+        contrasenas = ["a", "abc", "abcdef123", "MyPass123@", "X7$mK#pQw9&bZ2L!"]
+        for contrasena in contrasenas:
             resultado = evaluar_fortaleza(contrasena)
             assert resultado['nivel'] in niveles_validos
 

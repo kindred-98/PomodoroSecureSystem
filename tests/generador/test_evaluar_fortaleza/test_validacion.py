@@ -25,7 +25,7 @@ class TestValidacionEvaluarFortaleza:
         with pytest.raises(TypeError):
             evaluar_fortaleza(['a', 'b', 'c'])
     
-    def test_contraseña_vacia(self):
+    def test_contrasena_vacia(self):
         """Test: ValueError si está vacía"""
         with pytest.raises(ValueError, match="vacía"):
             evaluar_fortaleza("")

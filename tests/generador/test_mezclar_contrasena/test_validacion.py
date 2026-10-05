@@ -4,7 +4,7 @@ Tests de validación de entrada para mezclar_contraseña
 """
 
 import pytest
-from src.generador import mezclar_contraseña, mezclar_preservando_estructura
+from src.generador import mezclar_contrasena, mezclar_preservando_estructura
 
 
 class TestValidacionMezclar:
@@ -13,22 +13,22 @@ class TestValidacionMezclar:
     def test_no_es_string(self):
         """Test: TypeError si no es string"""
         with pytest.raises(TypeError, match="string"):
-            mezclar_contraseña(12345)
+            mezclar_contrasena(12345)
     
     def test_parametro_none(self):
         """Test: TypeError si es None"""
         with pytest.raises(TypeError):
-            mezclar_contraseña(None)
+            mezclar_contrasena(None)
     
     def test_parametro_lista(self):
         """Test: TypeError si es lista"""
         with pytest.raises(TypeError):
-            mezclar_contraseña(['a', 'b', 'c'])
+            mezclar_contrasena(['a', 'b', 'c'])
     
-    def test_contraseña_vacia(self):
+    def test_contrasena_vacia(self):
         """Test: ValueError si está vacía"""
         with pytest.raises(ValueError, match="vacía"):
-            mezclar_contraseña("")
+            mezclar_contrasena("")
 
 
 class TestValidacionMezclarPreservando:
@@ -39,7 +39,7 @@ class TestValidacionMezclarPreservando:
         with pytest.raises(TypeError):
             mezclar_preservando_estructura(12345, preservar_inicio=False)
     
-    def test_contraseña_vacia(self):
+    def test_contrasena_vacia(self):
         """Test: ValueError si está vacía"""
         with pytest.raises(ValueError):
             mezclar_preservando_estructura("", preservar_inicio=False)
@@ -67,7 +67,7 @@ class TestDistribucionAleatoria:
     def test_multiples_mezclas_variadas(self):
         """Test: Múltiples mezclas producen resultados diferentes"""
         original = "abcdefghij"
-        resultados = [mezclar_contraseña(original) for _ in range(20)]
+        resultados = [mezclar_contrasena(original) for _ in range(20)]
         # No todos deberían ser iguales al original
         assert any(r != original for r in resultados)
         # No todos deberían ser iguales entre sí
@@ -77,5 +77,5 @@ class TestDistribucionAleatoria:
         """Test: Usa secrets (criptográficamente seguro)"""
         # Simplemente verificar que funciona múltiples veces
         for _ in range(5):
-            resultado = mezclar_contraseña("abcdefgh123")
+            resultado = mezclar_contrasena("abcdefgh123")
             assert isinstance(resultado, str)

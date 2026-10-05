@@ -5,12 +5,12 @@ Requiere que la nueva contraseña alcance nivel "Muy Fuerte" (99%+).
 """
 
 from src.db.conexion import conexion_global
-from src.seguridad.encriptacion import hashear_contraseña, cifrar
+from src.seguridad.encriptacion import hashear_contrasena, cifrar
 from src.generador import evaluar_fortaleza
 from src.excepciones import ErrorRecursoNoEncontrado
 
 
-def cambiar_contraseña(usuario_id: str, nueva_contrasena: str) -> dict:
+def cambiar_contrasena(usuario_id: str, nueva_contrasena: str) -> dict:
     """
     Permite al usuario cambiar su contraseña manualmente.
     
@@ -68,7 +68,7 @@ def cambiar_contraseña(usuario_id: str, nueva_contrasena: str) -> dict:
         raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Guardar
-    nuevo_hash = hashear_contraseña(nueva_contrasena)
+    nuevo_hash = hashear_contrasena(nueva_contrasena)
     nueva_encriptada = cifrar(nueva_contrasena)
     
     coleccion.update_one(

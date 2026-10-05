@@ -4,7 +4,7 @@ Tests de integración y comportamientos generales
 """
 
 import pytest
-from src.generador import evaluar_fortaleza, generar_contraseña
+from src.generador import evaluar_fortaleza, generar_contrasena
 
 
 class TestGeneradasYEvaluadas:
@@ -19,7 +19,7 @@ class TestGeneradasYEvaluadas:
             'usar_simbolos': True,
             'excluir_ambiguos': False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         resultado = evaluar_fortaleza(contrasena)
         
         assert resultado['puntuacion'] > 50
@@ -34,7 +34,7 @@ class TestGeneradasYEvaluadas:
             'usar_simbolos': True,
             'excluir_ambiguos': False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         resultado = evaluar_fortaleza(contrasena)
         
         assert resultado['puntuacion'] >= 70
@@ -78,7 +78,7 @@ class TestConsistencia:
         assert resultado1['puntuacion'] == resultado2['puntuacion']
         assert resultado1['nivel'] == resultado2['nivel']
     
-    def test_contraseñas_similares_similar_puntuacion(self):
+    def test_contrasenas_similares_similar_puntuacion(self):
         """Test: Contraseñas similares dan puntuaciones similares"""
         resultado1 = evaluar_fortaleza("Abc12!@#XYZ")
         resultado2 = evaluar_fortaleza("Abc12!@#ZYX")  # Solo último diferente
@@ -87,9 +87,9 @@ class TestConsistencia:
         diferencia = abs(resultado1['puntuacion'] - resultado2['puntuacion'])
         assert diferencia < 20
     
-    def test_todo_tipo_contraseña_evaluable(self):
+    def test_todo_tipo_contrasena_evaluable(self):
         """Test: Cualquier contraseña es evaluable"""
-        contraseñas = [
+        contrasenas = [
             "a",
             "password",
             "P@ssw0rd",
@@ -98,7 +98,7 @@ class TestConsistencia:
             "Ésté€$"
         ]
         
-        for contrasena in contraseñas:
+        for contrasena in contrasenas:
             resultado = evaluar_fortaleza(contrasena)
             assert 0 <= resultado['puntuacion'] <= 100
             assert resultado['nivel'] in {"Débil", "Normal", "Fuerte", "Muy Fuerte"}

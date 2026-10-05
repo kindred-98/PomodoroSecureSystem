@@ -10,7 +10,7 @@ import bcrypt
 from cryptography.fernet import Fernet
 
 
-def hashear_contraseña(contrasena: str) -> str:
+def hashear_contrasena(contrasena: str) -> str:
     """
     Genera un hash bcrypt de una contraseña.
     
@@ -36,7 +36,7 @@ def hashear_contraseña(contrasena: str) -> str:
     return hash_bytes.decode('utf-8')
 
 
-def verificar_contraseña(contrasena: str, hash_almacenado: str) -> bool:
+def verificar_contrasena(contrasena: str, hash_almacenado: str) -> bool:
     """
     Verifica si una contraseña coincide con un hash bcrypt.
     
@@ -55,7 +55,7 @@ def verificar_contraseña(contrasena: str, hash_almacenado: str) -> bool:
             contrasena.encode('utf-8'),
             hash_almacenado.encode('utf-8')
         )
-    except (ValueError, Exception):
+    except Exception:  # nosec - un hash corrupto o de otra versión no debe romper login
         return False
 
 

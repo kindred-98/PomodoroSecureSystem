@@ -240,59 +240,72 @@ class ServicioTimer:
         except Exception:
             return False
 
-    def _manejar_fin_estado(self) -> str:
+    def _manejar_fin_estado(self) -> str | None:
         """Maneja la transición cuando un estado llega a 0."""
         from src.timer.ciclo_pomodoro import manejar_evento_timer
 
         if self.estado == ESTADO_TRABAJANDO:
-            try:
-                resultado = manejar_evento_timer(self.usuario_id, "pomodoro_completado")
-                accion = resultado.get('accion', '')
-                duracion = resultado.get('datos_extra', {}).get('duracion_min', 5)
+            return self._transicionar(manejar_evento_timer, "pomodoro_completado")
 
-                if 'largo' in accion:
-                    self.estado = ESTADO_DESCANSO_LARGO
-                else:
-                    self.estado = ESTADO_DESCANSO_CORTO
-
-                self.segundos_restantes = duracion * 60
-                self.segundos_totales = duracion * 60
-                self._inicio_estado = datetime.now(timezone.utc)
-                return self.estado
-
-            except Exception:  # nosec - el timer no debe propagar al hilo de la UI
-                self.ciclo_activo = False
-                self.estado = ESTADO_INACTIVO
-                return 'error'
-
-        elif self.estado in (ESTADO_DESCANSO_CORTO, ESTADO_DESCANSO_LARGO):
-            try:
-                resultado = manejar_evento_timer(self.usuario_id, "descanso_completado")
-                accion = resultado.get('accion', '')
-
-                if accion == 'nuevo_ciclo':
-                    self.pomodoro_actual = 1
-                    self._descansos_restantes = list(self._configuracion.get('descansos_cortos', [5, 5, 5, 5]))
-                elif accion == 'fin_jornada':
-                    self.ciclo_activo = False
-                    self.estado = ESTADO_INACTIVO
-                    return 'ciclo_completado'
-                else:
-                    self.pomodoro_actual = resultado.get('pomodoro_actual', self.pomodoro_actual + 1)
-
-                pomodoro_min = self._configuracion.get('pomodoro_min', 25)
-                self.estado = ESTADO_TRABAJANDO
-                self.segundos_restantes = pomodoro_min * 60
-                self.segundos_totales = pomodoro_min * 60
-                self._inicio_estado = datetime.now(timezone.utc)
-                return ESTADO_TRABAJANDO
-
-            except Exception:  # nosec - el timer no debe propagar al hilo de la UI
-                self.ciclo_activo = False
-                self.estado = ESTADO_INACTIVO
-                return 'error'
+        if self.estado in (ESTADO_DESCANSO_CORTO, ESTADO_DESCANSO_LARGO):
+            return self._transicionar(manejar_evento_timer, "descanso_completado")
 
         return None
+
+    def _transicionar(self, manejar_evento_timer, evento: str) -> str:
+        """Aplica la transición y deja el timer listo para el siguiente estado."""
+        try:
+            resultado = manejar_evento_timer(self.usuario_id, evento)
+        except Exception:  # nosec - el timer no debe propagar al hilo de la UI
+            self.ciclo_activo = False
+            self.estado = ESTADO_INACTIVO
+            return 'error'
+
+        if evento == "pomodoro_completado":
+            return self._arrancar_descanso(resultado)
+
+        return self._reanudar_trabajo(resultado)
+
+    def _arrancar_descanso(self, resultado: dict) -> str:
+        """Tras completar un pomodoro, entra en descanso corto o largo."""
+        accion = resultado.get('accion', '')
+        duracion = resultado.get('datos_extra', {}).get('duracion_min', 5)
+
+        self.estado = (
+            ESTADO_DESCANSO_LARGO if 'largo' in accion else ESTADO_DESCANSO_CORTO
+        )
+        self.segundos_restantes = duracion * 60
+        self.segundos_totales = duracion * 60
+        self._inicio_estado = datetime.now(timezone.utc)
+
+        return self.estado
+
+    def _reanudar_trabajo(self, resultado: dict) -> str:
+        """Tras completar un descanso, vuelve al trabajo o cierra la jornada."""
+        accion = resultado.get('accion', '')
+
+        if accion == 'fin_jornada':
+            self.ciclo_activo = False
+            self.estado = ESTADO_INACTIVO
+            return 'ciclo_completado'
+
+        if accion == 'nuevo_ciclo':
+            self.pomodoro_actual = 1
+            self._descansos_restantes = list(
+                self._configuracion.get('descansos_cortos', [5, 5, 5, 5])
+            )
+        else:
+            self.pomodoro_actual = resultado.get(
+                'pomodoro_actual', self.pomodoro_actual + 1
+            )
+
+        pomodoro_min = self._configuracion.get('pomodoro_min', 25)
+        self.estado = ESTADO_TRABAJANDO
+        self.segundos_restantes = pomodoro_min * 60
+        self.segundos_totales = pomodoro_min * 60
+        self._inicio_estado = datetime.now(timezone.utc)
+
+        return ESTADO_TRABAJANDO
 
     def pausar(self):
         """Pausa el timer."""

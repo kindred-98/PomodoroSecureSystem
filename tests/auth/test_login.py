@@ -11,7 +11,7 @@ class TestLoginValidacion:
         with pytest.raises(TypeError, match="email debe ser string"):
             iniciar_sesion(123, "pass")
     
-    def test_contraseña_no_string(self, mock_conexion_global, fernet_key_env):
+    def test_contrasena_no_string(self, mock_conexion_global, fernet_key_env):
         with pytest.raises(TypeError, match="contraseña debe ser string"):
             iniciar_sesion("a@b.com", 123)
     
@@ -19,7 +19,7 @@ class TestLoginValidacion:
         with pytest.raises(ValueError, match="email no puede estar vacío"):
             iniciar_sesion("", "pass")
     
-    def test_contraseña_vacia(self, mock_conexion_global, fernet_key_env):
+    def test_contrasena_vacia(self, mock_conexion_global, fernet_key_env):
         with pytest.raises(ValueError, match="contraseña no puede estar vacía"):
             iniciar_sesion("a@b.com", "")
 
@@ -41,7 +41,7 @@ class TestLoginCredenciales:
         with pytest.raises(Exception, match="Credenciales incorrectas"):
             iniciar_sesion("noexiste@test.com", "pass123")
     
-    def test_contraseña_incorrecta(self, mock_conexion_global, fernet_key_env, usuario_registrado):
+    def test_contrasena_incorrecta(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Contraseña incorrecta debe fallar"""
         usr = usuario_registrado
         with pytest.raises(Exception, match="Credenciales incorrectas"):

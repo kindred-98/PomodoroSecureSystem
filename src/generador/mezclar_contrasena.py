@@ -7,7 +7,7 @@ a contraseñas ya generadas.
 import secrets
 
 
-def mezclar_contraseña(contrasena: str) -> str:
+def mezclar_contrasena(contrasena: str) -> str:
     """
     Mezcla (shuffle) una contraseña usando criptografía segura.
     
@@ -81,7 +81,7 @@ def mezclar_preservando_estructura(contrasena: str, preservar_inicio: bool = Fal
     # Si se preserva el inicio, mezclar solo desde posición 1 en adelante
     if preservar_inicio:
         primer_char = contrasena[0]
-        resto_mezclado = mezclar_contraseña(contrasena[1:])
+        resto_mezclado = mezclar_contrasena(contrasena[1:])
         return primer_char + resto_mezclado
     
-    return mezclar_contraseña(contrasena)
+    return mezclar_contrasena(contrasena)

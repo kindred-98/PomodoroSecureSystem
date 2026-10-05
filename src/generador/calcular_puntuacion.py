@@ -5,10 +5,10 @@ de evaluación de contraseñas en un sistema de puntuación unificado.
 """
 
 import math
-from src.generador.generar_contraseña import generar_contraseña
+from src.generador.generar_contrasena import generar_contrasena
 from src.generador.detectar_patrones import detectar_patrones
 from src.generador.evaluar_fortaleza import evaluar_fortaleza
-from src.generador.mezclar_contraseña import mezclar_contraseña as mezclar
+from src.generador.mezclar_contrasena import mezclar_contrasena as mezclar
 
 
 def calcular_puntuacion(contrasena: str, incluir_analisis: bool = False) -> dict:
@@ -51,7 +51,6 @@ def calcular_puntuacion(contrasena: str, incluir_analisis: bool = False) -> dict
     tamano_charset = 95  # ASCII imprimibles
     longitud = len(contrasena)
     
-    # promedio_intentos = (tamaño_charset ^ longitud) / 2
     promedio_intentos = (tamano_charset ** longitud) / 2
     
     # Suponiendo 1 millón de intentos por segundo
@@ -112,7 +111,7 @@ def generar_y_evaluar(parametros: dict, mezclar_resultado: bool = False) -> dict
         raise TypeError("Los parámetros deben ser un diccionario")
     
     # Generar contraseña
-    contrasena = generar_contraseña(parametros)
+    contrasena = generar_contrasena(parametros)
     
     # Mezclar si se solicita
     if mezclar_resultado:

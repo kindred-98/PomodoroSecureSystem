@@ -213,7 +213,7 @@ def mock_conexion_global(conexion_mongodb_mock):
         'src.db.equipos.buscar_por_id',
         'src.db.equipos.obtener_miembros',
         'src.db.equipos.obtener_por_encargado',
-        'src.db.equipos.añadir_miembro',
+        'src.db.equipos.anadir_miembro',
         'src.db.sesiones.crear_sesion',
         'src.db.sesiones.actualizar_sesion',
         'src.db.sesiones.cerrar_sesion',
@@ -226,10 +226,10 @@ def mock_conexion_global(conexion_mongodb_mock):
     modulos_auth = [
         'src.auth.sesion',
         'src.auth.login',
-        'src.auth.ver_contraseña',
-        'src.auth.regenerar_contraseña',
-        'src.auth.cambiar_contraseña',
-        'src.auth.exportar_contraseña',
+        'src.auth.ver_contrasena',
+        'src.auth.regenerar_contrasena',
+        'src.auth.cambiar_contrasena',
+        'src.auth.exportar_contrasena',
         'src.auth.registro',
     ]
     modulos_conexion = [
@@ -267,7 +267,7 @@ def fernet_key_env():
 
 
 @pytest.fixture
-def parametros_contraseña_defecto():
+def parametros_contrasena_defecto():
     """Fixture: Parámetros por defecto para generación de contraseña en auth"""
     return {
         "longitud": 16,
@@ -279,14 +279,14 @@ def parametros_contraseña_defecto():
 
 
 @pytest.fixture
-def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contraseña_defecto):
+def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contrasena_defecto):
     """Fixture: Usuario completamente registrado con hash + encriptado en BD"""
-    from src.seguridad.encriptacion import hashear_contraseña, cifrar
-    from src.generador import generar_contraseña
+    from src.seguridad.encriptacion import hashear_contrasena, cifrar
+    from src.generador import generar_contrasena
     
-    contraseña = generar_contraseña(parametros_contraseña_defecto)
-    hash_pw = hashear_contraseña(contraseña)
-    enc_pw = cifrar(contraseña)
+    contrasena = generar_contrasena(parametros_contrasena_defecto)
+    hash_pw = hashear_contrasena(contrasena)
+    enc_pw = cifrar(contrasena)
     
     coleccion = mock_conexion_global.obtener_coleccion('usuarios')
     usuario = {
@@ -294,7 +294,7 @@ def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contrase
         'nombre': 'Usuario Auth',
         'contraseña_hash': hash_pw,
         'contraseña_encriptada': enc_pw,
-        'parametros_contraseña': parametros_contraseña_defecto,
+        'parametros_contraseña': parametros_contrasena_defecto,
         'rol': 'empleado',
         'activo': True,
         'email_verified': True,
@@ -314,7 +314,7 @@ def usuario_registrado(mock_conexion_global, fernet_key_env, parametros_contrase
     
     return {
         'usuario': usuario,
-        'contraseña': contraseña
+        'contraseña': contrasena
     }
 
 

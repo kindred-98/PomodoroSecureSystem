@@ -229,8 +229,8 @@ class RegistroView(ctk.CTkFrame):
         ).pack(anchor="w", pady=(10, 15))
 
         self._crear_slider_longitud()
-        self._crear_checkboxes_contraseña()
-        self._crear_tipo_contraseña()
+        self._crear_checkboxes_contrasena()
+        self._crear_tipo_contrasena()
 
     def _mostrar_paso_3(self):
         """Paso 3: Contraseña generada + Confirmación."""
@@ -413,7 +413,7 @@ class RegistroView(ctk.CTkFrame):
         self.label_longitud.configure(text=f"{longitud} caracteres")
         self.slider_longitud.configure(command=self._actualizar_longitud)
 
-    def _crear_checkboxes_contraseña(self):
+    def _crear_checkboxes_contrasena(self):
         """Crea los checkboxes de opciones de contraseña."""
         self.var_mayus = ctk.BooleanVar(value=self.datos_paso_2.get("usar_mayusculas", True))
         self.var_num = ctk.BooleanVar(value=self.datos_paso_2.get("usar_numeros", True))
@@ -434,29 +434,29 @@ class RegistroView(ctk.CTkFrame):
 
         ctk.CTkFrame(self.contenido, fg_color=BORDE, height=1).pack(fill="x", pady=(15, 10))
 
-    def _crear_tipo_contraseña(self):
+    def _crear_tipo_contrasena(self):
         """Crea las opciones de tipo de contraseña."""
-        self.tipo_contraseña = ctk.StringVar(value=self.datos_paso_2.get("tipo", "sistema"))
+        self.tipo_contrasena = ctk.StringVar(value=self.datos_paso_2.get("tipo", "sistema"))
 
         ctk.CTkRadioButton(
             self.contenido, text="Generada por el sistema (recomendado)",
-            variable=self.tipo_contraseña, value="sistema",
+            variable=self.tipo_contrasena, value="sistema",
             font=crear_fuente(13), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
-            command=self._toggle_tipo_contraseña,
+            command=self._toggle_tipo_contrasena,
         ).pack(anchor="w")
 
         ctk.CTkRadioButton(
             self.contenido, text="Mi propia contraseña",
-            variable=self.tipo_contraseña, value="personalizada",
+            variable=self.tipo_contrasena, value="personalizada",
             font=crear_fuente(13), text_color=TEXTO_SECUNDARIO,
             fg_color=TRABAJO_ACTIVO, hover_color=BOTON_PRIMARIO_HOVER,
-            command=self._toggle_tipo_contraseña,
+            command=self._toggle_tipo_contrasena,
         ).pack(anchor="w", pady=(2, 5))
 
-        self._crear_campos_contraseña_personalizada()
+        self._crear_campos_contrasena_personalizada()
 
-    def _crear_campos_contraseña_personalizada(self):
+    def _crear_campos_contrasena_personalizada(self):
         """Crea los campos de contraseña personalizada."""
         self.frame_pass = ctk.CTkFrame(self.contenido, fg_color="transparent")
         self.frame_pass.pack(fill="x", pady=(0, 5))
@@ -505,7 +505,7 @@ class RegistroView(ctk.CTkFrame):
         self.entry_pass2.pack(fill="x")
         self.entry_pass2.insert(0, self.datos_paso_2.get("contraseña2", ""))
 
-        if self.tipo_contraseña.get() == "personalizada":
+        if self.tipo_contrasena.get() == "personalizada":
             self.frame_pass.pack(fill="x", pady=(0, 5))
         else:
             self.frame_pass.pack_forget()
@@ -618,9 +618,9 @@ class RegistroView(ctk.CTkFrame):
         except Exception:
             pass
 
-    def _toggle_tipo_contraseña(self):
+    def _toggle_tipo_contrasena(self):
         """Muestra/oculta campos de contraseña personalizada."""
-        if self.tipo_contraseña.get() == "personalizada":
+        if self.tipo_contrasena.get() == "personalizada":
             self.frame_pass.pack(fill="x", pady=(0, 5))
         else:
             self.frame_pass.pack_forget()
@@ -774,9 +774,9 @@ class RegistroView(ctk.CTkFrame):
         self.datos_paso_2["usar_numeros"] = self.var_num.get()
         self.datos_paso_2["usar_simbolos"] = self.var_simb.get()
         self.datos_paso_2["excluir_ambiguos"] = self.var_ambig.get()
-        self.datos_paso_2["tipo"] = self.tipo_contraseña.get()
+        self.datos_paso_2["tipo"] = self.tipo_contrasena.get()
         
-        if self.tipo_contraseña.get() == "personalizada":
+        if self.tipo_contrasena.get() == "personalizada":
             contrasena = self.entry_pass.get()
             contrasena2 = self.entry_pass2.get()
             

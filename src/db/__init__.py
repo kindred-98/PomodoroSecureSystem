@@ -16,7 +16,7 @@ from src.db.equipos import (
     crear_equipo,
     obtener_miembros,
     obtener_por_encargado,
-    añadir_miembro,
+    anadir_miembro,
 )
 from src.db.sesiones import (
     crear_sesion,
@@ -46,7 +46,7 @@ __all__ = [
     "crear_equipo",
     "obtener_miembros",
     "obtener_por_encargado",
-    "añadir_miembro",
+    "anadir_miembro",
     # Sesiones
     "crear_sesion",
     "actualizar_sesion",

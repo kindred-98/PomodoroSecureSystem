@@ -64,8 +64,6 @@ class TestEmitirEvento:
         """Verifica que evento sin callbacks no falle"""
         with patch('src.timer.ciclo_pomodoro._callbacks', {}):
             _emitir_evento('inexistente', {})
-        
-        assert True
 
     def test_multiple_callbacks_se_ejecutan(self, mock_conexion_global):
         """Verifica que todos los callbacks se ejecuten"""

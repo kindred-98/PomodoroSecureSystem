@@ -10,7 +10,7 @@ from src.seguridad.encriptacion import descifrar, cifrar
 from src.excepciones import ErrorRecursoNoEncontrado, ErrorValidacion
 
 
-def exportar_contraseña(usuario_id: str, ruta_destino: str) -> str:
+def exportar_contrasena(usuario_id: str, ruta_destino: str) -> str:
     """
     Exporta la contraseña del usuario a un archivo JSON encriptado.
     

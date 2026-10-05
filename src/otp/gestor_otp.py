@@ -6,7 +6,7 @@ para validación de presencia del trabajador.
 
 import secrets
 from datetime import datetime, timedelta, timezone
-from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseña
+from src.seguridad.encriptacion import hashear_contrasena, verificar_contrasena
 from src.db.conexion import conexion_global
 from src.db.anomalias import registrar_anomalia
 
@@ -53,7 +53,7 @@ def generar_otp(usuario_id: str, ciclo_id: str = None) -> dict:
     codigo = str(secrets.randbelow(900000) + 100000)
     
     # Hashear el código
-    codigo_hash = hashear_contraseña(codigo)
+    codigo_hash = hashear_contrasena(codigo)
     
     # Calcular expiración
     ahora = datetime.now(timezone.utc)
@@ -177,7 +177,7 @@ def verificar_otp(usuario_id: str, codigo_introducido: str) -> dict:
     
     # Verificar código contra hash
     hash_almacenado = evento['otp_hash']
-    codigo_correcto = verificar_contraseña(codigo_introducido, hash_almacenado)
+    codigo_correcto = verificar_contrasena(codigo_introducido, hash_almacenado)
     
     if codigo_correcto:
         # Correcto

@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 from bson import ObjectId
 
 from src.auth.pin_diario import generar_pin_diario, verificar_pin_diario
-from src.seguridad.encriptacion import hashear_contraseña
+from src.seguridad.encriptacion import hashear_contrasena
 
 
 class TestGenerarPinDiario:

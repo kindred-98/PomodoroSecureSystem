@@ -3,61 +3,61 @@
 import pytest
 from unittest.mock import patch
 from src.seguridad.encriptacion import (
-    hashear_contraseña,
-    verificar_contraseña,
+    hashear_contrasena,
+    verificar_contrasena,
     cifrar,
     descifrar,
     generar_token_sesion,
 )
 
 
-class TestHashearContraseña:
+class TestHashearContrasena:
     """Tests para hashear_contraseña"""
     
     def test_genera_hash_bcrypt(self):
         """Hash debe empezar con $2b$ (formato bcrypt)"""
-        hash_resultado = hashear_contraseña("MiContraseña123!")
+        hash_resultado = hashear_contrasena("MiContraseña123!")
         assert hash_resultado.startswith("$2b$")
     
     def test_hashes_son_diferentes(self):
         """Cada hash debe ser diferente (salt único)"""
-        h1 = hashear_contraseña("Igual123!")
-        h2 = hashear_contraseña("Igual123!")
+        h1 = hashear_contrasena("Igual123!")
+        h2 = hashear_contrasena("Igual123!")
         assert h1 != h2
     
     def test_no_es_string_lanza_error(self):
         """Debe fallar si contraseña no es string"""
         with pytest.raises(TypeError, match="contraseña debe ser string"):
-            hashear_contraseña(12345)
+            hashear_contrasena(12345)
     
     def test_vacia_lanza_error(self):
         """Debe fallar si contraseña está vacía"""
         with pytest.raises(ValueError, match="no puede estar vacía"):
-            hashear_contraseña("")
+            hashear_contrasena("")
 
 
-class TestVerificarContraseña:
+class TestVerificarContrasena:
     """Tests para verificar_contraseña"""
     
-    def test_contraseña_correcta(self):
+    def test_contrasena_correcta(self):
         """Debe retornar True para contraseña correcta"""
         pw = "TestSegura123!"
-        hash_pw = hashear_contraseña(pw)
-        assert verificar_contraseña(pw, hash_pw) is True
+        hash_pw = hashear_contrasena(pw)
+        assert verificar_contrasena(pw, hash_pw) is True
     
-    def test_contraseña_incorrecta(self):
+    def test_contrasena_incorrecta(self):
         """Debe retornar False para contraseña incorrecta"""
-        hash_pw = hashear_contraseña("Correcta123!")
-        assert verificar_contraseña("Incorrecta456!", hash_pw) is False
+        hash_pw = hashear_contrasena("Correcta123!")
+        assert verificar_contrasena("Incorrecta456!", hash_pw) is False
     
     def test_tipo_invalido_retorna_false(self):
         """Debe retornar False si tipos no son string"""
-        assert verificar_contraseña(123, "hash") is False
-        assert verificar_contraseña("pw", 123) is False
+        assert verificar_contrasena(123, "hash") is False
+        assert verificar_contrasena("pw", 123) is False
     
     def test_hash_invalido_retorna_false(self):
         """Debe retornar False si hash no es válido"""
-        assert verificar_contraseña("pw", "no_es_hash") is False
+        assert verificar_contrasena("pw", "no_es_hash") is False
 
 
 class TestCifrarDescifrar:

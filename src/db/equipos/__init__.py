@@ -9,7 +9,7 @@ from src.db.equipos.obtener_miembros import obtener_miembros
 from src.db.equipos.obtener_por_encargado import obtener_por_encargado
 from src.db.equipos.obtener_para_encargado import obtener_para_encargado
 from src.db.equipos.obtener_por_supervisor import obtener_por_supervisor
-from src.db.equipos.añadir_miembro import añadir_miembro
+from src.db.equipos.anadir_miembro import anadir_miembro
 from src.db.equipos.listar_todos import listar_todos
 from src.db.equipos.editar_equipo import (
     editar_nombre,

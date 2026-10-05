@@ -3,8 +3,8 @@ Módulo: registro.py
 Responsabilidad: Flujo completo de registro de nuevos usuarios.
 """
 
-from src.seguridad.encriptacion import hashear_contraseña, cifrar
-from src.generador import generar_contraseña
+from src.seguridad.encriptacion import hashear_contrasena, cifrar
+from src.generador import generar_contrasena
 from src.db.usuarios import crear_usuario
 from src.db.conexion import conexion_global
 from src.auth.audit import audit_registro
@@ -167,10 +167,10 @@ def registrar_usuario(
         if not contrasena_generada:
             raise ValueError("Contraseña personalizada no proporcionada")
     else:
-        contrasena_generada = generar_contraseña(params)
+        contrasena_generada = generar_contrasena(params)
 
     # Crear hash para verificación de login (no reversible)
-    contrasena_hash = hashear_contraseña(contrasena_generada)
+    contrasena_hash = hashear_contrasena(contrasena_generada)
 
     # Encriptar para recuperación del usuario (reversible)
     contrasena_encriptada = cifrar(contrasena_generada)

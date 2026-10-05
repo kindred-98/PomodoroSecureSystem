@@ -4,7 +4,7 @@ Tests para validar la exclusión de caracteres ambiguos (0,O,l,I,1)
 """
 
 import pytest
-from src.generador import generar_contraseña
+from src.generador import generar_contrasena
 
 
 class TestExclusionAmbiguos:
@@ -19,7 +19,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         caracteres_ambiguos = "0Ol1I"
         for caracter in caracteres_ambiguos:
             assert caracter not in contrasena
@@ -33,7 +33,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         # Potencialmente podría contener 0, O, l, I o 1
         # (no es garantizado, pero es posible)
         assert isinstance(contrasena, str)
@@ -47,7 +47,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert '0' not in contrasena
     
     def test_excluye_mayuscula_o(self):
@@ -59,7 +59,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert 'O' not in contrasena
     
     def test_excluye_minuscula_l(self):
@@ -71,7 +71,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert 'l' not in contrasena
     
     def test_excluye_mayuscula_i(self):
@@ -83,7 +83,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert 'I' not in contrasena
     
     def test_excluye_uno_en_numeros(self):
@@ -95,7 +95,7 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert '1' not in contrasena
     
     def test_sigue_generando_numeros_sin_0_y_1(self):
@@ -107,6 +107,6 @@ class TestExclusionAmbiguos:
             "usar_simbolos": False,
             "excluir_ambiguos": True
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         # Debe haber números (2-9)
         assert any(c in "23456789" for c in contrasena)

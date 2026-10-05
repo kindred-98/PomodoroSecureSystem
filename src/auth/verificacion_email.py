@@ -222,11 +222,11 @@ def enviar_token_por_email(email: str, token: str, asunto: str = "Verificación 
 
     if not email_enabled:
         print("=" * 50)
-        print(f"📧 EMAIL DE VERIFICACIÓN")
+        print("📧 EMAIL DE VERIFICACIÓN")
         print("=" * 50)
         print(f"Para: {email}")
         print(f"Token: {token}")
-        print(f"Expira en: 5 minutos")
+        print("Expira en: 5 minutos")
         print("=" * 50)
         return {'enviado': True, 'modo': 'desarrollo'}
 

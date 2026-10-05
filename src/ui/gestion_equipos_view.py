@@ -391,7 +391,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             return
 
         try:
-            from src.db.equipos import añadir_miembro
+            from src.db.equipos import anadir_miembro
             from src.db.conexion import conexion_global
 
             coleccion = conexion_global.obtener_coleccion('usuarios')
@@ -406,7 +406,7 @@ class GestionEquiposView(ctk.CTkToplevel):
             if not usuario:
                 return
 
-            añadir_miembro(str(self._equipo_seleccionado['_id']), str(usuario['_id']))
+            anadir_miembro(str(self._equipo_seleccionado['_id']), str(usuario['_id']))
             self.entry_agregar.delete(0, "end")
             self._seleccionar_equipo(self._equipo_seleccionado)
         except Exception:  # nosec

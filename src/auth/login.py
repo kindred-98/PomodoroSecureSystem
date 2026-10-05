@@ -5,7 +5,7 @@ Responsabilidad: Autenticación de usuarios con email y contraseña.
 
 from datetime import datetime, timezone
 from src.db.conexion import conexion_global
-from src.seguridad.encriptacion import verificar_contraseña, generar_token_sesion
+from src.seguridad.encriptacion import verificar_contrasena, generar_token_sesion
 from src.auth.sesion import crear_sesion
 from src.auth.verificacion_email import esta_verificado
 from src.auth.rate_limiting import verificar_rate_limit_login, registrar_intento_login
@@ -74,7 +74,7 @@ def iniciar_sesion(email: str, contrasena: str) -> dict:
 
 # Verificar contraseña
     hash_almacenado = usuario.get('contraseña_hash', '')
-    if not verificar_contraseña(contrasena, hash_almacenado):
+    if not verificar_contrasena(contrasena, hash_almacenado):
         registrar_intento_login(email, False)
         audit_login(email, False)
         raise ErrorAutenticacion("Credenciales incorrectas")

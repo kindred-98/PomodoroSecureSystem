@@ -25,7 +25,7 @@ class TestDetectarPatronesValidacion:
         with pytest.raises(TypeError):
             detectar_patrones(['a', 'b', 'c'])
     
-    def test_contraseña_vacia(self):
+    def test_contrasena_vacia(self):
         """Test: ValueError si está vacía"""
         with pytest.raises(ValueError, match="vacía"):
             detectar_patrones("")

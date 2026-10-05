@@ -45,7 +45,17 @@ class TestRateLimiting:
 class TestProteccionInyeccion:
     """Tests de protección contra inyecciones."""
 
-    def test_login_sql_injection_email(self, mock_conexion_global, fernet_key_env):
+    @pytest.mark.parametrize(
+        "email",
+        [
+            "normal@test.com' OR '1'='1",
+            "normal@test.com\" OR \"1\"=\"1",
+            "normal@test.com' OR 1=1--",
+            "normal@test.com' UNION SELECT--",
+            "${'normal@test.com'}",
+        ],
+    )
+    def test_login_sql_injection_email(self, mock_conexion_global, fernet_key_env, email):
         """Login debe ser seguro contra SQL injection en email."""
         from src.auth.login import iniciar_sesion
         from src.auth.registro import registrar_usuario
@@ -57,19 +67,22 @@ class TestProteccionInyeccion:
             {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
         )
 
-        sql_injection_emails = [
-            "normal@test.com' OR '1'='1",
-            "normal@test.com\" OR \"1\"=\"1",
-            "normal@test.com' OR 1=1--",
-            "normal@test.com' UNION SELECT--",
-            "${'normal@test.com'}",
-        ]
+        with pytest.raises(ErrorAutenticacion):
+            iniciar_sesion(email, "anypassword")
 
-        for email in sql_injection_emails:
-            with pytest.raises(ErrorAutenticacion):
-                iniciar_sesion(email, "anypassword")
-
-    def test_login_special_characters_in_password(self, mock_conexion_global, fernet_key_env):
+    @pytest.mark.parametrize(
+        "password",
+        [
+            "password' or '1'='1",
+            "password\" or \"1\"=\"1",
+            "password; DROP TABLE--",
+            "password'--",
+            "password' /*",
+        ],
+    )
+    def test_login_special_characters_in_password(
+        self, mock_conexion_global, fernet_key_env, password
+    ):
         """Login debe manejar caracteres especiales en contraseña."""
         from src.auth.login import iniciar_sesion
         from src.auth.registro import registrar_usuario
@@ -81,57 +94,50 @@ class TestProteccionInyeccion:
             {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
         )
 
-        special_passwords = [
-            "password' or '1'='1",
-            "password\" or \"1\"=\"1",
-            "password; DROP TABLE--",
-            "password'--",
-            "password' /*",
-        ]
+        with pytest.raises((ErrorAutenticacion, ValueError, TypeError)):
+            iniciar_sesion("special@test.com", password)
 
-        for password in special_passwords:
-            with pytest.raises((ErrorAutenticacion, ValueError, TypeError)):
-                iniciar_sesion("special@test.com", password)
-
-    def test_registro_xss_in_nombre(self, mock_conexion_global, fernet_key_env):
-        """Registro debe sanitizar nombre con caracteres peligrosos."""
-        from src.auth.registro import registrar_usuario
-
-        xss_nombres = [
+    @pytest.mark.parametrize(
+        "nombre",
+        [
             "<script>alert('xss')</script>",
             " nombre",
             "{nombre}",
             "${nombre}",
-        ]
-
-        for nombre in xss_nombres:
-            with pytest.raises(ValueError):
-                registrar_usuario(
-                    f"xss{nombre.replace('<', '').replace('>', '')}@test.com",
-                    nombre,
-                    "empleado",
-                    {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
-                )
-
-    def test_registro_email_injection(self, mock_conexion_global, fernet_key_env):
-        """Registro debe rechazar emails con inyecciones."""
+        ],
+    )
+    def test_registro_xss_in_nombre(self, mock_conexion_global, fernet_key_env, nombre):
+        """Registro debe sanitizar nombre con caracteres peligrosos."""
         from src.auth.registro import registrar_usuario
 
-        injection_emails = [
+        with pytest.raises(ValueError):
+            registrar_usuario(
+                f"xss{nombre.replace('<', '').replace('>', '')}@test.com",
+                nombre,
+                "empleado",
+                {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
+            )
+
+    @pytest.mark.parametrize(
+        "email",
+        [
             "test@test.com<script>",
             "test@test.com${alert}",
             "test@test.com{{}}",
             "test@test.com<%",
-        ]
+        ],
+    )
+    def test_registro_email_injection(self, mock_conexion_global, fernet_key_env, email):
+        """Registro debe rechazar emails con inyecciones."""
+        from src.auth.registro import registrar_usuario
 
-        for email in injection_emails:
-            with pytest.raises(ValueError):
-                registrar_usuario(
-                    email,
-                    "Test User",
-                    "empleado",
-                    {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
-                )
+        with pytest.raises(ValueError):
+            registrar_usuario(
+                email,
+                "Test User",
+                "empleado",
+                {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
+            )
 
 
 class TestSeguridadTokens:
@@ -154,14 +160,14 @@ class TestSeguridadTokens:
         assert token != "000000"
         assert token != "123456"
 
-    def test_hash_contraseña_no_reversible(self, fernet_key_env):
+    def test_hash_contrasena_no_reversible(self, fernet_key_env):
         """Hash de contraseña no debe ser reversible."""
-        from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseña
+        from src.seguridad.encriptacion import hashear_contrasena, verificar_contrasena
 
         password = "TestPassword123!"
-        hashed = hashear_contraseña(password)
+        hashed = hashear_contrasena(password)
 
-        assert verificar_contraseña(password, hashed) is True
+        assert verificar_contrasena(password, hashed) is True
         assert password.encode() != hashed.encode()
         assert hashed.startswith("$2b$")
 

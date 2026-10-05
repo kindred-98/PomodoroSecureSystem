@@ -8,7 +8,7 @@ import secrets
 import os
 from datetime import datetime, timezone
 from src.db.conexion import conexion_global
-from src.seguridad.encriptacion import hashear_contraseña
+from src.seguridad.encriptacion import hashear_contrasena
 
 PALABRAS = [
     "agua", "aire", "alto", "amar", "angel", "arbol", "arte", "ave", "azul",
@@ -140,7 +140,7 @@ def generar_frase_usuario(usuario_id: str) -> str | None:
         return None
     
     frase = generar_frase_semilla()
-    frase_hash = hashear_contraseña(frase)
+    frase_hash = hashear_contrasena(frase)
     
     # Guardar hash (para verificación)
     coleccion.insert_one({
@@ -178,7 +178,7 @@ def verificar_frase_semilla(usuario_id: str, frase: str) -> bool:
         bool: True si es correcta.
     """
     from bson import ObjectId
-    from src.seguridad.encriptacion import verificar_contraseña
+    from src.seguridad.encriptacion import verificar_contrasena
     
     try:
         usuario_oid = ObjectId(usuario_id)
@@ -195,7 +195,7 @@ def verificar_frase_semilla(usuario_id: str, frase: str) -> bool:
     if not registro:
         return False
     
-    return verificar_contraseña(frase, registro['frase_hash'])
+    return verificar_contrasena(frase, registro['frase_hash'])
 
 
 def marcar_frase_usada(usuario_id: str) -> bool:

@@ -5,7 +5,7 @@ Tests de validación de tipos de caracteres para generar_contraseña()
 
 import pytest
 import string
-from src.generador import generar_contraseña
+from src.generador import generar_contrasena
 
 
 class TestTiposCaracteres:
@@ -20,7 +20,7 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert any(c.isupper() for c in contrasena)
     
     def test_genera_con_numeros(self):
@@ -32,7 +32,7 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert any(c.isdigit() for c in contrasena)
     
     def test_genera_con_simbolos(self):
@@ -44,7 +44,7 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         simbolos = set(string.punctuation)
         assert any(c in simbolos for c in contrasena)
     
@@ -57,7 +57,7 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert any(c.isupper() for c in contrasena)
         assert any(c.isdigit() for c in contrasena)
     
@@ -70,7 +70,7 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert any(c.isupper() for c in contrasena)
         assert any(c.isdigit() for c in contrasena)
         simbolos = set(string.punctuation)
@@ -85,7 +85,7 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert contrasena.islower()
     
     def test_no_contiene_mayusculas_si_no_especificado(self):
@@ -97,5 +97,5 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contrasena = generar_contraseña(parametros)
+        contrasena = generar_contrasena(parametros)
         assert not any(c.isupper() for c in contrasena)
