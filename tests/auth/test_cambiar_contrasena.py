@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.auth.cambiar_contrasena import cambiar_contrasena
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestCambiarContrasenaValidacion:
@@ -72,5 +73,5 @@ class TestCambiarContrasenaExito:
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env):
         pw_fuerte = "K#mW7$hPq9xN2zB!Lw4T"
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario no encontrado"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario no encontrado"):
             cambiar_contrasena(id_falso, pw_fuerte)

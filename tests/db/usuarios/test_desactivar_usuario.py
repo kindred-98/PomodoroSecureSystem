@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.db.usuarios.desactivar_usuario import desactivar_usuario
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestDesactivarUsuarioValidacion:
@@ -39,7 +40,7 @@ class TestDesactivarUsuarioExito:
     def test_usuario_no_existe(self, mock_conexion_global, coleccion_usuarios):
         """Debe fallar si usuario no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario con ID .* no existe"):
             desactivar_usuario(id_falso)
     
     def test_desactivar_dos_veces(self, mock_conexion_global, usuario_en_db, coleccion_usuarios):

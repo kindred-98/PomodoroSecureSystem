@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 from bson import ObjectId
 from src.db.anomalias.registrar_anomalia import registrar_anomalia
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestRegistrarAnomaliaValidacion:
@@ -50,5 +51,5 @@ class TestRegistrarAnomaliaExito:
     def test_usuario_no_existe(self, mock_conexion_global, coleccion_usuarios, coleccion_anomalias):
         """Debe fallar si usuario no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario con ID .* no existe"):
             registrar_anomalia(id_falso, 'tipo', 'desc')

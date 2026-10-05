@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.db.usuarios.actualizar_pomodoro import actualizar_pomodoro
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestActualizarPomodoroValidacion:
@@ -56,5 +57,5 @@ class TestActualizarPomodoroExito:
     def test_usuario_no_existe(self, mock_conexion_global, coleccion_usuarios):
         """Debe fallar si usuario no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario con ID .* no existe"):
             actualizar_pomodoro(id_falso, 5)

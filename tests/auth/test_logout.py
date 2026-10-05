@@ -2,6 +2,7 @@
 
 import pytest
 from src.auth.logout import cerrar_sesion
+from src.excepciones import ErrorSesion
 
 
 class TestLogoutValidacion:
@@ -35,7 +36,7 @@ class TestLogoutExito:
     
     def test_token_inexistente(self, mock_conexion_global):
         """Token que no existe debe fallar"""
-        with pytest.raises(Exception, match="Sesión no encontrada"):
+        with pytest.raises(ErrorSesion, match="Sesión no encontrada"):
             cerrar_sesion("token_que_no_existe_1234567890abcdef")
     
     def test_sesion_ya_cerrada(self, mock_conexion_global, fernet_key_env, usuario_registrado):
@@ -48,5 +49,5 @@ class TestLogoutExito:
         
         cerrar_sesion(token)
         
-        with pytest.raises(Exception, match="ya está cerrada"):
+        with pytest.raises(ErrorSesion, match="ya está cerrada"):
             cerrar_sesion(token)

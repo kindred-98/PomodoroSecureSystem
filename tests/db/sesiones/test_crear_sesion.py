@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 from bson import ObjectId
 from src.db.sesiones.crear_sesion import crear_sesion
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestCrearSesionValidacion:
@@ -52,7 +53,7 @@ class TestCrearSesionExito:
     def test_usuario_no_existe(self, mock_conexion_global, coleccion_usuarios, coleccion_sesiones):
         """Debe fallar si usuario no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario con ID .* no existe"):
             crear_sesion(id_falso, 'pomodoro')
     
     def test_tipos_sesion_validos(self, mock_conexion_global, usuario_en_db, coleccion_usuarios, coleccion_sesiones):

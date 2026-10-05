@@ -6,6 +6,7 @@ import pytest
 from bson import ObjectId
 from src.auth.exportar_contrasena import exportar_contrasena
 from src.seguridad.encriptacion import descifrar
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestExportarContrasenaValidacion:
@@ -67,5 +68,5 @@ class TestExportarContrasenaExito:
     
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env, tmp_path):
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario no encontrado"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario no encontrado"):
             exportar_contrasena(id_falso, str(tmp_path / "test.enc"))

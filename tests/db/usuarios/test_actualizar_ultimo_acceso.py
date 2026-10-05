@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.usuarios.actualizar_ultimo_acceso import actualizar_ultimo_acceso
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestActualizarUltimoAccesoValidacion:
@@ -51,5 +52,5 @@ class TestActualizarUltimoAccesoExito:
     def test_usuario_no_existe(self, mock_conexion_global, coleccion_usuarios):
         """Debe fallar si usuario no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario con ID .* no existe"):
             actualizar_ultimo_acceso(id_falso)

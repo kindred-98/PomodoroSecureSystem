@@ -8,6 +8,7 @@ from src.timer.ciclo_pomodoro import (
     manejar_evento_timer,
     registrar_callback,
 )
+from src.excepciones import ErrorEstadoInvalido
 from src.timer.estados import (
     ESTADO_TRABAJANDO,
     ESTADO_DESCANSO_CORTO,
@@ -151,7 +152,7 @@ class TestManejarEventoTimer:
     
     def test_sin_ciclo_activo_falla(self, mock_conexion_global, usuario_en_db):
         """Sin ciclo activo debe fallar"""
-        with pytest.raises(Exception, match="No hay ciclo"):
+        with pytest.raises(ErrorEstadoInvalido, match="No hay ciclo"):
             manejar_evento_timer(str(usuario_en_db['_id']), "pomodoro_completado")
     
     def test_evento_invalido(self, mock_conexion_global, usuario_en_db):

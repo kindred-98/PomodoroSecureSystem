@@ -5,6 +5,7 @@ from datetime import datetime
 from bson import ObjectId
 from unittest.mock import patch, MagicMock
 from src.db.usuarios.crear_usuario import crear_usuario
+from src.excepciones import ErrorValidacion
 
 
 class TestCrearUsuarioValidacionTipos:
@@ -82,7 +83,7 @@ class TestCrearUsuarioExito:
         crear_usuario('test@example.com', 'Test 1', 'hash1', 'empleado')
         
         # Intentar crear segundo con mismo email debe fallar
-        with pytest.raises(Exception, match="email .* ya está registrado"):
+        with pytest.raises(ErrorValidacion, match="email .* ya está registrado"):
             crear_usuario('test@example.com', 'Test 2', 'hash2', 'empleado')
 
 

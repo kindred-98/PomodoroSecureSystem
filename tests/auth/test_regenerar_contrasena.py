@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.auth.regenerar_contrasena import regenerar_contrasena
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestRegenerarContrasenaValidacion:
@@ -57,5 +58,5 @@ class TestRegenerarContrasenaExito:
     
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env, parametros_contrasena_defecto):
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario no encontrado"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario no encontrado"):
             regenerar_contrasena(id_falso, parametros_contrasena_defecto)

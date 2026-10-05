@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.db.equipos.crear_equipo import crear_equipo
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestCrearEquipoValidacion:
@@ -44,5 +45,5 @@ class TestCrearEquipoExito:
     def test_encargado_no_existe(self, mock_conexion_global, coleccion_usuarios, coleccion_equipos):
         """Debe fallar si encargado no existe"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Encargado con ID .* no existe"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Encargado con ID .* no existe"):
             crear_equipo('Team', id_falso, 'desc')

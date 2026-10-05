@@ -3,6 +3,7 @@
 import pytest
 from bson import ObjectId
 from src.auth.ver_contrasena import ver_contrasena
+from src.excepciones import ErrorAutenticacion, ErrorRecursoNoEncontrado
 
 
 class TestVerContrasenaValidacion:
@@ -41,11 +42,11 @@ class TestVerContrasenaExito:
     def test_ver_contrasena_login_incorrecto(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Login incorrecto debe fallar"""
         usr = usuario_registrado
-        with pytest.raises(Exception, match="verificación incorrecta"):
+        with pytest.raises(ErrorAutenticacion, match="verificación incorrecta"):
             ver_contrasena(str(usr['usuario']['_id']), "Contraseña_Mal_123!")
     
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env):
         """Usuario inexistente debe fallar"""
         id_falso = str(ObjectId())
-        with pytest.raises(Exception, match="Usuario no encontrado"):
+        with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario no encontrado"):
             ver_contrasena(id_falso, "pass")

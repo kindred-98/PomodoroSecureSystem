@@ -2,6 +2,7 @@
 
 import pytest
 from src.auth.login import iniciar_sesion
+from src.excepciones import ErrorAutenticacion
 
 
 class TestLoginValidacion:
@@ -38,13 +39,13 @@ class TestLoginCredenciales:
     
     def test_email_inexistente(self, mock_conexion_global, fernet_key_env):
         """Email que no existe debe fallar"""
-        with pytest.raises(Exception, match="Credenciales incorrectas"):
+        with pytest.raises(ErrorAutenticacion, match="Credenciales incorrectas"):
             iniciar_sesion("noexiste@test.com", "pass123")
     
     def test_contrasena_incorrecta(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Contraseña incorrecta debe fallar"""
         usr = usuario_registrado
-        with pytest.raises(Exception, match="Credenciales incorrectas"):
+        with pytest.raises(ErrorAutenticacion, match="Credenciales incorrectas"):
             iniciar_sesion(usr['usuario']['email'], "Contraseña_Mal_123!")
     
     def test_usuario_desactivado(self, mock_conexion_global, fernet_key_env, usuario_registrado):
@@ -56,7 +57,7 @@ class TestLoginCredenciales:
             {'$set': {'activo': False}}
         )
         
-        with pytest.raises(Exception, match="Usuario desactivado"):
+        with pytest.raises(ErrorAutenticacion, match="Usuario desactivado"):
             iniciar_sesion(usr['usuario']['email'], usr['contraseña'])
 
 

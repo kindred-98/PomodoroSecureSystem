@@ -3,6 +3,7 @@
 import pytest
 from src.auth.sesion import crear_sesion, verificar_sesion, cerrar_sesion_por_token
 from src.seguridad.encriptacion import generar_token_sesion
+from src.excepciones import ErrorSesion
 
 
 class TestCrearSesion:
@@ -51,7 +52,7 @@ class TestVerificarSesion:
     
     def test_token_inexistente(self, mock_conexion_global):
         """Token que no existe debe fallar"""
-        with pytest.raises(Exception, match="Sesión inválida"):
+        with pytest.raises(ErrorSesion, match="Sesión inválida"):
             verificar_sesion("token_inexistente_1234567890abcdef")
     
     def test_sesion_cerrada(self, mock_conexion_global, usuario_en_db):
@@ -60,7 +61,7 @@ class TestVerificarSesion:
         crear_sesion(str(usuario_en_db['_id']), token)
         cerrar_sesion_por_token(token)
         
-        with pytest.raises(Exception, match="Sesión inválida"):
+        with pytest.raises(ErrorSesion, match="Sesión inválida"):
             verificar_sesion(token)
     
     def test_token_no_string(self, mock_conexion_global):
@@ -83,7 +84,7 @@ class TestCerrarSesionPorToken:
         assert cerrar_sesion_por_token(token) is True
     
     def test_sesion_no_existe(self, mock_conexion_global):
-        with pytest.raises(Exception, match="Sesión no encontrada"):
+        with pytest.raises(ErrorSesion, match="Sesión no encontrada"):
             cerrar_sesion_por_token("no_existe_token_1234567890abcdef")
     
     def test_token_no_string(self, mock_conexion_global):

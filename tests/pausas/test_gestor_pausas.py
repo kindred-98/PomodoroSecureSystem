@@ -43,12 +43,12 @@ class TestIniciarPausa:
         iniciar_pausa(uid)
         finalizar_pausa(uid)
         
-        with pytest.raises(Exception, match="Máximo de pausas"):
+        with pytest.raises(ValueError, match="Máximo de pausas"):
             iniciar_pausa(uid)
     
     def test_sin_ciclo_activo_falla(self, mock_conexion_global, usuario_en_db):
         """Sin ciclo activo debe fallar"""
-        with pytest.raises(Exception, match="ciclo.*activo"):
+        with pytest.raises(RuntimeError, match="ciclo.*activo"):
             iniciar_pausa(str(usuario_en_db['_id']))
     
     def test_pausa_activa_existente_falla(self, mock_conexion_global, usuario_en_db):
@@ -93,7 +93,7 @@ class TestFinalizarPausa:
     
     def test_sin_pausa_activa_falla(self, mock_conexion_global, usuario_en_db):
         """Sin pausa activa debe fallar"""
-        with pytest.raises(Exception, match="No hay pausa activa"):
+        with pytest.raises(RuntimeError, match="No hay pausa activa"):
             finalizar_pausa(str(usuario_en_db['_id']))
     
     def test_usuario_id_no_string(self, mock_conexion_global):
