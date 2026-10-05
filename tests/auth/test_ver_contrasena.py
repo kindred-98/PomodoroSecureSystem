@@ -42,8 +42,9 @@ class TestVerContrasenaExito:
     def test_ver_contrasena_login_incorrecto(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Login incorrecto debe fallar"""
         usr = usuario_registrado
+        valor_1 = str(usr['usuario']['_id'])
         with pytest.raises(ErrorAutenticacion, match="verificación incorrecta"):
-            ver_contrasena(str(usr['usuario']['_id']), "Contraseña_Mal_123!")
+            ver_contrasena(valor_1, "Contraseña_Mal_123!")
     
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env):
         """Usuario inexistente debe fallar"""

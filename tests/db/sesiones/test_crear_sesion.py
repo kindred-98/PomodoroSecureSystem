@@ -17,8 +17,9 @@ class TestCrearSesionValidacion:
     
     def test_tipo_sesion_no_string(self, mock_conexion_global):
         """Debe fallar si tipo_sesion no es string"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError, match="tipo_sesion debe ser string"):
-            crear_sesion(str(ObjectId()), 123)
+            crear_sesion(oid_texto, 123)
     
     def test_usuario_id_vacio(self, mock_conexion_global):
         """Debe fallar si usuario_id es vacío"""
@@ -27,8 +28,9 @@ class TestCrearSesionValidacion:
     
     def test_tipo_sesion_vacio(self, mock_conexion_global):
         """Debe fallar si tipo_sesion es vacío"""
+        oid_texto = str(ObjectId())
         with pytest.raises(ValueError, match="tipo_sesion debe ser uno de"):
-            crear_sesion(str(ObjectId()), '')
+            crear_sesion(oid_texto, '')
     
     def test_usuario_id_invalido(self, mock_conexion_global):
         """Debe fallar si usuario_id no es ObjectId válido"""

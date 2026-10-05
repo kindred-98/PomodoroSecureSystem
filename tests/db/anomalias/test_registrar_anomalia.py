@@ -17,13 +17,15 @@ class TestRegistrarAnomaliaValidacion:
     
     def test_tipo_no_string(self, mock_conexion_global):
         """Debe fallar si tipo no es string"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError, match="tipo debe ser string"):
-            registrar_anomalia(str(ObjectId()), 123, 'desc')
+            registrar_anomalia(oid_texto, 123, 'desc')
     
     def test_descripcion_no_string(self, mock_conexion_global):
         """Debe fallar si descripcion no es string"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError, match="descripcion debe ser string"):
-            registrar_anomalia(str(ObjectId()), 'tipo', 123)
+            registrar_anomalia(oid_texto, 'tipo', 123)
     
     def test_usuario_id_vacio(self, mock_conexion_global):
         """Debe fallar si usuario_id es vacío"""

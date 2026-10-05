@@ -58,8 +58,9 @@ class TestObtenerMiembros:
     def test_equipo_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si el equipo no existe"""
         with patch('src.db.equipos.obtener_miembros.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                obtener_miembros(str(ObjectId()))
+                obtener_miembros(oid_texto)
 
     def test_equipo_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace equipo_id no string"""

@@ -45,12 +45,14 @@ class TestRegistrarSesionPomodoro:
             registrar_sesion_pomodoro(123, {}, 25)
     
     def test_datos_no_dict(self, mock_conexion_global, usuario_en_db):
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(TypeError, match="datos_ciclo debe ser dict"):
-            registrar_sesion_pomodoro(str(usuario_en_db['_id']), "no", 25)
+            registrar_sesion_pomodoro(valor_1, "no", 25)
     
     def test_duracion_no_int(self, mock_conexion_global, usuario_en_db):
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(TypeError, match="duracion_min debe ser int"):
-            registrar_sesion_pomodoro(str(usuario_en_db['_id']), {}, "25")
+            registrar_sesion_pomodoro(valor_1, {}, "25")
     
     def test_usuario_id_invalido(self, mock_conexion_global):
         with pytest.raises(ValueError, match="inválido"):

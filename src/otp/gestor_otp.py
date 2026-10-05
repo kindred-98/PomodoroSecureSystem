@@ -208,7 +208,7 @@ def verificar_otp(usuario_id: str, codigo_introducido: str) -> dict:
         anomalia = registrar_anomalia(
             usuario_id,
             'tercer_intento_otp',
-            f"3 intentos fallidos de OTP consecutivos.",
+                "3 intentos fallidos de OTP consecutivos.",
         )
         
         return {

@@ -36,5 +36,6 @@ class TestLongitud:
     @pytest.mark.parametrize("longitud", [7, 0, -5, 129, 1000])
     def test_rechaza_longitud_invalida(self, longitud):
         """Test: Rechaza longitudes fuera del rango permitido"""
+        parametros__ = _parametros(longitud)
         with pytest.raises(ValueError):
-            generar_contrasena(_parametros(longitud))
+            generar_contrasena(parametros__)

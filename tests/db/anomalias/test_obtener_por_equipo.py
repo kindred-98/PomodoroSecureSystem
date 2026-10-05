@@ -75,8 +75,9 @@ class TestObtenerPorEquipo:
     def test_equipo_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si el equipo no existe"""
         with patch('src.db.anomalias.obtener_por_equipo.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                obtener_por_equipo(str(ObjectId()))
+                obtener_por_equipo(oid_texto)
 
     def test_equipo_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace equipo_id no string"""

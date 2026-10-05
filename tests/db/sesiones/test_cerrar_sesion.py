@@ -20,8 +20,9 @@ class TestCerrarSesion:
 
     def test_completada_no_bool_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace completada no bool"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError):
-            cerrar_sesion(str(ObjectId()), completada="si")
+            cerrar_sesion(oid_texto, completada="si")
 
     def test_sesion_id_invalido_lanza_valueerror(self, mock_conexion_global):
         """Verifica que se rechace sesion_id inválido"""
@@ -31,5 +32,6 @@ class TestCerrarSesion:
     def test_sesion_no_existe_lanza_error(self, mock_conexion_global):
         """Verifica que lance error si la sesión no existe"""
         with patch('src.db.sesiones.cerrar_sesion.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                cerrar_sesion(str(ObjectId()))
+                cerrar_sesion(oid_texto)

@@ -16,8 +16,9 @@ class TestActualizarPomodoroValidacion:
     
     def test_incremento_no_int(self, mock_conexion_global):
         """Debe fallar si incremento no es int"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError, match="incremento debe ser int"):
-            actualizar_pomodoro(str(ObjectId()), 'cinco')
+            actualizar_pomodoro(oid_texto, 'cinco')
     
     def test_usuario_id_vacio(self, mock_conexion_global):
         """Debe fallar si usuario_id es vacío"""

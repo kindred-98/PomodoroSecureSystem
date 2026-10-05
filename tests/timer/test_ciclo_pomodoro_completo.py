@@ -90,14 +90,10 @@ class TestIniciarCicloValidacion:
 
     def test_descansos_cortos_no_es_lista(self, mock_conexion_global):
         """Verifica que descansos_cortos debe ser lista"""
+        oid_texto = str(ObjectId())
         with patch('src.timer.ciclo_pomodoro.conexion_global', mock_conexion_global):
-            with pytest.raises(ValueError) as exc_info:
-                iniciar_ciclo(
-                    str(ObjectId()),
-                    {'descansos_cortos': "no es lista"}
-                )
-        
-        assert "descansos_cortos debe ser list" in str(exc_info.value)
+            with pytest.raises(ValueError, match="descansos_cortos debe ser list"):
+                iniciar_ciclo(oid_texto, {'descansos_cortos': "no es lista"})
 
 
 class TestObtenerEstadoCicloValidacion:
@@ -122,14 +118,16 @@ class TestManejarEventoTimerCasosEspeciales:
     def test_evento_invalido_tipo(self, mock_conexion_global):
         """Verifica que rechace evento no string"""
         with patch('src.timer.ciclo_pomodoro.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(TypeError):
-                manejar_evento_timer(str(ObjectId()), 123)
+                manejar_evento_timer(oid_texto, 123)
 
     def test_no_hay_ciclo_activo(self, mock_conexion_global):
         """Verifica que falle si no hay ciclo activo"""
         with patch('src.timer.ciclo_pomodoro.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorEstadoInvalido, match="No hay ciclo Pomodoro activo"):
-                manejar_evento_timer(str(ObjectId()), "pomodoro_completado")
+                manejar_evento_timer(oid_texto, "pomodoro_completado")
 
 
 class TestDescansoLargoCompletado:
@@ -328,14 +326,10 @@ class TestRegistrarCallback:
 
     def test_evento_no_existente_lanza_error(self, mock_conexion_global):
         """Verifica que lance error si evento no existe"""
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(ValueError, match="no válido"):
             registrar_callback('evento_inexistente', lambda x: x)
-        
-        assert "no válido" in str(exc_info.value)
 
     def test_funcion_no_callable_lanza_error(self, mock_conexion_global):
         """Verifica que rechace función no callable"""
-        with pytest.raises(TypeError) as exc_info:
+        with pytest.raises(TypeError, match="callable"):
             registrar_callback('descanso_iniciado', "no es callable")
-        
-        assert "callable" in str(exc_info.value)

@@ -25,7 +25,7 @@ __all__ = [
     'obtener_por_encargado',
     'obtener_para_encargado',
     'obtener_por_supervisor',
-    'añadir_miembro',
+    'anadir_miembro',
     'listar_todos',
     'editar_nombre',
     'asignar_encargado',

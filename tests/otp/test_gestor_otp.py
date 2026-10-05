@@ -173,8 +173,9 @@ class TestVerificarOtp:
             verificar_otp(123, "123456")
 
     def test_codigo_no_string(self, mock_conexion_global, usuario_en_db):
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(TypeError, match="codigo_introducido debe ser string"):
-            verificar_otp(str(usuario_en_db['_id']), 123456)
+            verificar_otp(valor_1, 123456)
 
     def test_usuario_id_vacio(self, mock_conexion_global):
         with pytest.raises(ValueError, match="no puede estar vacío"):

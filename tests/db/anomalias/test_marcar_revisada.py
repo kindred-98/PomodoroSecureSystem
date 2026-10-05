@@ -51,8 +51,9 @@ class TestMarcarRevisada:
     def test_anomalia_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si la anomalía no existe"""
         with patch('src.db.anomalias.marcar_revisada.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                marcar_revisada(str(ObjectId()))
+                marcar_revisada(oid_texto)
 
     def test_anomalia_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace anomalia_id no string"""

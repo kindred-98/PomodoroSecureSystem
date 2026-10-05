@@ -37,8 +37,9 @@ class TestActualizarSesion:
 
     def test_actualizaciones_no_dict_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace actualizaciones no dict"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError):
-            actualizar_sesion(str(ObjectId()), "no es dict")
+            actualizar_sesion(oid_texto, "no es dict")
 
     def test_sesion_id_invalido_lanza_valueerror(self, mock_conexion_global):
         """Verifica que se rechace sesion_id inválido"""
@@ -48,8 +49,9 @@ class TestActualizarSesion:
     def test_sesion_no_existe_lanza_error(self, mock_conexion_global):
         """Verifica que lance error si la sesión no existe"""
         with patch('src.db.sesiones.actualizar_sesion.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                actualizar_sesion(str(ObjectId()), {'pausas_utilizadas': 1})
+                actualizar_sesion(oid_texto, {'pausas_utilizadas': 1})
 
     def test_multiple_campos_actualizados(self, mock_conexion_global):
         """Verifica que se actualicen múltiples campos"""

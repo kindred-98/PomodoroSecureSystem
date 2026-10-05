@@ -47,8 +47,9 @@ class TestObtenerPorUsuario:
     def test_usuario_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si el usuario no existe"""
         with patch('src.db.anomalias.obtener_por_usuario.conexion_global', mock_conexion_global):
+            oid_texto = str(ObjectId())
             with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
-                obtener_por_usuario(str(ObjectId()))
+                obtener_por_usuario(oid_texto)
 
     def test_usuario_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace usuario_id no string"""
@@ -102,15 +103,17 @@ class TestObtenerPorUsuario:
         coleccion_usuarios = mock_conexion_global.obtener_coleccion('usuarios')
         usuario_id = ObjectId()
         coleccion_usuarios.insert_one({'_id': usuario_id})
-        
+        usuario_oid = str(usuario_id)
+
         with pytest.raises(TypeError):
-            obtener_por_usuario(str(usuario_id), limite="10")
+            obtener_por_usuario(usuario_oid, limite="10")
 
     def test_limite_menor_que_uno_lanza_valueerror(self, mock_conexion_global):
         """Verifica que se rechace límite < 1"""
         coleccion_usuarios = mock_conexion_global.obtener_coleccion('usuarios')
         usuario_id = ObjectId()
         coleccion_usuarios.insert_one({'_id': usuario_id})
-        
+        usuario_oid = str(usuario_id)
+
         with pytest.raises(ValueError):
-            obtener_por_usuario(str(usuario_id), limite=0)
+            obtener_por_usuario(usuario_oid, limite=0)

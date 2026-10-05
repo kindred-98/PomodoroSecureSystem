@@ -82,18 +82,21 @@ class TestObtenerHistorial:
 
     def test_limite_no_int_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace límite no int"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError):
-            obtener_historial(str(ObjectId()), limite="10")
+            obtener_historial(oid_texto, limite="10")
 
     def test_limite_cero_lanza_valueerror(self, mock_conexion_global):
         """Verifica que se rechace límite 0"""
+        oid_texto = str(ObjectId())
         with pytest.raises(ValueError):
-            obtener_historial(str(ObjectId()), limite=0)
+            obtener_historial(oid_texto, limite=0)
 
     def test_limite_negativo_lanza_valueerror(self, mock_conexion_global):
         """Verifica que se rechace límite negativo"""
+        oid_texto = str(ObjectId())
         with pytest.raises(ValueError):
-            obtener_historial(str(ObjectId()), limite=-5)
+            obtener_historial(oid_texto, limite=-5)
 
     def test_limite_default(self, mock_conexion_global):
         """Verifica el límite por defecto (50)"""

@@ -36,14 +36,16 @@ class TestCambiarContrasenaFortaleza:
     def test_contrasena_debil_rechazada(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Contraseña débil debe ser rechazada"""
         usr = usuario_registrado
+        valor_1 = str(usr['usuario']['_id'])
         with pytest.raises(ValueError, match="Muy Fuerte"):
-            cambiar_contrasena(str(usr['usuario']['_id']), "abc")
+            cambiar_contrasena(valor_1, "abc")
     
     def test_contrasena_normal_rechazada(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Contraseña normal debe ser rechazada"""
         usr = usuario_registrado
+        valor_1 = str(usr['usuario']['_id'])
         with pytest.raises(ValueError, match="Muy Fuerte"):
-            cambiar_contrasena(str(usr['usuario']['_id']), "Abc12345!")
+            cambiar_contrasena(valor_1, "Abc12345!")
 
 
 class TestCambiarContrasenaExito:

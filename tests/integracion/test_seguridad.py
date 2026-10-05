@@ -110,9 +110,10 @@ class TestProteccionInyeccion:
         """Registro debe sanitizar nombre con caracteres peligrosos."""
         from src.auth.registro import registrar_usuario
 
+        valor_1 = nombre.replace('<', '').replace('>', '')
         with pytest.raises(ValueError):
             registrar_usuario(
-                f"xss{nombre.replace('<', '').replace('>', '')}@test.com",
+                f"xss{valor_1}@test.com",
                 nombre,
                 "empleado",
                 {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}

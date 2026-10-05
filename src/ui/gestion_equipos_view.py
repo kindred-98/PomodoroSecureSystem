@@ -139,7 +139,9 @@ class GestionEquiposView(ctk.CTkToplevel):
                 btn.pack(fill="x", padx=5, pady=2)
 
                 info = ctk.CTkLabel(
-                    frame, text=f"{len(miembros)} miembros" + (f" | Con encargado" if encargado else " | Sin encargado"),
+                    frame,
+                    text=f"{len(miembros)} miembros"
+                         + (" | Con encargado" if encargado else " | Sin encargado"),
                     font=crear_fuente(9),
                     text_color=TEXTO_SECUNDARIO,
                     anchor="w",

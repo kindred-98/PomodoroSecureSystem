@@ -78,8 +78,9 @@ class TestIniciarCiclo:
             iniciar_ciclo("no_es_objectid")
     
     def test_pomodoro_min_invalido(self, mock_conexion_global, usuario_en_db):
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(ValueError, match="pomodoro_min"):
-            iniciar_ciclo(str(usuario_en_db['_id']), {'pomodoro_min': -5})
+            iniciar_ciclo(valor_1, {'pomodoro_min': -5})
 
 
 class TestObtenerEstadoCiclo:
@@ -152,8 +153,9 @@ class TestManejarEventoTimer:
     
     def test_sin_ciclo_activo_falla(self, mock_conexion_global, usuario_en_db):
         """Sin ciclo activo debe fallar"""
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(ErrorEstadoInvalido, match="No hay ciclo"):
-            manejar_evento_timer(str(usuario_en_db['_id']), "pomodoro_completado")
+            manejar_evento_timer(valor_1, "pomodoro_completado")
     
     def test_evento_invalido(self, mock_conexion_global, usuario_en_db):
         """Evento no válido debe fallar"""
@@ -168,8 +170,9 @@ class TestManejarEventoTimer:
             manejar_evento_timer(123, "pomodoro_completado")
     
     def test_evento_no_string(self, mock_conexion_global, usuario_en_db):
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(TypeError, match="evento debe ser string"):
-            manejar_evento_timer(str(usuario_en_db['_id']), 123)
+            manejar_evento_timer(valor_1, 123)
     
     def test_registra_sesion_en_bd(self, mock_conexion_global, usuario_en_db):
         """Al completar pomodoro debe registrar sesión en BD"""

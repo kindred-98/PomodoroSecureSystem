@@ -11,8 +11,9 @@ class TestCrearEquipoValidacion:
     
     def test_nombre_no_string(self, mock_conexion_global):
         """Debe fallar si nombre no es string"""
+        oid_texto = str(ObjectId())
         with pytest.raises(TypeError, match="nombre debe ser string"):
-            crear_equipo(123, str(ObjectId()), 'desc')
+            crear_equipo(123, oid_texto, 'desc')
     
     def test_encargado_no_string(self, mock_conexion_global):
         """Debe fallar si encargado_id no es string"""
@@ -21,8 +22,9 @@ class TestCrearEquipoValidacion:
     
     def test_nombre_vacio(self, mock_conexion_global):
         """Debe fallar si nombre es vacío"""
+        oid_texto = str(ObjectId())
         with pytest.raises(ValueError, match="Nombre no puede estar vacío"):
-            crear_equipo('', str(ObjectId()), 'desc')
+            crear_equipo('', oid_texto, 'desc')
     
     def test_encargado_invalido(self, mock_conexion_global):
         """Debe fallar si encargado_id no es ObjectId válido"""

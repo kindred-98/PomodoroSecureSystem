@@ -48,8 +48,9 @@ class TestIniciarPausa:
     
     def test_sin_ciclo_activo_falla(self, mock_conexion_global, usuario_en_db):
         """Sin ciclo activo debe fallar"""
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(RuntimeError, match="ciclo.*activo"):
-            iniciar_pausa(str(usuario_en_db['_id']))
+            iniciar_pausa(valor_1)
     
     def test_pausa_activa_existente_falla(self, mock_conexion_global, usuario_en_db):
         """Si hay pausa activa, se limpia automáticamente (pausa huérfana)"""
@@ -93,8 +94,9 @@ class TestFinalizarPausa:
     
     def test_sin_pausa_activa_falla(self, mock_conexion_global, usuario_en_db):
         """Sin pausa activa debe fallar"""
+        valor_1 = str(usuario_en_db['_id'])
         with pytest.raises(RuntimeError, match="No hay pausa activa"):
-            finalizar_pausa(str(usuario_en_db['_id']))
+            finalizar_pausa(valor_1)
     
     def test_usuario_id_no_string(self, mock_conexion_global):
         with pytest.raises(TypeError, match="usuario_id debe ser string"):

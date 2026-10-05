@@ -107,11 +107,12 @@ class TestCrearReporteJornada:
 
     def test_usuario_id_invalido_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id inválido"""
-        with pytest.raises(ValueError):
-            with patch('src.db.reportes.conexion_global', mock_conexion_global):
+        fecha_actual = datetime.now(timezone.utc)
+        with patch('src.db.reportes.conexion_global', mock_conexion_global):
+            with pytest.raises(ValueError):
                 crear_reporte_jornada(
                     usuario_id="id-invalido",
-                    fecha=datetime.now(timezone.utc),
+                    fecha=fecha_actual,
                     ciclos_iniciados=4,
                     ciclos_completados=3,
                     pomodoros_totales=12,
@@ -198,8 +199,8 @@ class TestCrearReporteExpiracion:
 
     def test_usuario_id_invalido_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id inválido"""
-        with pytest.raises(ValueError):
-            with patch('src.db.reportes.conexion_global', mock_conexion_global):
+        with patch('src.db.reportes.conexion_global', mock_conexion_global):
+            with pytest.raises(ValueError):
                 crear_reporte_expiracion(
                     usuario_id="id-invalido",
                     estado_anterior={},

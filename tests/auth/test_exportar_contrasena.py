@@ -13,24 +13,27 @@ class TestExportarContrasenaValidacion:
     """Tests para validación en exportar_contraseña"""
     
     def test_usuario_id_no_string(self, mock_conexion_global, fernet_key_env, tmp_path):
+        valor_1 = str(tmp_path / "test.enc")
         with pytest.raises(TypeError, match="usuario_id debe ser string"):
-            exportar_contrasena(123, str(tmp_path / "test.enc"))
+            exportar_contrasena(123, valor_1)
     
     def test_ruta_no_string(self, mock_conexion_global, fernet_key_env):
         with pytest.raises(TypeError, match="ruta_destino debe ser string"):
             exportar_contrasena("id", 123)
     
     def test_usuario_id_vacio(self, mock_conexion_global, fernet_key_env, tmp_path):
+        valor_1 = str(tmp_path / "test.enc")
         with pytest.raises(ValueError, match="usuario_id no puede estar vacío"):
-            exportar_contrasena("", str(tmp_path / "test.enc"))
+            exportar_contrasena("", valor_1)
     
     def test_ruta_vacia(self, mock_conexion_global, fernet_key_env):
         with pytest.raises(ValueError, match="ruta_destino no puede estar vacía"):
             exportar_contrasena("id", "")
     
     def test_usuario_id_invalido(self, mock_conexion_global, fernet_key_env, tmp_path):
+        valor_1 = str(tmp_path / "test.enc")
         with pytest.raises(ValueError, match="usuario_id inválido"):
-            exportar_contrasena("no_es_objectid", str(tmp_path / "test.enc"))
+            exportar_contrasena("no_es_objectid", valor_1)
     
     def test_directorio_no_existe(self, mock_conexion_global, fernet_key_env):
         with pytest.raises(ValueError, match="directorio no existe"):
@@ -68,5 +71,6 @@ class TestExportarContrasenaExito:
     
     def test_usuario_no_existe(self, mock_conexion_global, fernet_key_env, tmp_path):
         id_falso = str(ObjectId())
+        valor_1 = str(tmp_path / "test.enc")
         with pytest.raises(ErrorRecursoNoEncontrado, match="Usuario no encontrado"):
-            exportar_contrasena(id_falso, str(tmp_path / "test.enc"))
+            exportar_contrasena(id_falso, valor_1)
