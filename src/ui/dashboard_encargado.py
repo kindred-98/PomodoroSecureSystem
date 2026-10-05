@@ -35,11 +35,11 @@ _SIN_NOMBRE = "Sin nombre"
 class DashboardEncargado(ctk.CTkFrame):
     """Dashboard del encargado: timer personal + supervisión de equipo."""
 
-    def __init__(self, parent, usuario, on_logout, on_ver_contraseña, on_ver_historial):
+    def __init__(self, parent, usuario, on_logout, on_ver_contrasena, on_ver_historial):
         super().__init__(parent, fg_color=FONDO_PRINCIPAL)
         self.usuario = usuario
         self.on_logout = on_logout
-        self.on_ver_contraseña = on_ver_contraseña
+        self.on_ver_contrasena = on_ver_contrasena
         self.on_ver_historial = on_ver_historial
         self._job_refresh = None
         self._equipos_cache = []          # lista de equipos del encargado
@@ -108,7 +108,7 @@ class DashboardEncargado(ctk.CTkFrame):
         ctk.CTkFrame(lateral, fg_color=BORDE, height=1).pack(fill="x", padx=15, pady=15)
 
         botones_lateral = [
-            ("🔑 Contraseña", self.on_ver_contraseña),
+            ("🔑 Contraseña", self.on_ver_contrasena),
             ("📋 Historial", self.on_ver_historial),
             ("Fin de Jornada", self._fin_jornada_click),
             ("🚪 Cerrar Sesión", self._on_logout_click),
@@ -245,7 +245,6 @@ class DashboardEncargado(ctk.CTkFrame):
         pom_total = estado.get('pomodoros_totales', 4)
         pausas = estado.get('pausas_usadas', 0)
         pausas_max = estado.get('pausas_maximas', 2)
-        activo = estado.get('ciclo_activo', False)
 
         # Countdown
         minutos = seg // 60
@@ -577,7 +576,7 @@ class DashboardEncargado(ctk.CTkFrame):
                 command=ventana.destroy,
             ).pack(pady=(0, 15))
 
-        except Exception as e:  # nosec
+        except Exception:  # nosec
             pass
 
     def _contar_anomalias_todos(self):

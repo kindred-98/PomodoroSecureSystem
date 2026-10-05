@@ -10,9 +10,10 @@ from src.auth.sesion import crear_sesion
 from src.auth.verificacion_email import esta_verificado
 from src.auth.rate_limiting import verificar_rate_limit_login, registrar_intento_login
 from src.auth.audit import audit_login, audit_bloqueo_cuenta
+from src.excepciones import ErrorAutenticacion
 
 
-def iniciar_sesion(email: str, contraseña: str) -> dict:
+def iniciar_sesion(email: str, contrasena: str) -> dict:
     """
     Autentica un usuario y crea una sesión activa.
     
@@ -41,42 +42,42 @@ def iniciar_sesion(email: str, contraseña: str) -> dict:
     # Validación de tipos
     if not isinstance(email, str):
         raise TypeError(f"email debe ser string, recibido: {type(email).__name__}")
-    if not isinstance(contraseña, str):
-        raise TypeError(f"contraseña debe ser string, recibido: {type(contraseña).__name__}")
+    if not isinstance(contrasena, str):
+        raise TypeError(f"contraseña debe ser string, recibido: {type(contrasena).__name__}")
     
     email = email.strip().lower()
 
     if not email:
         raise ValueError("email no puede estar vacío")
-    if not contraseña:
+    if not contrasena:
         raise ValueError("contraseña no puede estar vacía")
 
     puede_intentar, mensaje_rate = verificar_rate_limit_login(email)
     if not puede_intentar:
         audit_bloqueo_cuenta(email, "rate_limit_login")
-        raise Exception(mensaje_rate)
+        raise ErrorAutenticacion(mensaje_rate)
 
     # Buscar usuario por email
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     usuario = coleccion_usuarios.find_one({'email': email})
     
     if usuario is None:
-        raise Exception("Credenciales incorrectas")
+        raise ErrorAutenticacion("Credenciales incorrectas")
     
 # Verificar que está activo
     if not usuario.get('activo', True):
-        raise Exception("Usuario desactivado")
+        raise ErrorAutenticacion("Usuario desactivado")
 
     # Verificar que email está verificado
     if not esta_verificado(email):
-        raise Exception("Debes verificar tu email antes de iniciar sesión")
+        raise ErrorAutenticacion("Debes verificar tu email antes de iniciar sesión")
 
 # Verificar contraseña
     hash_almacenado = usuario.get('contraseña_hash', '')
-    if not verificar_contraseña(contraseña, hash_almacenado):
+    if not verificar_contraseña(contrasena, hash_almacenado):
         registrar_intento_login(email, False)
         audit_login(email, False)
-        raise Exception("Credenciales incorrectas")
+        raise ErrorAutenticacion("Credenciales incorrectas")
 
     # Registrar intento exitoso
     registrar_intento_login(email, True)

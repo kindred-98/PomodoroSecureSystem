@@ -42,46 +42,46 @@ class TestValidacion:
     
     def test_rechaza_tipos_mas_que_espacios(self):
         """Test: Rechaza si hay más tipos requeridos que espacio en lista"""
-        contraseña = ['a']  # Solo 1 espacio
+        contrasena = ['a']  # Solo 1 espacio
         parametros = {
             "usar_mayusculas": True,
             "usar_numeros": True,
             "usar_simbolos": True  # 3 tipos pero solo 1 espacio
         }
         with pytest.raises(ValueError):
-            asegurar_tipos_caracteres(contraseña, parametros)
+            asegurar_tipos_caracteres(contrasena, parametros)
     
     def test_rechaza_2_tipos_en_lista_1_elemento(self):
         """Test: Rechaza 2 tipos en lista de 1 elemento"""
-        contraseña = ['a']  # Solo 1 espacio
+        contrasena = ['a']  # Solo 1 espacio
         parametros = {
             "usar_mayusculas": True,
             "usar_numeros": True,
             "usar_simbolos": False
         }
         with pytest.raises(ValueError):
-            asegurar_tipos_caracteres(contraseña, parametros)
+            asegurar_tipos_caracteres(contrasena, parametros)
     
     def test_acepta_1_tipo_en_lista_1_elemento(self):
         """Test: Acepta 1 tipo en lista de 1 elemento"""
-        contraseña = ['a']
+        contrasena = ['a']
         parametros = {
             "usar_mayusculas": True,
             "usar_numeros": False,
             "usar_simbolos": False
         }
-        resultado = asegurar_tipos_caracteres(contraseña, parametros)
+        resultado = asegurar_tipos_caracteres(contrasena, parametros)
         assert len(resultado) == 1
         assert resultado[0].isupper()
     
     def test_genera_correcto_con_todos_parametros_validos(self):
         """Test: Funciona correctamente con entrada válida"""
-        contraseña = ['a', 'b', 'c', 'd']
+        contrasena = ['a', 'b', 'c', 'd']
         parametros = {
             "usar_mayusculas": True,
             "usar_numeros": False,
             "usar_simbolos": False
         }
-        resultado = asegurar_tipos_caracteres(contraseña, parametros)
+        resultado = asegurar_tipos_caracteres(contrasena, parametros)
         assert isinstance(resultado, list)
         assert len(resultado) == 4

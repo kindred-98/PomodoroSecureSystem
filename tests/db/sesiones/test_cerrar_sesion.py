@@ -7,6 +7,7 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from src.db.sesiones.cerrar_sesion import cerrar_sesion
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestCerrarSesion:
@@ -27,10 +28,8 @@ class TestCerrarSesion:
         with pytest.raises(ValueError):
             cerrar_sesion("id-invalido")
 
-    def test_sesion_no_existe_lanza_exception(self, mock_conexion_global):
-        """Verifica que lance excepción si sesión no existe"""
-        with pytest.raises(Exception) as exc_info:
-            with patch('src.db.sesiones.cerrar_sesion.conexion_global', mock_conexion_global):
+    def test_sesion_no_existe_lanza_error(self, mock_conexion_global):
+        """Verifica que lance error si la sesión no existe"""
+        with patch('src.db.sesiones.cerrar_sesion.conexion_global', mock_conexion_global):
+            with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
                 cerrar_sesion(str(ObjectId()))
-        
-        assert "no existe" in str(exc_info.value)

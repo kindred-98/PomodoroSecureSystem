@@ -17,6 +17,7 @@ Excepciones:
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def obtener_por_usuario(usuario_id: str, limite: int = 50) -> list:
@@ -46,7 +47,7 @@ def obtener_por_usuario(usuario_id: str, limite: int = 50) -> list:
     usuario = coleccion_usuarios.find_one({'_id': usuario_oid})
     
     if not usuario:
-        raise Exception(f"Usuario con ID '{usuario_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Usuario con ID '{usuario_id}' no existe")
     
     # Obtener anomalías ordenadas por fecha (más recientes primero)
     coleccion_anomalias = conexion_global.obtener_coleccion('anomalias')

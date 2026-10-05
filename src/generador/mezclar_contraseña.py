@@ -7,7 +7,7 @@ a contraseñas ya generadas.
 import secrets
 
 
-def mezclar_contraseña(contraseña: str) -> str:
+def mezclar_contraseña(contrasena: str) -> str:
     """
     Mezcla (shuffle) una contraseña usando criptografía segura.
     
@@ -24,15 +24,15 @@ def mezclar_contraseña(contraseña: str) -> str:
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(f"La contraseña debe ser string, "
-                       f"recibido: {type(contraseña).__name__}")
+                       f"recibido: {type(contrasena).__name__}")
     
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
     # Convertir a lista para modificar
-    caracteres = list(contraseña)
+    caracteres = list(contrasena)
     
     # Fisher-Yates shuffle usando secrets (criptográficamente seguro)
     # Itera desde el final hacia el principio
@@ -47,7 +47,7 @@ def mezclar_contraseña(contraseña: str) -> str:
     return "".join(caracteres)
 
 
-def mezclar_preservando_estructura(contraseña: str, preservar_inicio: bool = False) -> str:
+def mezclar_preservando_estructura(contrasena: str, preservar_inicio: bool = False) -> str:
     """
     Mezcla una contraseña preservando opcionalmente caracteres en posiciones iniciales.
     
@@ -65,14 +65,14 @@ def mezclar_preservando_estructura(contraseña: str, preservar_inicio: bool = Fa
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía o es demasiado corta
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(f"La contraseña debe ser string, "
-                       f"recibido: {type(contraseña).__name__}")
+                       f"recibido: {type(contrasena).__name__}")
     
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
-    if preservar_inicio and len(contraseña) < 2:
+    if preservar_inicio and len(contrasena) < 2:
         raise ValueError(
             "Se requiere contraseña de al menos 2 caracteres "
             "para preservar el inicio"
@@ -80,8 +80,8 @@ def mezclar_preservando_estructura(contraseña: str, preservar_inicio: bool = Fa
     
     # Si se preserva el inicio, mezclar solo desde posición 1 en adelante
     if preservar_inicio:
-        primer_char = contraseña[0]
-        resto_mezclado = mezclar_contraseña(contraseña[1:])
+        primer_char = contrasena[0]
+        resto_mezclado = mezclar_contraseña(contrasena[1:])
         return primer_char + resto_mezclado
     
-    return mezclar_contraseña(contraseña)
+    return mezclar_contraseña(contrasena)

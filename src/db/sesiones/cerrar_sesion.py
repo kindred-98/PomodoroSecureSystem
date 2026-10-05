@@ -6,6 +6,7 @@ Responsabilidad: Cerrar una sesión de trabajo.
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def cerrar_sesion(sesion_id: str, completada: bool = True) -> dict:
@@ -38,7 +39,7 @@ def cerrar_sesion(sesion_id: str, completada: bool = True) -> dict:
     sesion = coleccion.find_one({'_id': objeto_id})
     
     if sesion is None:
-        raise Exception(f"Sesión con ID '{sesion_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Sesión con ID '{sesion_id}' no existe")
     
     # Calcular duración
     fin = datetime.now(timezone.utc)

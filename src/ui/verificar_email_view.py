@@ -150,7 +150,7 @@ class VerificarEmailView(ctk.CTkFrame):
             token = crear_o_actualizar_verificacion(self.email)
             
             # Enviar por email
-            result = enviar_token_por_email(self.email, token)
+            enviar_token_por_email(self.email, token)
             
             self.label_estado.configure(
                 text="✓ Código enviado. Revisa tu email o consola.",

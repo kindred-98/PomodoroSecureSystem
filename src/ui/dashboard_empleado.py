@@ -30,11 +30,11 @@ from src.ui.templates.fuentes import crear_fuente
 class DashboardEmpleado(ctk.CTkFrame):
     """Dashboard del empleado con timer, pausas y navegación."""
 
-    def __init__(self, parent, usuario, on_logout, on_ver_contraseña):
+    def __init__(self, parent, usuario, on_logout, on_ver_contrasena):
         super().__init__(parent, fg_color=FONDO_PRINCIPAL)
         self.usuario = usuario
         self.on_logout = on_logout
-        self.on_ver_contraseña = on_ver_contraseña
+        self.on_ver_contrasena = on_ver_contrasena
         self._job_refresh = None
         self._crear_widgets()
         self._sincronizar_con_servicio()
@@ -116,7 +116,7 @@ class DashboardEmpleado(ctk.CTkFrame):
             font=crear_fuente(12),
             fg_color=BOTON_SECUNDARIO, hover_color=BOTON_SECUNDARIO_HOVER,
             text_color=TEXTO_PRINCIPAL, height=36, corner_radius=8,
-            command=self.on_ver_contraseña,
+            command=self.on_ver_contrasena,
         ).pack(fill="x", padx=15, pady=3)
 
         ctk.CTkButton(
@@ -219,7 +219,6 @@ class DashboardEmpleado(ctk.CTkFrame):
         pom_total = estado.get('pomodoros_totales', 4)
         pausas = estado.get('pausas_usadas', 0)
         pausas_max = estado.get('pausas_maximas', 2)
-        activo = estado.get('ciclo_activo', False)
 
         # Countdown
         minutos = seg // 60

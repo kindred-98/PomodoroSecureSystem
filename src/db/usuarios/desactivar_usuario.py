@@ -5,6 +5,7 @@ Responsabilidad: Desactivar un usuario (soft delete).
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def desactivar_usuario(usuario_id: str) -> dict:
@@ -38,6 +39,6 @@ def desactivar_usuario(usuario_id: str) -> dict:
     )
     
     if resultado is None:
-        raise Exception(f"Usuario con ID '{usuario_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Usuario con ID '{usuario_id}' no existe")
     
     return resultado

@@ -14,6 +14,7 @@ from src.timer.estados import (
     TRANSICIONES_VALIDAS,
 )
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorEstadoInvalido
 
 # Callbacks registrados por otros módulos (FASE 6 los usará)
 _callbacks = {
@@ -237,7 +238,7 @@ def manejar_evento_timer(usuario_id: str, evento: str) -> dict:
     })
 
     if ciclo is None:
-        raise Exception("No hay ciclo Pomodoro activo para este usuario")
+        raise ErrorEstadoInvalido("No hay ciclo Pomodoro activo para este usuario")
 
     manejadores = {
         "pomodoro_completado": _manejar_pomodoro_completado,

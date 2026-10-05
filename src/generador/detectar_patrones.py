@@ -29,10 +29,10 @@ def _es_consecutiva(subcadena: str, paso: int) -> bool:
     )
 
 
-def _ventanas(contraseña: str, largo: int):
+def _ventanas(contrasena: str, largo: int):
     """Genera las subcadenas consecutivas de largo fijo."""
-    for i in range(len(contraseña) - largo + 1):
-        yield contraseña[i:i + largo]
+    for i in range(len(contrasena) - largo + 1):
+        yield contrasena[i:i + largo]
 
 
 def _es_teclado_adyacente(subcadena: str) -> bool:
@@ -51,42 +51,42 @@ def _registrar(resultados: dict, clave_lista: str, clave_bool: str, valor) -> No
     resultados[clave_bool] = True
 
 
-def _detectar_secuencias(contraseña: str, resultados: dict) -> None:
+def _detectar_secuencias(contrasena: str, resultados: dict) -> None:
     """Detecta secuencias ASCII consecutivas de 3 caracteres."""
-    for sub in _ventanas(contraseña, 3):
+    for sub in _ventanas(contrasena, 3):
         if _es_consecutiva(sub, 1):
             _registrar(resultados, 'secuencias_encontradas',
                        'tiene_secuencias_consecutivas', sub)
 
 
-def _detectar_repeticiones(contraseña: str, resultados: dict) -> None:
+def _detectar_repeticiones(contrasena: str, resultados: dict) -> None:
     """Detecta triples de caracteres idénticos."""
-    for sub in _ventanas(contraseña, 3):
+    for sub in _ventanas(contrasena, 3):
         if sub[0] == sub[1] == sub[2]:
             _registrar(resultados, 'repeticiones_encontradas',
                        'tiene_repeticiones', sub)
 
 
-def _detectar_teclado(contraseña: str, resultados: dict) -> None:
+def _detectar_teclado(contrasena: str, resultados: dict) -> None:
     """Detecta tríos adyacentes en el teclado QWERTY."""
-    for sub in _ventanas(contraseña, 3):
+    for sub in _ventanas(contrasena, 3):
         sub = sub.lower()
         if _es_teclado_adyacente(sub):
             _registrar(resultados, 'adyacencias_encontradas',
                        'tiene_teclado_adyacente', sub)
 
 
-def _detectar_crecientes(contraseña: str, resultados: dict) -> None:
+def _detectar_crecientes(contrasena: str, resultados: dict) -> None:
     """Detecta patrones crecientes de 4 caracteres (abcd, 1234)."""
-    for sub in _ventanas(contraseña, 4):
+    for sub in _ventanas(contrasena, 4):
         if _es_consecutiva(sub, 1):
             _registrar(resultados, 'patrones_crecientes',
                        'tiene_patrones_crecientes', sub)
 
 
-def _detectar_invertidos(contraseña: str, resultados: dict) -> None:
+def _detectar_invertidos(contrasena: str, resultados: dict) -> None:
     """Detecta patrones invertidos de 4 caracteres (dcba, 4321)."""
-    for sub in _ventanas(contraseña, 4):
+    for sub in _ventanas(contrasena, 4):
         if _es_consecutiva(sub, -1):
             _registrar(resultados, 'patrones_invertidos',
                        'tiene_patrones_invertidos', sub)
@@ -101,7 +101,7 @@ def _calcular_fortaleza(resultados: dict) -> float:
     return max(0.0, 1.0 - debilidades)
 
 
-def detectar_patrones(contraseña: str) -> dict:
+def detectar_patrones(contrasena: str) -> dict:
     """
     Detecta patrones débiles y predecibles en una contraseña.
     
@@ -135,11 +135,11 @@ def detectar_patrones(contraseña: str) -> dict:
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(f"La contraseña debe ser string, "
-                       f"recibido: {type(contraseña).__name__}")
+                       f"recibido: {type(contrasena).__name__}")
     
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
     resultados = {
@@ -155,11 +155,11 @@ def detectar_patrones(contraseña: str) -> dict:
         'patrones_invertidos': [],
     }
     
-    _detectar_secuencias(contraseña, resultados)
-    _detectar_repeticiones(contraseña, resultados)
-    _detectar_teclado(contraseña, resultados)
-    _detectar_crecientes(contraseña, resultados)
-    _detectar_invertidos(contraseña, resultados)
+    _detectar_secuencias(contrasena, resultados)
+    _detectar_repeticiones(contrasena, resultados)
+    _detectar_teclado(contrasena, resultados)
+    _detectar_crecientes(contrasena, resultados)
+    _detectar_invertidos(contrasena, resultados)
 
     resultados['fortaleza_patron'] = _calcular_fortaleza(resultados)
 

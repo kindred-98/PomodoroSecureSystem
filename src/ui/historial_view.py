@@ -113,8 +113,6 @@ class HistorialView(ctk.CTkFrame):
             from bson import ObjectId
 
             # Obtener miembros del equipo del supervisor
-            usuario_id = str(self.usuario['_id'])
-            
             if self.es_supervisor:
                 self._cargar_historial_supervisor()
             else:

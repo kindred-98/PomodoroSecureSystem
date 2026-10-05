@@ -81,6 +81,6 @@ class TestValidacionEntrada:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert isinstance(contraseña, str)
-        assert len(contraseña) == 12
+        contrasena = generar_contraseña(parametros)
+        assert isinstance(contrasena, str)
+        assert len(contrasena) == 12

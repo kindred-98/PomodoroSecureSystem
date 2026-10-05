@@ -317,7 +317,6 @@ class GestionEquiposView(ctk.CTkToplevel):
 
                 nombre = m.get('nombre', _SIN_NOMBRE)
                 rol = m.get('rol', 'empleado').title()
-                email = m.get('email', '')
 
                 ctk.CTkLabel(
                     frame, text=f"👤 {nombre}",

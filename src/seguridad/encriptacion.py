@@ -10,7 +10,7 @@ import bcrypt
 from cryptography.fernet import Fernet
 
 
-def hashear_contraseña(contraseña: str) -> str:
+def hashear_contraseña(contrasena: str) -> str:
     """
     Genera un hash bcrypt de una contraseña.
     
@@ -24,19 +24,19 @@ def hashear_contraseña(contraseña: str) -> str:
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(
-            f"contraseña debe ser string, recibido: {type(contraseña).__name__}"
+            f"contraseña debe ser string, recibido: {type(contrasena).__name__}"
         )
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
-    bytes_contraseña = contraseña.encode('utf-8')
-    hash_bytes = bcrypt.hashpw(bytes_contraseña, bcrypt.gensalt(rounds=12))
+    bytes_contrasena = contrasena.encode('utf-8')
+    hash_bytes = bcrypt.hashpw(bytes_contrasena, bcrypt.gensalt(rounds=12))
     return hash_bytes.decode('utf-8')
 
 
-def verificar_contraseña(contraseña: str, hash_almacenado: str) -> bool:
+def verificar_contraseña(contrasena: str, hash_almacenado: str) -> bool:
     """
     Verifica si una contraseña coincide con un hash bcrypt.
     
@@ -47,12 +47,12 @@ def verificar_contraseña(contraseña: str, hash_almacenado: str) -> bool:
     Returns:
         bool: True si coincide, False si no
     """
-    if not isinstance(contraseña, str) or not isinstance(hash_almacenado, str):
+    if not isinstance(contrasena, str) or not isinstance(hash_almacenado, str):
         return False
     
     try:
         return bcrypt.checkpw(
-            contraseña.encode('utf-8'),
+            contrasena.encode('utf-8'),
             hash_almacenado.encode('utf-8')
         )
     except (ValueError, Exception):

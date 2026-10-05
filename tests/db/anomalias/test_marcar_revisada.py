@@ -8,6 +8,7 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from src.db.anomalias.marcar_revisada import marcar_revisada
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestMarcarRevisada:
@@ -49,11 +50,9 @@ class TestMarcarRevisada:
 
     def test_anomalia_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si la anomalía no existe"""
-        with pytest.raises(Exception) as exc_info:
-            with patch('src.db.anomalias.marcar_revisada.conexion_global', mock_conexion_global):
+        with patch('src.db.anomalias.marcar_revisada.conexion_global', mock_conexion_global):
+            with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
                 marcar_revisada(str(ObjectId()))
-        
-        assert "no existe" in str(exc_info.value)
 
     def test_anomalia_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace anomalia_id no string"""

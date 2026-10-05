@@ -35,8 +35,8 @@ class TestVerContraseñaExito:
     def test_ver_contraseña_correcta(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Ver contraseña con login correcto debe retornar contraseña"""
         usr = usuario_registrado
-        contraseña = ver_contraseña(str(usr['usuario']['_id']), usr['contraseña'])
-        assert contraseña == usr['contraseña']
+        contrasena = ver_contraseña(str(usr['usuario']['_id']), usr['contraseña'])
+        assert contrasena == usr['contraseña']
     
     def test_ver_contraseña_login_incorrecto(self, mock_conexion_global, fernet_key_env, usuario_registrado):
         """Login incorrecto debe fallar"""

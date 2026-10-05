@@ -6,9 +6,10 @@ Responsabilidad: Crear un nuevo usuario en la base de datos.
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorValidacion
 
 
-def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "empleado") -> dict:
+def crear_usuario(email: str, nombre: str, contrasena_hash: str, rol: str = "empleado") -> dict:
     """
     Crea un nuevo usuario en la base de datos.
     
@@ -44,8 +45,8 @@ def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "em
         raise TypeError(f"Email debe ser string, recibido: {type(email).__name__}")
     if not isinstance(nombre, str):
         raise TypeError(f"Nombre debe ser string, recibido: {type(nombre).__name__}")
-    if not isinstance(contraseña_hash, str):
-        raise TypeError(f"Contraseña_hash debe ser string, recibido: {type(contraseña_hash).__name__}")
+    if not isinstance(contrasena_hash, str):
+        raise TypeError(f"Contraseña_hash debe ser string, recibido: {type(contrasena_hash).__name__}")
     if not isinstance(rol, str):
         raise TypeError(f"Rol debe ser string, recibido: {type(rol).__name__}")
     
@@ -57,7 +58,7 @@ def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "em
         raise ValueError("Email no puede estar vacío")
     if not nombre:
         raise ValueError("Nombre no puede estar vacío")
-    if not contraseña_hash:
+    if not contrasena_hash:
         raise ValueError("Contraseña_hash no puede estar vacía")
     
     roles_validos = {"empleado", "encargado", "supervisor"}
@@ -67,13 +68,13 @@ def crear_usuario(email: str, nombre: str, contraseña_hash: str, rol: str = "em
     # Verificar que email no exista
     coleccion = conexion_global.obtener_coleccion('usuarios')
     if coleccion.find_one({'email': email}):
-        raise Exception(f"El email '{email}' ya está registrado")
+        raise ErrorValidacion(f"El email '{email}' ya está registrado")
     
     # Crear documento
     usuario = {
         'email': email,
         'nombre': nombre,
-        'contraseña_hash': contraseña_hash,
+        'contraseña_hash': contrasena_hash,
         'rol': rol,
         'activo': True,
         'fecha_registro': datetime.now(timezone.utc),

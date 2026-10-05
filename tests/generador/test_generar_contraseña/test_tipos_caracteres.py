@@ -20,8 +20,8 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert any(c.isupper() for c in contraseña)
+        contrasena = generar_contraseña(parametros)
+        assert any(c.isupper() for c in contrasena)
     
     def test_genera_con_numeros(self):
         """Test: Incluye números cuando se especifica"""
@@ -32,8 +32,8 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert any(c.isdigit() for c in contraseña)
+        contrasena = generar_contraseña(parametros)
+        assert any(c.isdigit() for c in contrasena)
     
     def test_genera_con_simbolos(self):
         """Test: Incluye símbolos cuando se especifica"""
@@ -44,9 +44,9 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
+        contrasena = generar_contraseña(parametros)
         simbolos = set(string.punctuation)
-        assert any(c in simbolos for c in contraseña)
+        assert any(c in simbolos for c in contrasena)
     
     def test_genera_con_mayusculas_y_numeros(self):
         """Test: Combina mayúsculas y números"""
@@ -57,9 +57,9 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert any(c.isupper() for c in contraseña)
-        assert any(c.isdigit() for c in contraseña)
+        contrasena = generar_contraseña(parametros)
+        assert any(c.isupper() for c in contrasena)
+        assert any(c.isdigit() for c in contrasena)
     
     def test_genera_con_todos_tipos(self):
         """Test: Combina todos los tipos (mayúsculas, números, símbolos)"""
@@ -70,11 +70,11 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert any(c.isupper() for c in contraseña)
-        assert any(c.isdigit() for c in contraseña)
+        contrasena = generar_contraseña(parametros)
+        assert any(c.isupper() for c in contrasena)
+        assert any(c.isdigit() for c in contrasena)
         simbolos = set(string.punctuation)
-        assert any(c in simbolos for c in contraseña)
+        assert any(c in simbolos for c in contrasena)
     
     def test_genera_solo_minusculas(self):
         """Test: Sin flags, genera solo minúsculas"""
@@ -85,8 +85,8 @@ class TestTiposCaracteres:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert contraseña.islower()
+        contrasena = generar_contraseña(parametros)
+        assert contrasena.islower()
     
     def test_no_contiene_mayusculas_si_no_especificado(self):
         """Test: No contiene mayúsculas si no se especifica"""
@@ -97,5 +97,5 @@ class TestTiposCaracteres:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert not any(c.isupper() for c in contraseña)
+        contrasena = generar_contraseña(parametros)
+        assert not any(c.isupper() for c in contrasena)

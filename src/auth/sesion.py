@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorSesion
 
 # Expiración de sesiones en segundos (default 8 horas = 28800 segundos)
 _EXPIRAR_SESION_SEGUNDOS = int(os.getenv('EXPIRAR_SESION_SEGUNDOS', '28800'))
@@ -92,7 +93,7 @@ def verificar_sesion(token_sesion: str) -> dict:
     })
     
     if sesion is None:
-        raise Exception("Sesión inválida o expirada")
+        raise ErrorSesion("Sesión inválida o expirada")
     
     # Verificar expiración configurada
     inicio = sesion.get('inicio')
@@ -109,14 +110,14 @@ def verificar_sesion(token_sesion: str) -> dict:
                 {'_id': sesion['_id']},
                 {'$set': {'activa': False}}
             )
-            raise Exception("Sesión expirada")
+            raise ErrorSesion("Sesión expirada")
     
     # Obtener usuario
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     usuario = coleccion_usuarios.find_one({'_id': sesion['usuario_id']})
     
     if usuario is None or not usuario.get('activo', False):
-        raise Exception("Usuario inactivo o no encontrado")
+        raise ErrorSesion("Usuario inactivo o no encontrado")
     
     return usuario
 
@@ -145,10 +146,10 @@ def cerrar_sesion_por_token(token_sesion: str) -> bool:
     sesion = coleccion.find_one({'token_sesion': token_sesion})
     
     if sesion is None:
-        raise Exception("Sesión no encontrada")
+        raise ErrorSesion("Sesión no encontrada")
     
     if not sesion.get('activa', False):
-        raise Exception("La sesión ya está cerrada")
+        raise ErrorSesion("La sesión ya está cerrada")
     
     coleccion.update_one(
         {'_id': sesion['_id']},

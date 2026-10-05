@@ -5,6 +5,7 @@ Responsabilidad: Actualizar puntuación de Pomodoro del usuario.
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def actualizar_pomodoro(usuario_id: str, incremento: int) -> dict:
@@ -41,6 +42,6 @@ def actualizar_pomodoro(usuario_id: str, incremento: int) -> dict:
     )
     
     if resultado is None:
-        raise Exception(f"Usuario con ID '{usuario_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Usuario con ID '{usuario_id}' no existe")
     
     return resultado

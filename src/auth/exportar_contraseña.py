@@ -7,6 +7,7 @@ import json
 import os
 from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import descifrar, cifrar
+from src.excepciones import ErrorRecursoNoEncontrado, ErrorValidacion
 
 
 def exportar_contraseña(usuario_id: str, ruta_destino: str) -> str:
@@ -53,20 +54,20 @@ def exportar_contraseña(usuario_id: str, ruta_destino: str) -> str:
     usuario = coleccion.find_one({'_id': objeto_id})
     
     if usuario is None:
-        raise Exception("Usuario no encontrado")
+        raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Obtener y desencriptar la contraseña
-    contraseña_encriptada = usuario.get('contraseña_encriptada', '')
-    if not contraseña_encriptada:
-        raise Exception("No hay contraseña encriptada para exportar")
+    contrasena_encriptada = usuario.get('contraseña_encriptada', '')
+    if not contrasena_encriptada:
+        raise ErrorValidacion("No hay contraseña encriptada para exportar")
     
-    contraseña = descifrar(contraseña_encriptada)
+    contrasena = descifrar(contrasena_encriptada)
     
     # Crear JSON con datos del usuario
     datos_exportacion = {
         'email': usuario.get('email', ''),
         'nombre': usuario.get('nombre', ''),
-        'contraseña': contraseña,
+        'contraseña': contrasena,
         'parametros': usuario.get('parametros_contraseña', {}),
         'exportado_en': str(os.path.basename(ruta_destino))
     }

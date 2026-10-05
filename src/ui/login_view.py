@@ -320,14 +320,14 @@ class LoginView(ctk.CTkFrame):
     def _on_login_click(self):
         """Procesa el intento de login."""
         email = self.entry_email.get().strip()
-        contraseña = self.entry_contraseña.get()
+        contrasena = self.entry_contraseña.get()
 
         # Validaciones
         if not email:
             self._mostrar_error("El email es obligatorio")
             return
 
-        if not contraseña:
+        if not contrasena:
             self._mostrar_error("La contraseña es obligatoria")
             return
 
@@ -344,7 +344,7 @@ class LoginView(ctk.CTkFrame):
         self.boton_login.configure(state="disabled", text="Verificando...")
 
         try:
-            self.on_login(email, contraseña)
+            self.on_login(email, contrasena)
         except Exception as e:
             self._mostrar_error(str(e))
 
@@ -403,7 +403,7 @@ class LoginView(ctk.CTkFrame):
         ).pack(side="left")
 
     @classmethod
-    def _crear_panel_datos_verificados(cls, dialogo, usuario, contraseña_real):
+    def _crear_panel_datos_verificados(cls, dialogo, usuario, contrasena_real):
         """Muestra los datos del usuario recién verificado con opción de copiarlos."""
         frame_info = ctk.CTkFrame(dialogo, fg_color="transparent")
         frame_info.pack(fill="x", padx=30, pady=15)
@@ -411,7 +411,7 @@ class LoginView(ctk.CTkFrame):
         cls._crear_fila_resumen(frame_info, "Nombre", usuario.get('nombre', ''))
         cls._crear_fila_resumen(frame_info, "Email", usuario.get('email', ''))
         cls._crear_fila_resumen(frame_info, "Rol", usuario.get('rol', 'empleado'))
-        cls._crear_fila_resumen(frame_info, "Contraseña", contraseña_real)
+        cls._crear_fila_resumen(frame_info, "Contraseña", contrasena_real)
 
         label_copiar = ctk.CTkLabel(dialogo, text="", font=crear_fuente(12))
         label_copiar.pack()
@@ -421,7 +421,7 @@ class LoginView(ctk.CTkFrame):
             texto = (
                 f"Nombre: {usuario.get('nombre', '')}\n"
                 f"Email: {usuario.get('email', '')}\n"
-                f"Contraseña: {contraseña_real}\n"
+                f"Contraseña: {contrasena_real}\n"
                 f"Rol: {usuario.get('rol', 'empleado')}"
             )
             pyperclip.copy(texto)
@@ -450,8 +450,8 @@ class LoginView(ctk.CTkFrame):
         if not usuario:
             return
 
-        contraseña_real = descifrar(usuario.get('contraseña_encriptada', ''))
-        cls._crear_panel_datos_verificados(dialogo, usuario, contraseña_real)
+        contrasena_real = descifrar(usuario.get('contraseña_encriptada', ''))
+        cls._crear_panel_datos_verificados(dialogo, usuario, contrasena_real)
 
     @classmethod
     def _mostrar_resumen_verificacion(cls, dialogo, email):
@@ -630,7 +630,7 @@ class LoginView(ctk.CTkFrame):
         ).pack(fill="x", padx=30)
 
         widgets = self._crear_widgets_verificacion(dialogo)
-        entry_email, label_error, frame_codigo, entry_codigo, btn_enviar = widgets
+        _, _, _, entry_codigo, btn_enviar = widgets
 
         btn_enviar.configure(
             command=lambda: self._enviar_codigo_dialogo(dialogo, widgets)

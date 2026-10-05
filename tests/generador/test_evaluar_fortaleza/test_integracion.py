@@ -19,8 +19,8 @@ class TestGeneradasYEvaluadas:
             'usar_simbolos': True,
             'excluir_ambiguos': False
         }
-        contraseña = generar_contraseña(parametros)
-        resultado = evaluar_fortaleza(contraseña)
+        contrasena = generar_contraseña(parametros)
+        resultado = evaluar_fortaleza(contrasena)
         
         assert resultado['puntuacion'] > 50
         assert resultado['nivel'] in {"Normal", "Fuerte", "Muy Fuerte"}
@@ -34,8 +34,8 @@ class TestGeneradasYEvaluadas:
             'usar_simbolos': True,
             'excluir_ambiguos': False
         }
-        contraseña = generar_contraseña(parametros)
-        resultado = evaluar_fortaleza(contraseña)
+        contrasena = generar_contraseña(parametros)
+        resultado = evaluar_fortaleza(contrasena)
         
         assert resultado['puntuacion'] >= 70
         assert resultado['nivel'] in {"Fuerte", "Muy Fuerte"}
@@ -71,9 +71,9 @@ class TestConsistencia:
     
     def test_misma_entrada_mismo_resultado(self):
         """Test: Misma entrada siempre da mismo resultado"""
-        contraseña = "MyPa$$w0rd!"
-        resultado1 = evaluar_fortaleza(contraseña)
-        resultado2 = evaluar_fortaleza(contraseña)
+        contrasena = "MyPa$$w0rd!"
+        resultado1 = evaluar_fortaleza(contrasena)
+        resultado2 = evaluar_fortaleza(contrasena)
         
         assert resultado1['puntuacion'] == resultado2['puntuacion']
         assert resultado1['nivel'] == resultado2['nivel']
@@ -98,7 +98,7 @@ class TestConsistencia:
             "Ésté€$"
         ]
         
-        for contraseña in contraseñas:
-            resultado = evaluar_fortaleza(contraseña)
+        for contrasena in contraseñas:
+            resultado = evaluar_fortaleza(contrasena)
             assert 0 <= resultado['puntuacion'] <= 100
             assert resultado['nivel'] in {"Débil", "Normal", "Fuerte", "Muy Fuerte"}

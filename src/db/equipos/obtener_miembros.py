@@ -5,6 +5,7 @@ Responsabilidad: Obtener lista de miembros de un equipo.
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def obtener_miembros(equipo_id: str) -> list:
@@ -34,7 +35,7 @@ def obtener_miembros(equipo_id: str) -> list:
     equipo = coleccion_equipos.find_one({'_id': objeto_id})
     
     if equipo is None:
-        raise Exception(f"Equipo con ID '{equipo_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Equipo con ID '{equipo_id}' no existe")
     
     # Obtener detalles de los miembros
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')

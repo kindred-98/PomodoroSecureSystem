@@ -61,12 +61,12 @@ def generar_contraseña(parametros: dict) -> str:
         )
     
     # Generar lista aleatoria de caracteres
-    contraseña = [secrets.choice(juego_caracteres) for _ in range(longitud)]
+    contrasena = [secrets.choice(juego_caracteres) for _ in range(longitud)]
     
     # Asegurar que hay al menos 1 de cada tipo seleccionado
-    contraseña = asegurar_tipos_caracteres(contraseña, parametros)
+    contrasena = asegurar_tipos_caracteres(contrasena, parametros)
     
-    return "".join(contraseña)
+    return "".join(contrasena)
 
 
 def generar_contraseña_segura(longitud: int = 16) -> str:

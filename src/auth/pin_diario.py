@@ -7,8 +7,48 @@ Se hashea con bcrypt. Solo se devuelve en texto plano en el momento de creación
 
 import secrets
 from datetime import datetime, timezone
+
+from bson import ObjectId
+from bson.errors import InvalidId
+
 from src.seguridad.encriptacion import hashear_contraseña, verificar_contraseña
 from src.db.conexion import conexion_global
+
+
+def _validar_usuario_id(usuario_id: str) -> str:
+    """Valida que usuario_id sea un string no vacío."""
+    if not isinstance(usuario_id, str):
+        raise TypeError(
+            f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}"
+        )
+    if not usuario_id.strip():
+        raise ValueError("usuario_id no puede estar vacío")
+    return usuario_id
+
+
+def _validar_pin(pin_introducido: str) -> str:
+    """Valida que el PIN sea un string no vacío."""
+    if not isinstance(pin_introducido, str):
+        raise TypeError(
+            f"pin debe ser string, recibido: {type(pin_introducido).__name__}"
+        )
+    if not pin_introducido.strip():
+        raise ValueError("pin no puede estar vacío")
+    return pin_introducido
+
+
+def _a_object_id(usuario_id: str):
+    """Convierte a ObjectId; si no es válido, devuelve el valor original."""
+    try:
+        return ObjectId(usuario_id)
+    except (InvalidId, TypeError):
+        return usuario_id
+
+
+def _coleccion_hoy():
+    """Devuelve la colección de PINes junto con la fecha de hoy."""
+    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return conexion_global.obtener_coleccion('pines_diarios'), hoy
 
 
 def generar_pin_diario(usuario_id: str) -> str | None:
@@ -21,15 +61,10 @@ def generar_pin_diario(usuario_id: str) -> str | None:
         str: El PIN en texto plano si se generó ahora (solo esta vez).
         None: Si ya existía un PIN para hoy (ya no recuperable).
     """
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        usuario_oid = usuario_id
+    usuario_oid = _a_object_id(_validar_usuario_id(usuario_id))
 
     # Verificar si ya tiene PIN para hoy
-    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    coleccion = conexion_global.obtener_coleccion('pines_diarios')
+    coleccion, hoy = _coleccion_hoy()
     existente = coleccion.find_one({
         'usuario_id': usuario_oid,
         'fecha': hoy,
@@ -58,42 +93,31 @@ def eliminar_pin_diario(usuario_id: str) -> bool:
     """
     Elimina el PIN del día para permitir generar uno nuevo.
     Útil si el usuario perdió el PIN y necesita uno nuevo.
-    
+
     Returns:
         bool: True si se eliminó, False si no había PIN.
     """
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        usuario_oid = usuario_id
+    usuario_oid = _a_object_id(_validar_usuario_id(usuario_id))
+    coleccion, hoy = _coleccion_hoy()
 
-    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    coleccion = conexion_global.obtener_coleccion('pines_diarios')
-    
     resultado = coleccion.delete_one({
         'usuario_id': usuario_oid,
         'fecha': hoy,
     })
-    
+
     return resultado.deleted_count > 0
 
 
 def obtener_ultimo_pin(usuario_id: str) -> dict | None:
     """
     Obtiene el registro del último PIN generado hoy.
-    
+
     Returns:
         dict: Registro del PIN o None.
     """
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        usuario_oid = usuario_id
+    usuario_oid = _a_object_id(_validar_usuario_id(usuario_id))
+    coleccion, hoy = _coleccion_hoy()
 
-    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    coleccion = conexion_global.obtener_coleccion('pines_diarios')
     return coleccion.find_one({
         'usuario_id': usuario_oid,
         'fecha': hoy,
@@ -107,14 +131,10 @@ def verificar_pin_diario(usuario_id: str, pin_introducido: str) -> bool:
     Returns:
         bool: True si es correcto
     """
-    from bson import ObjectId
-    try:
-        usuario_oid = ObjectId(usuario_id)
-    except Exception:
-        usuario_oid = usuario_id
+    usuario_oid = _a_object_id(_validar_usuario_id(usuario_id))
+    pin_introducido = _validar_pin(pin_introducido)
 
-    hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    coleccion = conexion_global.obtener_coleccion('pines_diarios')
+    coleccion, hoy = _coleccion_hoy()
     registro = coleccion.find_one({
         'usuario_id': usuario_oid,
         'fecha': hoy,

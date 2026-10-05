@@ -17,6 +17,7 @@ Excepciones:
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def marcar_revisada(anomalia_id: str) -> dict:
@@ -43,7 +44,7 @@ def marcar_revisada(anomalia_id: str) -> dict:
     # Verificar que la anomalía existe
     anomalia = coleccion_anomalias.find_one({'_id': anomalia_oid})
     if not anomalia:
-        raise Exception(f"Anomalía con ID '{anomalia_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Anomalía con ID '{anomalia_id}' no existe")
     
     # Actualizar documento: marcar como revisada y registrar fecha de revisión
     actualizaciones = {

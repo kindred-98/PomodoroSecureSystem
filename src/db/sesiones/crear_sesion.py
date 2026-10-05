@@ -6,6 +6,7 @@ Responsabilidad: Crear una nueva sesión de trabajo.
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def crear_sesion(usuario_id: str, tipo_sesion: str = "pomodoro") -> dict:
@@ -53,7 +54,7 @@ def crear_sesion(usuario_id: str, tipo_sesion: str = "pomodoro") -> dict:
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     usuario = coleccion_usuarios.find_one({'_id': usuario_objeto_id})
     if usuario is None:
-        raise Exception(f"Usuario con ID '{usuario_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Usuario con ID '{usuario_id}' no existe")
     
     # Crear sesión
     sesion = {

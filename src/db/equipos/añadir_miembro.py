@@ -5,6 +5,7 @@ Responsabilidad: Agregar un usuario a un equipo.
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado, ErrorValidacion
 
 
 def añadir_miembro(equipo_id: str, usuario_id: str) -> dict:
@@ -38,17 +39,17 @@ def añadir_miembro(equipo_id: str, usuario_id: str) -> dict:
     coleccion_equipos = conexion_global.obtener_coleccion('equipos')
     equipo = coleccion_equipos.find_one({'_id': equipo_objeto_id})
     if equipo is None:
-        raise Exception(f"Equipo con ID '{equipo_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Equipo con ID '{equipo_id}' no existe")
     
     # Verificar que usuario existe
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     usuario = coleccion_usuarios.find_one({'_id': usuario_objeto_id})
     if usuario is None:
-        raise Exception(f"Usuario con ID '{usuario_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Usuario con ID '{usuario_id}' no existe")
     
     # Verificar que no sea duplicado
     if usuario_objeto_id in equipo['miembros']:
-        raise Exception(f"Usuario '{usuario_id}' ya es miembro del equipo")
+        raise ErrorValidacion(f"Usuario '{usuario_id}' ya es miembro del equipo")
     
     # Agregar miembro
     resultado = coleccion_equipos.find_one_and_update(

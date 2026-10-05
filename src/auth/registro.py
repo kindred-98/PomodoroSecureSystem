@@ -98,7 +98,7 @@ def registrar_usuario(
     email: str,
     nombre: str,
     rol: str,
-    parametros_contraseña: dict
+    parametros_contrasena: dict
 ) -> dict:
     """
     Registra un nuevo usuario con contraseña generada por el sistema.
@@ -134,7 +134,7 @@ def registrar_usuario(
     _validar_tipo("email", email, str)
     _validar_tipo("nombre", nombre, str)
     _validar_tipo("rol", rol, str)
-    _validar_tipo("parametros_contraseña", parametros_contraseña, dict)
+    _validar_tipo("parametros_contraseña", parametros_contrasena, dict)
 
     # Validación de valores
     email = _validar_email(email)
@@ -151,32 +151,32 @@ def registrar_usuario(
     rol = _resolver_rol(rol, es_primer_usuario)
 
     # Determinar tipo de contraseña: personalizada vs generada por sistema
-    tipo = parametros_contraseña.get("tipo", "sistema")
+    tipo = parametros_contrasena.get("tipo", "sistema")
 
     # Valores por defecto si params vacío
     params = {
-        "longitud": parametros_contraseña.get("longitud", 16),
-        "usar_mayusculas": parametros_contraseña.get("usar_mayusculas", True),
-        "usar_numeros": parametros_contraseña.get("usar_numeros", True),
-        "usar_simbolos": parametros_contraseña.get("usar_simbolos", True),
-        "excluir_ambiguos": parametros_contraseña.get("excluir_ambiguos", False),
+        "longitud": parametros_contrasena.get("longitud", 16),
+        "usar_mayusculas": parametros_contrasena.get("usar_mayusculas", True),
+        "usar_numeros": parametros_contrasena.get("usar_numeros", True),
+        "usar_simbolos": parametros_contrasena.get("usar_simbolos", True),
+        "excluir_ambiguos": parametros_contrasena.get("excluir_ambiguos", False),
     }
 
     if tipo == "personalizada":
-        contraseña_generada = parametros_contraseña.get("contraseña", "")
-        if not contraseña_generada:
+        contrasena_generada = parametros_contrasena.get("contraseña", "")
+        if not contrasena_generada:
             raise ValueError("Contraseña personalizada no proporcionada")
     else:
-        contraseña_generada = generar_contraseña(params)
+        contrasena_generada = generar_contraseña(params)
 
     # Crear hash para verificación de login (no reversible)
-    contraseña_hash = hashear_contraseña(contraseña_generada)
+    contrasena_hash = hashear_contraseña(contrasena_generada)
 
     # Encriptar para recuperación del usuario (reversible)
-    contraseña_encriptada = cifrar(contraseña_generada)
+    contrasena_encriptada = cifrar(contrasena_generada)
 
     # Guardar en base de datos (inicialmente no verificado)
-    usuario = crear_usuario(email, nombre, contraseña_hash, rol)
+    usuario = crear_usuario(email, nombre, contrasena_hash, rol)
 
     # Actualizar campos en una sola operación
     coleccion.update_one(
@@ -184,18 +184,18 @@ def registrar_usuario(
         {'$set': {
             'email_verificado': False,
             'fecha_verificacion': None,
-            'contraseña_encriptada': contraseña_encriptada,
+            'contraseña_encriptada': contrasena_encriptada,
             'parametros_contraseña': params
         }}
     )
     usuario['email_verificado'] = False
     usuario['fecha_verificacion'] = None
-    usuario['contraseña_encriptada'] = contraseña_encriptada
+    usuario['contraseña_encriptada'] = contrasena_encriptada
     usuario['parametros_contraseña'] = params
 
     audit_registro(email, True)
 
     return {
         'usuario': usuario,
-        'contraseña_generada': contraseña_generada
+        'contraseña_generada': contrasena_generada
     }

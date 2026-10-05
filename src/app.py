@@ -99,7 +99,7 @@ class PomodoroSecureApp(ctk.CTk):
                 self,
                 usuario=self.usuario_actual,
                 on_logout=self._on_logout,
-                on_ver_contraseña=self._mostrar_password,
+                on_ver_contrasena=self._mostrar_password,
                 on_ver_historial=self._mostrar_historial,
             )
         elif rol == 'encargado':
@@ -107,7 +107,7 @@ class PomodoroSecureApp(ctk.CTk):
                 self,
                 usuario=self.usuario_actual,
                 on_logout=self._on_logout,
-                on_ver_contraseña=self._mostrar_password,
+                on_ver_contrasena=self._mostrar_password,
                 on_ver_historial=self._mostrar_historial,
             )
         else:
@@ -115,7 +115,7 @@ class PomodoroSecureApp(ctk.CTk):
                 self,
                 usuario=self.usuario_actual,
                 on_logout=self._on_logout,
-                on_ver_contraseña=self._mostrar_password,
+                on_ver_contrasena=self._mostrar_password,
             )
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista
@@ -142,11 +142,11 @@ class PomodoroSecureApp(ctk.CTk):
         vista.pack(fill="both", expand=True)
         self.vista_actual = vista
 
-    def _on_login(self, email, contraseña):
+    def _on_login(self, email, contrasena):
         """Callback cuando el usuario intenta login."""
         from src.auth import iniciar_sesion
         try:
-            resultado = iniciar_sesion(email, contraseña)
+            resultado = iniciar_sesion(email, contrasena)
             self.usuario_actual = resultado['usuario']
             self._mostrar_dashboard()
 

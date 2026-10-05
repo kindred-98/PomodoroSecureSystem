@@ -32,12 +32,12 @@ class TestGenerarPinDiario:
 
     def test_usuario_id_no_string_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id no string"""
-        with pytest.raises(Exception):
+        with pytest.raises(TypeError):
             generar_pin_diario(123)
 
     def test_usuario_id_vacio_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id vacío"""
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             generar_pin_diario("")
 
 
@@ -55,24 +55,22 @@ class TestVerificarPinDiario:
 
     def test_usuario_id_no_string_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id no string"""
-        with pytest.raises(Exception):
+        with pytest.raises(TypeError):
             verificar_pin_diario(123, "123456")
 
-    def test_usuario_id_vacio_retorna_false(self, mock_conexion_global):
+    def test_usuario_id_vacio_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace usuario_id vacío"""
-        with patch('src.auth.pin_diario.conexion_global', mock_conexion_global):
-            resultado = verificar_pin_diario("", "123456")
-        assert resultado is False
+        with pytest.raises(ValueError):
+            verificar_pin_diario("", "123456")
 
     def test_pin_no_string_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace PIN no string"""
         usuario_id = str(ObjectId())
-        with pytest.raises(Exception):
+        with pytest.raises(TypeError):
             verificar_pin_diario(usuario_id, 123456)
 
-    def test_pin_vacio_retorna_false(self, mock_conexion_global):
+    def test_pin_vacio_lanza_error(self, mock_conexion_global):
         """Verifica que se rechace PIN vacío"""
         usuario_id = str(ObjectId())
-        with patch('src.auth.pin_diario.conexion_global', mock_conexion_global):
-            resultado = verificar_pin_diario(usuario_id, "")
-        assert resultado is False
+        with pytest.raises(ValueError):
+            verificar_pin_diario(usuario_id, "")

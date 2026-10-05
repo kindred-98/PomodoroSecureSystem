@@ -7,6 +7,7 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from src.db.equipos.obtener_miembros import obtener_miembros
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestObtenerMiembros:
@@ -56,11 +57,9 @@ class TestObtenerMiembros:
 
     def test_equipo_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si el equipo no existe"""
-        with pytest.raises(Exception) as exc_info:
-            with patch('src.db.equipos.obtener_miembros.conexion_global', mock_conexion_global):
+        with patch('src.db.equipos.obtener_miembros.conexion_global', mock_conexion_global):
+            with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
                 obtener_miembros(str(ObjectId()))
-        
-        assert "no existe" in str(exc_info.value)
 
     def test_equipo_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace equipo_id no string"""

@@ -231,8 +231,8 @@ def finalizar_pausa(usuario_id: str) -> dict:
     # Crear reporte para supervisor y encargado
     try:
         _crear_reporte_pausa(usuario_id, pausa_actualizada, duracion_minutos)
-    except Exception as e:
-        pass  # nolint # nosec B110
+    except Exception:  # nosec B110
+        pass
     
     anomalia_registrada = None
     

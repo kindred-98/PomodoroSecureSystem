@@ -3,6 +3,7 @@ Tests de seguridad: Rate limiting y protección contra inyecciones.
 """
 
 import pytest
+from src.excepciones import ErrorAutenticacion
 
 
 class TestRateLimiting:
@@ -65,7 +66,7 @@ class TestProteccionInyeccion:
         ]
 
         for email in sql_injection_emails:
-            with pytest.raises(Exception):
+            with pytest.raises(ErrorAutenticacion):
                 iniciar_sesion(email, "anypassword")
 
     def test_login_special_characters_in_password(self, mock_conexion_global, fernet_key_env):
@@ -89,7 +90,7 @@ class TestProteccionInyeccion:
         ]
 
         for password in special_passwords:
-            with pytest.raises(Exception):
+            with pytest.raises((ErrorAutenticacion, ValueError, TypeError)):
                 iniciar_sesion("special@test.com", password)
 
     def test_registro_xss_in_nombre(self, mock_conexion_global, fernet_key_env):
@@ -104,7 +105,7 @@ class TestProteccionInyeccion:
         ]
 
         for nombre in xss_nombres:
-            with pytest.raises((ValueError, TypeError)):
+            with pytest.raises(ValueError):
                 registrar_usuario(
                     f"xss{nombre.replace('<', '').replace('>', '')}@test.com",
                     nombre,
@@ -180,8 +181,8 @@ class TestSeguridadTokens:
         token = crear_o_actualizar_verificacion("tokenlen@test.com")
         verificar_token_db("tokenlen@test.com", token)
 
-        contraseña = resultado["contraseña_generada"]
-        resultado_login = iniciar_sesion("tokenlen@test.com", contraseña)
+        contrasena = resultado["contraseña_generada"]
+        resultado_login = iniciar_sesion("tokenlen@test.com", contrasena)
         token_sesion = resultado_login["token_sesion"]
 
         assert len(token_sesion) >= 32

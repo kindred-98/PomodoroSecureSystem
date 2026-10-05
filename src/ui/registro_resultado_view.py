@@ -23,7 +23,7 @@ class RegistroResultadoView(ctk.CTkFrame):
         self.email = email
         self.on_login = on_login
         self.usuario = None
-        self.contraseña = None
+        self.contrasena = None
         self._cargar_datos()
         self._crear_widgets()
 
@@ -36,9 +36,9 @@ class RegistroResultadoView(ctk.CTkFrame):
         self.usuario = coleccion.find_one({'email': self.email.lower()})
 
         if self.usuario:
-            self.contraseña = descifrar(self.usuario.get('contraseña_encriptada', ''))
+            self.contrasena = descifrar(self.usuario.get('contraseña_encriptada', ''))
         else:
-            self.contraseña = "••••••••••••"
+            self.contrasena = "••••••••••••"
 
     def _crear_widgets(self):
         """Crea los widgets."""
@@ -96,7 +96,7 @@ class RegistroResultadoView(ctk.CTkFrame):
             fila("Email", email)
             fila("Rol", rol)
 
-            if self.contraseña:
+            if self.contrasena:
                 frame_pass = ctk.CTkFrame(self.card, fg_color="transparent")
                 frame_pass.pack(fill="x", padx=30, pady=(15, 10))
 
@@ -109,7 +109,7 @@ class RegistroResultadoView(ctk.CTkFrame):
 
                 ctk.CTkLabel(
                     frame_pass,
-                    text=self.contraseña,
+                    text=self.contrasena,
                     font=NORMAL,
                     text_color=COMPLETADO,
                 ).pack(side="left")
@@ -138,8 +138,8 @@ class RegistroResultadoView(ctk.CTkFrame):
 
     def _copiar_todo(self):
         """Copia toda la información."""
-        if self.usuario and self.contraseña:
-            texto = f"Nombre: {self.usuario.get('nombre', '')}\nEmail: {self.usuario.get('email', '')}\nContraseña: {self.contraseña}\nRol: {self.usuario.get('rol', 'empleado')}"
+        if self.usuario and self.contrasena:
+            texto = f"Nombre: {self.usuario.get('nombre', '')}\nEmail: {self.usuario.get('email', '')}\nContraseña: {self.contrasena}\nRol: {self.usuario.get('rol', 'empleado')}"
             pyperclip.copy(texto)
 
     def _ir_a_login(self):

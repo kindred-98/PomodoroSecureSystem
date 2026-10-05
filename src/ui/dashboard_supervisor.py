@@ -33,11 +33,11 @@ _SIN_NOMBRE = "Sin nombre"
 class DashboardSupervisor(ctk.CTkFrame):
     """Dashboard del supervisor: gestión de equipos, anomalías, configuración."""
 
-    def __init__(self, parent, usuario, on_logout, on_ver_contraseña, on_ver_historial):
+    def __init__(self, parent, usuario, on_logout, on_ver_contrasena, on_ver_historial):
         super().__init__(parent, fg_color=FONDO_PRINCIPAL)
         self.usuario = usuario
         self.on_logout = on_logout
-        self.on_ver_contraseña = on_ver_contraseña
+        self.on_ver_contrasena = on_ver_contrasena
         self.on_ver_historial = on_ver_historial
         self._crear_widgets()
         self._cargar_datos()
@@ -80,7 +80,7 @@ class DashboardSupervisor(ctk.CTkFrame):
             ("📋 Historial", self.on_ver_historial),
             ("☕ Descansos Fijos", self._ver_descansos_fijos),
             ("👥 Equipos", self._ver_gestion_equipos),
-            ("🔑 Contraseña", self.on_ver_contraseña),
+            ("🔑 Contraseña", self.on_ver_contrasena),
             ("🚪 Cerrar Sesión", self._on_logout_click),
         ]
         for texto, cmd in botones:

@@ -12,8 +12,8 @@ class TestLongitud:
     
     def test_genera_con_longitud_correcta(self, parametros_generador_defecto):
         """Test: La contraseña generada tiene la longitud especificada"""
-        contraseña = generar_contraseña(parametros_generador_defecto)
-        assert len(contraseña) == parametros_generador_defecto["longitud"]
+        contrasena = generar_contraseña(parametros_generador_defecto)
+        assert len(contrasena) == parametros_generador_defecto["longitud"]
     
     def test_genera_con_longitud_8(self):
         """Test: Genera contraseña con longitud mínima (8)"""
@@ -24,8 +24,8 @@ class TestLongitud:
             "usar_simbolos": False,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert len(contraseña) == 8
+        contrasena = generar_contraseña(parametros)
+        assert len(contrasena) == 8
     
     def test_genera_con_longitud_12(self):
         """Test: Genera contraseña con longitud estándar (12)"""
@@ -36,8 +36,8 @@ class TestLongitud:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert len(contraseña) == 12
+        contrasena = generar_contraseña(parametros)
+        assert len(contrasena) == 12
     
     def test_genera_con_longitud_20(self):
         """Test: Genera contraseña con longitud intermedia (20)"""
@@ -48,8 +48,8 @@ class TestLongitud:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert len(contraseña) == 20
+        contrasena = generar_contraseña(parametros)
+        assert len(contrasena) == 20
     
     def test_genera_con_longitud_128(self):
         """Test: Genera contraseña con longitud máxima (128)"""
@@ -60,8 +60,8 @@ class TestLongitud:
             "usar_simbolos": True,
             "excluir_ambiguos": False
         }
-        contraseña = generar_contraseña(parametros)
-        assert len(contraseña) == 128
+        contrasena = generar_contraseña(parametros)
+        assert len(contrasena) == 128
     
     def test_rechaza_longitud_menor_8(self):
         """Test: Rechaza longitud menor a 8"""

@@ -8,6 +8,7 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from src.db.anomalias.obtener_por_usuario import obtener_por_usuario
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestObtenerPorUsuario:
@@ -45,11 +46,9 @@ class TestObtenerPorUsuario:
 
     def test_usuario_no_existe_lanza_exception(self, mock_conexion_global):
         """Verifica que lance excepción si el usuario no existe"""
-        with pytest.raises(Exception) as exc_info:
-            with patch('src.db.anomalias.obtener_por_usuario.conexion_global', mock_conexion_global):
+        with patch('src.db.anomalias.obtener_por_usuario.conexion_global', mock_conexion_global):
+            with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
                 obtener_por_usuario(str(ObjectId()))
-        
-        assert "no existe" in str(exc_info.value)
 
     def test_usuario_id_no_string_lanza_typeerror(self, mock_conexion_global):
         """Verifica que se rechace usuario_id no string"""

@@ -6,6 +6,7 @@ Responsabilidad: Crear un nuevo equipo.
 from datetime import datetime, timezone
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "", supervisor_id: str = None) -> dict:
@@ -58,7 +59,7 @@ def crear_equipo(nombre: str, encargado_id: str, descripcion: str = "", supervis
     coleccion_usuarios = conexion_global.obtener_coleccion('usuarios')
     encargado = coleccion_usuarios.find_one({'_id': encargado_objeto_id})
     if encargado is None:
-        raise Exception(f"Encargado con ID '{encargado_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Encargado con ID '{encargado_id}' no existe")
     
     # Agregar supervisor_id si se proporciona
     supervisor_oid = None

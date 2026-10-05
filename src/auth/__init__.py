@@ -21,6 +21,8 @@ from src.auth.verificacion_email import (
     enviar_token_por_email,
     esta_verificado,
 )
+from src.excepciones import ErrorRecursoNoEncontrado
+
 
 def obtener_contraseña(usuario_id: str) -> str:
     """
@@ -40,7 +42,7 @@ def obtener_contraseña(usuario_id: str) -> str:
     usuario = coleccion.find_one({'_id': oid})
     
     if not usuario:
-        raise Exception("Usuario no encontrado")
+        raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     return descifrar(usuario.get('contraseña_encriptada', ''))
 

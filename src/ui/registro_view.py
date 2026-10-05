@@ -777,29 +777,29 @@ class RegistroView(ctk.CTkFrame):
         self.datos_paso_2["tipo"] = self.tipo_contraseña.get()
         
         if self.tipo_contraseña.get() == "personalizada":
-            contraseña = self.entry_pass.get()
-            contraseña2 = self.entry_pass2.get()
+            contrasena = self.entry_pass.get()
+            contrasena2 = self.entry_pass2.get()
             
-            if len(contraseña) < 5:
+            if len(contrasena) < 5:
                 self.label_error.configure(text="Mínimo 5 caracteres")
                 return False
-            if len(contraseña) > 72:
+            if len(contrasena) > 72:
                 self.label_error.configure(text="Máximo 72 caracteres")
                 return False
-            if contraseña != contraseña2:
+            if contrasena != contrasena2:
                 self.label_error.configure(text="Las contraseñas no coinciden")
                 return False
-            if not re.search(r"[a-z]", contraseña):
+            if not re.search(r"[a-z]", contrasena):
                 self.label_error.configure(text="Debe tener al menos una minúscula (a-z)")
                 return False
-            if not re.search(r"[A-Z]", contraseña):
+            if not re.search(r"[A-Z]", contrasena):
                 self.label_error.configure(text="Debe tener al menos una mayúscula (A-Z)")
                 return False
-            if not re.search(r"[ !@#$%^&*()_+\-=\[\]{};:'\",./<>?\\|`~]", contraseña):
+            if not re.search(r"[ !@#$%^&*()_+\-=\[\]{};:'\",./<>?\\|`~]", contrasena):
                 self.label_error.configure(text="Debe tener al menos un símbolo (!@#$%^&*...)")
                 return False
             
-            self.datos_paso_2["contraseña"] = contraseña
+            self.datos_paso_2["contraseña"] = contrasena
             self.datos_paso_2["tipo"] = "personalizada"
         
         self.label_error.configure(text="")

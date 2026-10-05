@@ -11,7 +11,7 @@ from src.generador.evaluar_fortaleza import evaluar_fortaleza
 from src.generador.mezclar_contraseña import mezclar_contraseña as mezclar
 
 
-def calcular_puntuacion(contraseña: str, incluir_analisis: bool = False) -> dict:
+def calcular_puntuacion(contrasena: str, incluir_analisis: bool = False) -> dict:
     """
     Calcula puntuación integral de una contraseña de forma rápida.
     
@@ -34,25 +34,25 @@ def calcular_puntuacion(contraseña: str, incluir_analisis: bool = False) -> dic
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(f"La contraseña debe ser string, "
-                       f"recibido: {type(contraseña).__name__}")
+                       f"recibido: {type(contrasena).__name__}")
     
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
     # Evaluar fortaleza
-    resultado_fortaleza = evaluar_fortaleza(contraseña)
+    resultado_fortaleza = evaluar_fortaleza(contrasena)
     puntuacion = resultado_fortaleza['puntuacion']
     nivel = resultado_fortaleza['nivel']
     
     # Estimar tiempo de crackeo (modelo exponencial simplificado)
     # Basado en puntuación y longitud
-    tamaño_charset = 95  # ASCII imprimibles
-    longitud = len(contraseña)
+    tamano_charset = 95  # ASCII imprimibles
+    longitud = len(contrasena)
     
     # promedio_intentos = (tamaño_charset ^ longitud) / 2
-    promedio_intentos = (tamaño_charset ** longitud) / 2
+    promedio_intentos = (tamano_charset ** longitud) / 2
     
     # Suponiendo 1 millón de intentos por segundo
     tiempo_segundos = promedio_intentos / 1_000_000
@@ -79,7 +79,7 @@ def calcular_puntuacion(contraseña: str, incluir_analisis: bool = False) -> dic
     
     # Incluir análisis de patrones si se solicita
     if incluir_analisis:
-        resultado['analisis_patrones'] = detectar_patrones(contraseña)
+        resultado['analisis_patrones'] = detectar_patrones(contrasena)
     
     return resultado
 
@@ -112,24 +112,24 @@ def generar_y_evaluar(parametros: dict, mezclar_resultado: bool = False) -> dict
         raise TypeError("Los parámetros deben ser un diccionario")
     
     # Generar contraseña
-    contraseña = generar_contraseña(parametros)
+    contrasena = generar_contraseña(parametros)
     
     # Mezclar si se solicita
     if mezclar_resultado:
-        contraseña = mezclar(contraseña)
+        contrasena = mezclar(contrasena)
     
     # Evaluar
-    evaluacion = evaluar_fortaleza(contraseña)
+    evaluacion = evaluar_fortaleza(contrasena)
     puntuacion = evaluacion['puntuacion']
     
     # Estimar tiempo de crackeo
-    tamaño_charset = 95
-    longitud = len(contraseña)
-    promedio_intentos = (tamaño_charset ** longitud) / 2
+    tamano_charset = 95
+    longitud = len(contrasena)
+    promedio_intentos = (tamano_charset ** longitud) / 2
     tiempo_segundos = promedio_intentos / 1_000_000
     
     return {
-        'contraseña': contraseña,
+        'contraseña': contrasena,
         'puntuacion': puntuacion,
         'nivel': evaluacion['nivel'],
         'es_segura': puntuacion >= 70,

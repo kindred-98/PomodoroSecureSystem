@@ -5,6 +5,7 @@ Responsabilidad: Actualizar datos de una sesión activa.
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def actualizar_sesion(sesion_id: str, actualizaciones: dict) -> dict:
@@ -42,6 +43,6 @@ def actualizar_sesion(sesion_id: str, actualizaciones: dict) -> dict:
     )
     
     if resultado is None:
-        raise Exception(f"Sesión con ID '{sesion_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Sesión con ID '{sesion_id}' no existe")
     
     return resultado

@@ -7,9 +7,10 @@ Requiere que la nueva contraseña alcance nivel "Muy Fuerte" (99%+).
 from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import hashear_contraseña, cifrar
 from src.generador import evaluar_fortaleza
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
-def cambiar_contraseña(usuario_id: str, nueva_contraseña: str) -> dict:
+def cambiar_contraseña(usuario_id: str, nueva_contrasena: str) -> dict:
     """
     Permite al usuario cambiar su contraseña manualmente.
     
@@ -33,15 +34,15 @@ def cambiar_contraseña(usuario_id: str, nueva_contraseña: str) -> dict:
     """
     if not isinstance(usuario_id, str):
         raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
-    if not isinstance(nueva_contraseña, str):
+    if not isinstance(nueva_contrasena, str):
         raise TypeError(
             f"nueva_contraseña debe ser string, "
-            f"recibido: {type(nueva_contraseña).__name__}"
+            f"recibido: {type(nueva_contrasena).__name__}"
         )
     
     if not usuario_id.strip():
         raise ValueError("usuario_id no puede estar vacío")
-    if not nueva_contraseña:
+    if not nueva_contrasena:
         raise ValueError("nueva_contraseña no puede estar vacía")
     
     from bson import ObjectId
@@ -51,7 +52,7 @@ def cambiar_contraseña(usuario_id: str, nueva_contraseña: str) -> dict:
         raise ValueError(f"usuario_id inválido: '{usuario_id}'")
     
     # Evaluar fortaleza de la nueva contraseña
-    resultado = evaluar_fortaleza(nueva_contraseña)
+    resultado = evaluar_fortaleza(nueva_contrasena)
     
     if resultado['nivel'] != "Muy Fuerte":
         raise ValueError(
@@ -64,11 +65,11 @@ def cambiar_contraseña(usuario_id: str, nueva_contraseña: str) -> dict:
     usuario = coleccion.find_one({'_id': objeto_id})
     
     if usuario is None:
-        raise Exception("Usuario no encontrado")
+        raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Guardar
-    nuevo_hash = hashear_contraseña(nueva_contraseña)
-    nueva_encriptada = cifrar(nueva_contraseña)
+    nuevo_hash = hashear_contraseña(nueva_contrasena)
+    nueva_encriptada = cifrar(nueva_contrasena)
     
     coleccion.update_one(
         {'_id': objeto_id},

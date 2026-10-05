@@ -6,6 +6,7 @@ Responsabilidad: Regenerar la contraseña de un usuario con nuevos parámetros.
 from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import hashear_contraseña, cifrar
 from src.generador import generar_contraseña
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:
@@ -53,14 +54,14 @@ def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:
     usuario = coleccion.find_one({'_id': objeto_id})
     
     if usuario is None:
-        raise Exception("Usuario no encontrado")
+        raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Generar nueva contraseña
-    nueva_contraseña = generar_contraseña(nuevos_parametros)
+    nueva_contrasena = generar_contraseña(nuevos_parametros)
     
     # Crear nuevo hash y encriptación
-    nuevo_hash = hashear_contraseña(nueva_contraseña)
-    nueva_encriptada = cifrar(nueva_contraseña)
+    nuevo_hash = hashear_contraseña(nueva_contrasena)
+    nueva_encriptada = cifrar(nueva_contrasena)
     
     # Actualizar en base de datos
     coleccion.update_one(
@@ -73,6 +74,6 @@ def regenerar_contraseña(usuario_id: str, nuevos_parametros: dict) -> dict:
     )
     
     return {
-        'nueva_contraseña': nueva_contraseña,
+        'nueva_contraseña': nueva_contrasena,
         'mensaje': "Contraseña regenerada exitosamente"
     }

@@ -16,6 +16,7 @@ from src.timer.estados import (
 )
 from src.db.conexion import conexion_global
 from src.pausas.gestor_pausas import MAXIMO_PAUSAS
+from src.excepciones import ErrorEstadoInvalido
 
 # Configuración de expiración de sesión
 HORAS_MAXIMAS_SESION = 12  # Una jornada laboral típica
@@ -259,7 +260,7 @@ class ServicioTimer:
                 self._inicio_estado = datetime.now(timezone.utc)
                 return self.estado
 
-            except Exception as e:
+            except Exception:  # nosec - el timer no debe propagar al hilo de la UI
                 self.ciclo_activo = False
                 self.estado = ESTADO_INACTIVO
                 return 'error'
@@ -286,7 +287,7 @@ class ServicioTimer:
                 self._inicio_estado = datetime.now(timezone.utc)
                 return ESTADO_TRABAJANDO
 
-            except Exception as e:
+            except Exception:  # nosec - el timer no debe propagar al hilo de la UI
                 self.ciclo_activo = False
                 self.estado = ESTADO_INACTIVO
                 return 'error'
@@ -296,9 +297,9 @@ class ServicioTimer:
     def pausar(self):
         """Pausa el timer."""
         if self.estado == ESTADO_PAUSADO:
-            raise Exception("El timer ya está pausado")
+            raise ErrorEstadoInvalido("El timer ya está pausado")
         if not self.ciclo_activo:
-            raise Exception("No hay ciclo activo para pausar")
+            raise ErrorEstadoInvalido("No hay ciclo activo para pausar")
 
         from src.pausas import iniciar_pausa
         iniciar_pausa(self.usuario_id)
@@ -311,7 +312,7 @@ class ServicioTimer:
     def reanudar(self):
         """Reanuda el timer después de una pausa."""
         if self.estado != ESTADO_PAUSADO:
-            raise Exception("El timer no está pausado")
+            raise ErrorEstadoInvalido("El timer no está pausado")
 
         from src.pausas import finalizar_pausa
         finalizar_pausa(self.usuario_id)

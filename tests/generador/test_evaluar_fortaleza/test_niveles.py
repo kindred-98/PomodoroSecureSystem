@@ -40,8 +40,8 @@ class TestNiveles:
         """Test: Nivel siempre es uno de los esperados"""
         niveles_validos = {"Débil", "Normal", "Fuerte", "Muy Fuerte"}
         contraseñas = ["a", "abc", "abcdef123", "MyPass123@", "X7$mK#pQw9&bZ2L!"]
-        for contraseña in contraseñas:
-            resultado = evaluar_fortaleza(contraseña)
+        for contrasena in contraseñas:
+            resultado = evaluar_fortaleza(contrasena)
             assert resultado['nivel'] in niveles_validos
 
 

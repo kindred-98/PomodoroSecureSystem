@@ -35,24 +35,24 @@ def _posicion_disponible(longitud: int, preferida: int) -> int:
     return min(preferida, longitud - 1)
 
 
-def _garantizar_mayusculas(contraseña: list, excluidos: str) -> None:
+def _garantizar_mayusculas(contrasena: list, excluidos: str) -> None:
     """Coloca una mayúscula en la posición 0."""
-    contraseña[0] = _elegir_mayuscula(excluidos)
+    contrasena[0] = _elegir_mayuscula(excluidos)
 
 
-def _garantizar_numero(contraseña: list, excluidos: str) -> None:
+def _garantizar_numero(contrasena: list, excluidos: str) -> None:
     """Coloca un número en la posición 1, o al final si la contraseña es más corta."""
-    posicion = _posicion_disponible(len(contraseña), 1)
-    contraseña[posicion] = _elegir_numero(excluidos)
+    posicion = _posicion_disponible(len(contrasena), 1)
+    contrasena[posicion] = _elegir_numero(excluidos)
 
 
-def _garantizar_simbolo(contraseña: list) -> None:
+def _garantizar_simbolo(contrasena: list) -> None:
     """Coloca un símbolo en la posición 2, o al final si la contraseña es más corta."""
-    posicion = _posicion_disponible(len(contraseña), 2)
-    contraseña[posicion] = secrets.choice(string.punctuation)
+    posicion = _posicion_disponible(len(contrasena), 2)
+    contrasena[posicion] = secrets.choice(string.punctuation)
 
 
-def asegurar_tipos_caracteres(contraseña: list, parametros: dict) -> list:
+def asegurar_tipos_caracteres(contrasena: list, parametros: dict) -> list:
     """
     Garantiza que la contraseña contiene al menos 1 carácter
     de cada tipo seleccionado.
@@ -68,10 +68,10 @@ def asegurar_tipos_caracteres(contraseña: list, parametros: dict) -> list:
         ValueError: Si longitud < número de tipos requeridos
     """
     # Validación propia
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
     
-    if not isinstance(contraseña, list):
+    if not isinstance(contrasena, list):
         raise TypeError("La contraseña debe ser una lista de caracteres")
     
     # Contar cuántos tipos son requeridos
@@ -80,22 +80,22 @@ def asegurar_tipos_caracteres(contraseña: list, parametros: dict) -> list:
     )
 
     # Validar que hay espacio suficiente
-    if tipos_requeridos > len(contraseña):
+    if tipos_requeridos > len(contrasena):
         raise ValueError(
-            f"Longitud insuficiente ({len(contraseña)}) "
+            f"Longitud insuficiente ({len(contrasena)}) "
             f"para garantizar {tipos_requeridos} tipos de caracteres"
         )
 
     excluidos = _AMBIGUOS if parametros.get("excluir_ambiguos", False) else ""
 
     garantizadores = {
-        _FLAGS_TIPO["mayusculas"]: lambda: _garantizar_mayusculas(contraseña, excluidos),
-        _FLAGS_TIPO["numeros"]: lambda: _garantizar_numero(contraseña, excluidos),
-        _FLAGS_TIPO["simbolos"]: lambda: _garantizar_simbolo(contraseña),
+        _FLAGS_TIPO["mayusculas"]: lambda: _garantizar_mayusculas(contrasena, excluidos),
+        _FLAGS_TIPO["numeros"]: lambda: _garantizar_numero(contrasena, excluidos),
+        _FLAGS_TIPO["simbolos"]: lambda: _garantizar_simbolo(contrasena),
     }
 
     for flag, garantizar in garantizadores.items():
         if parametros.get(flag, False):
             garantizar()
 
-    return contraseña
+    return contrasena

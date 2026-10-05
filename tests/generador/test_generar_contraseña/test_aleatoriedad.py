@@ -13,9 +13,9 @@ class TestAleatoriedad:
     def test_determinismo_no_existe(self, parametros_generador_defecto):
         """Test: Genera contraseñas distintas cada vez (aleatoriedad)"""
         contraseña1 = generar_contraseña(parametros_generador_defecto)
-        contraseña2 = generar_contraseña(parametros_generador_defecto)
+        contrasena2 = generar_contraseña(parametros_generador_defecto)
         # Muy improbable que genere dos iguales (1 entre 62^12)
-        assert contraseña1 != contraseña2
+        assert contraseña1 != contrasena2
     
     def test_distribucion_aleatoria_basica(self):
         """Test: Genera variedad en las contraseñas"""
@@ -37,8 +37,8 @@ class TestStress:
     def test_genera_50_contraseñas_sin_error(self, parametros_generador_defecto):
         """Test: Puede generar 50 contraseñas sin errores"""
         for _ in range(50):
-            contraseña = generar_contraseña(parametros_generador_defecto)
-            assert len(contraseña) == 12
+            contrasena = generar_contraseña(parametros_generador_defecto)
+            assert len(contrasena) == 12
     
     def test_genera_100_contraseñas_sin_error(self):
         """Test: Puede generar 100 contraseñas sin errores"""
@@ -50,8 +50,8 @@ class TestStress:
             "excluir_ambiguos": False
         }
         for _ in range(100):
-            contraseña = generar_contraseña(parametros)
-            assert len(contraseña) == 10
+            contrasena = generar_contraseña(parametros)
+            assert len(contrasena) == 10
     
     def test_todas_unicas_en_100_generaciones(self, parametros_generador_defecto):
         """Test: 100 generaciones produce contraseñas prácticamente todas únicas"""
@@ -70,8 +70,8 @@ class TestStress:
                 "usar_simbolos": True,
                 "excluir_ambiguos": False
             }
-            contraseña = generar_contraseña(parametros)
-            assert len(contraseña) == longitud
+            contrasena = generar_contraseña(parametros)
+            assert len(contrasena) == longitud
     
     def test_stress_combinaciones_parametros(self):
         """Test: Genera sin error con múltiples combinaciones de parámetros"""
@@ -86,11 +86,11 @@ class TestStress:
              "usar_simbolos": True, "excluir_ambiguos": True},
         ]
         for parametros in combinaciones:
-            contraseña = generar_contraseña(parametros)
-            assert len(contraseña) == parametros["longitud"]
+            contrasena = generar_contraseña(parametros)
+            assert len(contrasena) == parametros["longitud"]
     
     def test_genera_correctamente_es_string(self, parametros_generador_defecto):
         """Test: El resultado es siempre string"""
         for _ in range(20):
-            contraseña = generar_contraseña(parametros_generador_defecto)
-            assert isinstance(contraseña, str)
+            contrasena = generar_contraseña(parametros_generador_defecto)
+            assert isinstance(contrasena, str)

@@ -6,9 +6,10 @@ Requiere validación de identidad (contraseña de login).
 
 from src.db.conexion import conexion_global
 from src.seguridad.encriptacion import verificar_contraseña, descifrar
+from src.excepciones import ErrorAutenticacion, ErrorRecursoNoEncontrado, ErrorValidacion
 
 
-def ver_contraseña(usuario_id: str, contraseña_login: str) -> str:
+def ver_contraseña(usuario_id: str, contrasena_login: str) -> str:
     """
     Muestra la contraseña encriptada del usuario tras validación.
     
@@ -29,12 +30,12 @@ def ver_contraseña(usuario_id: str, contraseña_login: str) -> str:
     """
     if not isinstance(usuario_id, str):
         raise TypeError(f"usuario_id debe ser string, recibido: {type(usuario_id).__name__}")
-    if not isinstance(contraseña_login, str):
-        raise TypeError(f"contraseña_login debe ser string, recibido: {type(contraseña_login).__name__}")
+    if not isinstance(contrasena_login, str):
+        raise TypeError(f"contraseña_login debe ser string, recibido: {type(contrasena_login).__name__}")
     
     if not usuario_id.strip():
         raise ValueError("usuario_id no puede estar vacío")
-    if not contraseña_login:
+    if not contrasena_login:
         raise ValueError("contraseña_login no puede estar vacía")
     
     from bson import ObjectId
@@ -47,16 +48,16 @@ def ver_contraseña(usuario_id: str, contraseña_login: str) -> str:
     usuario = coleccion.find_one({'_id': objeto_id})
     
     if usuario is None:
-        raise Exception("Usuario no encontrado")
+        raise ErrorRecursoNoEncontrado("Usuario no encontrado")
     
     # Verificar identidad con contraseña de login
     hash_almacenado = usuario.get('contraseña_hash', '')
-    if not verificar_contraseña(contraseña_login, hash_almacenado):
-        raise Exception("Contraseña de verificación incorrecta")
+    if not verificar_contraseña(contrasena_login, hash_almacenado):
+        raise ErrorAutenticacion("Contraseña de verificación incorrecta")
     
     # Desencriptar y retornar
-    contraseña_encriptada = usuario.get('contraseña_encriptada', '')
-    if not contraseña_encriptada:
-        raise Exception("No hay contraseña encriptada almacenada")
+    contrasena_encriptada = usuario.get('contraseña_encriptada', '')
+    if not contrasena_encriptada:
+        raise ErrorValidacion("No hay contraseña encriptada almacenada")
     
-    return descifrar(contraseña_encriptada)
+    return descifrar(contrasena_encriptada)

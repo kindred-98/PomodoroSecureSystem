@@ -18,6 +18,7 @@ Excepciones:
 
 from bson import ObjectId
 from src.db.conexion import conexion_global
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 def obtener_por_equipo(equipo_id: str, limite: int = 100) -> list:
@@ -47,7 +48,7 @@ def obtener_por_equipo(equipo_id: str, limite: int = 100) -> list:
     equipo = coleccion_equipos.find_one({'_id': equipo_oid})
     
     if not equipo:
-        raise Exception(f"Equipo con ID '{equipo_id}' no existe")
+        raise ErrorRecursoNoEncontrado(f"Equipo con ID '{equipo_id}' no existe")
     
     # Obtener lista de IDs de miembros del equipo
     miembros_ids = equipo.get('miembros', [])

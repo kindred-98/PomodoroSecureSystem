@@ -7,6 +7,7 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from src.db.sesiones.actualizar_sesion import actualizar_sesion
+from src.excepciones import ErrorRecursoNoEncontrado
 
 
 class TestActualizarSesion:
@@ -44,13 +45,11 @@ class TestActualizarSesion:
         with pytest.raises(ValueError):
             actualizar_sesion("id-invalido", {'pausas_utilizadas': 1})
 
-    def test_sesion_no_existe_lanza_exception(self, mock_conexion_global):
-        """Verifica que lance excepción si sesión no existe"""
-        with pytest.raises(Exception) as exc_info:
-            with patch('src.db.sesiones.actualizar_sesion.conexion_global', mock_conexion_global):
+    def test_sesion_no_existe_lanza_error(self, mock_conexion_global):
+        """Verifica que lance error si la sesión no existe"""
+        with patch('src.db.sesiones.actualizar_sesion.conexion_global', mock_conexion_global):
+            with pytest.raises(ErrorRecursoNoEncontrado, match="no existe"):
                 actualizar_sesion(str(ObjectId()), {'pausas_utilizadas': 1})
-        
-        assert "no existe" in str(exc_info.value)
 
     def test_multiple_campos_actualizados(self, mock_conexion_global):
         """Verifica que se actualicen múltiples campos"""

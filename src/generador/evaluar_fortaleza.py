@@ -56,13 +56,13 @@ def _factor_longitud(longitud: int) -> float:
     return 1.0
 
 
-def _analizar_tipos(contraseña: str) -> dict:
+def _analizar_tipos(contrasena: str) -> dict:
     """Indica qué tipos de carácter contiene la contraseña."""
     return {
-        'tiene_mayusculas': any(c.isupper() for c in contraseña),
-        'tiene_minusculas': any(c.islower() for c in contraseña),
-        'tiene_numeros': any(c.isdigit() for c in contraseña),
-        'tiene_simbolos': any(not c.isalnum() for c in contraseña),
+        'tiene_mayusculas': any(c.isupper() for c in contrasena),
+        'tiene_minusculas': any(c.islower() for c in contrasena),
+        'tiene_numeros': any(c.isdigit() for c in contrasena),
+        'tiene_simbolos': any(not c.isalnum() for c in contrasena),
     }
 
 
@@ -80,14 +80,14 @@ def _factor_diversidad(tipos_presentes: int) -> float:
     return _FACTOR_DIVERSIDAD[tipos_presentes - 1]
 
 
-def _calcular_entropia(contraseña: str, tipos: dict) -> float:
+def _calcular_entropia(contrasena: str, tipos: dict) -> float:
     """Aproxima los bits de entropía a partir del espacio de caracteres."""
-    tamaño_charset = sum(
+    tamano_charset = sum(
         aporte for clave, aporte in _APORTE_CHARSET if tipos[clave]
     )
-    if tamaño_charset == 0:
+    if tamano_charset == 0:
         return 0
-    return len(contraseña) * math.log2(tamaño_charset)
+    return len(contrasena) * math.log2(tamano_charset)
 
 
 def _penalizaciones(analisis_patrones: dict) -> dict:
@@ -107,7 +107,7 @@ def _determinar_nivel(puntuacion: int) -> str:
     return "Muy Fuerte"
 
 
-def evaluar_fortaleza(contraseña: str) -> dict:
+def evaluar_fortaleza(contrasena: str) -> dict:
     """
     Evalúa la fortaleza de una contraseña usando sistema de puntuación integral.
     
@@ -143,17 +143,17 @@ def evaluar_fortaleza(contraseña: str) -> dict:
         TypeError: Si contraseña no es string
         ValueError: Si contraseña está vacía
     """
-    if not isinstance(contraseña, str):
+    if not isinstance(contrasena, str):
         raise TypeError(f"La contraseña debe ser string, "
-                       f"recibido: {type(contraseña).__name__}")
+                       f"recibido: {type(contrasena).__name__}")
     
-    if not contraseña:
+    if not contrasena:
         raise ValueError("La contraseña no puede estar vacía")
 
-    longitud = len(contraseña)
+    longitud = len(contrasena)
 
     # ==================== CRITERIO 1: LONGITUD ====================
-    tipos = _analizar_tipos(contraseña)
+    tipos = _analizar_tipos(contrasena)
     tipos_presentes = sum(tipos.values())
 
     # Factores penalizadores aplicados a longitud, entropía y patrones
@@ -167,13 +167,13 @@ def evaluar_fortaleza(contraseña: str) -> dict:
     puntos_diversidad = _puntos_diversidad(tipos_presentes)
 
     # ==================== CRITERIO 3: ENTROPÍA ====================
-    entropia_bits = _calcular_entropia(contraseña, tipos)
+    entropia_bits = _calcular_entropia(contrasena, tipos)
     puntos_entropia = int(
         min(20, int(entropia_bits / 5)) * penalizacion_combinada
     )
 
     # ==================== CRITERIO 4: PATRONES ====================
-    analisis_patrones = detectar_patrones(contraseña)
+    analisis_patrones = detectar_patrones(contrasena)
     puntos_patrones = int(
         analisis_patrones['fortaleza_patron'] * 20 * factor_long
     )

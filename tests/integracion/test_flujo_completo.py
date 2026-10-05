@@ -5,6 +5,7 @@ Registro → Verificación de email → Login
 
 import pytest
 import time
+from src.excepciones import ErrorAutenticacion
 
 
 class TestFlujoCompletoRegistroLogin:
@@ -77,12 +78,10 @@ class TestFlujoCompletoRegistroLogin:
             {"longitud": 16, "usar_mayusculas": True, "usar_numeros": True, "usar_simbolos": True, "excluir_ambiguos": False}
         )
 
-        contraseña = resultado["contraseña_generada"]
+        contrasena = resultado["contraseña_generada"]
 
-        with pytest.raises(Exception) as exc_info:
-            iniciar_sesion("unverified@test.com", contraseña)
-
-        assert "verificar tu email" in str(exc_info.value)
+        with pytest.raises(ErrorAutenticacion, match="verificar tu email"):
+            iniciar_sesion("unverified@test.com", contrasena)
 
     def test_login_exitoso_tras_verificacion(self, mock_conexion_global, fernet_key_env):
         """Login debe funcionar después de verificar email."""
@@ -98,12 +97,12 @@ class TestFlujoCompletoRegistroLogin:
         )
 
         email = resultado["usuario"]["email"]
-        contraseña = resultado["contraseña_generada"]
+        contrasena = resultado["contraseña_generada"]
 
         token = crear_o_actualizar_verificacion(email)
         verificar_token_db(email, token)
 
-        login_result = iniciar_sesion(email, contraseña)
+        login_result = iniciar_sesion(email, contrasena)
 
         assert "usuario" in login_result
         assert "token_sesion" in login_result
@@ -124,12 +123,12 @@ class TestFlujoCompletoRegistroLogin:
         )
 
         email = resultado["usuario"]["email"]
-        contraseña = resultado["contraseña_generada"]
+        contrasena = resultado["contraseña_generada"]
 
         token_creado = crear_o_actualizar_verificacion(email)
         verificar_token_db(email, token_creado)
 
-        login_result = iniciar_sesion(email, contraseña)
+        login_result = iniciar_sesion(email, contrasena)
         token_sesion = login_result["token_sesion"]
 
         resultado_verificar = verificar_sesion(token_sesion)
@@ -185,8 +184,8 @@ class TestFlujoRecuperacion:
         )
 
         contraseña_original = resultado["contraseña_generada"]
-        contraseña_encriptada = resultado["usuario"]["contraseña_encriptada"]
+        contrasena_encriptada = resultado["usuario"]["contraseña_encriptada"]
 
-        contraseña_descifrada = descifrar(contraseña_encriptada)
+        contraseña_descifrada = descifrar(contrasena_encriptada)
 
         assert contraseña_descifrada == contraseña_original
